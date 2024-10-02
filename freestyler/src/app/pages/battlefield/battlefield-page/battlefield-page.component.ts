@@ -1,9 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Message } from '../../../models/message';
 import { User } from '../../../models/user';
 import { Pair } from '../../../models/pair';
 import { users } from '../../../data/users';
 import { pairs } from '../../../data/pairs';
+import { DeviceDetectorService } from '../../../services/device-detector.service';
 
 
 @Component({
@@ -11,13 +12,18 @@ import { pairs } from '../../../data/pairs';
   templateUrl: './battlefield-page.component.html',
   styleUrl: './battlefield-page.component.css'
 })
-export class BattlefieldPageComponent {
-  onlineUsers: User[] = users;
-  pairs: Pair[] = pairs;
-  messages: Message[] = [];
-  newMessage: string = '';
+export class BattlefieldPageComponent implements OnInit {
+  isMobile: boolean = false;
+  isTablet: boolean = false;
+  isDesktop: boolean = false;
 
 
-  constructor() {}
+  constructor(private deviceService: DeviceDetectorService) {}
+
+  ngOnInit(): void {
+    this.deviceService.isMobile$.subscribe(isMobile => this.isMobile = isMobile);
+    this.deviceService.isTablet$.subscribe(isTablet => this.isTablet = isTablet);
+    this.deviceService.isDesktop$.subscribe(isDesktop => this.isDesktop = isDesktop);
+  }
 
 }
