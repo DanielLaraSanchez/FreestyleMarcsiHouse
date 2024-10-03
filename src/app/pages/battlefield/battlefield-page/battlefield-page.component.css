@@ -19,7 +19,7 @@
   border-radius: 50%;
   width: 60px;
   height: 60px;
-  z-index: 1001; /* Ensure it's above other elements */
+  z-index: 1001;
   box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
 
@@ -32,7 +32,8 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  padding: 10px;
+  padding: 20px;
+  gap: 20px;
   overflow-y: auto;
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* IE and Edge */
@@ -45,9 +46,8 @@
 
 /* User Tile */
 .user-tile {
-  width: calc(100% / 2 - 20px); /* Two columns on desktop */
-  max-width: 200px;
-  margin: 10px;
+  width: calc(100% / 2 - 20px); /* Two columns on mobile */
+  max-width: 240px; /* Adjusted max-width */
   box-sizing: border-box;
 }
 
@@ -63,45 +63,56 @@
   }
 }
 
+/* User Avatar Container */
 .user-avatar-container {
   position: relative;
-  background-color: #fff;
+  background-color: #f9f9f9; /* Soft light background color */
   border-radius: 12px;
-  padding: 15px;
+  padding: 20px; /* Increased padding for balance */
   text-align: center;
   cursor: pointer;
   transition: box-shadow 0.3s;
+  overflow: hidden;
 }
 
 .user-avatar-container:hover {
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.2); /* Increased shadow on hover */
+  /* Removed scaling to prevent blurriness */
+}
+
+/* Profile Picture Enhancement */
+.user-avatar-container p-avatar {
+  border: 2px solid #d4d4d4; /* Subtle border */
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Subtle shadow */
 }
 
 /* Star and Points */
 .user-points {
-  position: absolute;
   display: flex;
   align-items: center;
-  font-size: 0.9em;
-  flex-direction:column;
-  margin-left: 5px;
-  top: 1;
-  font-weight: bold;
+  font-size: 0.85em; /* Smaller font size for points */
+  justify-content: center;
+  margin-top: 10px;
 }
 
 .user-points i {
-  margin-left: 8px;
-  font-size: 1.2em;
-  color: gold;
+  font-size: 1em; /* Adjust icon size */
+  margin-right: 5px;
+  color: gold; /* Yellow for star */
+}
 
+.user-points span {
+  color: #333; /* Dark color for points number */
+  font-weight: bold;
 }
 
 /* User Name */
 .user-name {
-  margin-top: 10px;
+  margin-top: 15px;
   font-weight: bold;
   color: #333;
-  text-align: center;
+  font-size: 1.1em; /* Larger font size for readability */
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -111,8 +122,9 @@
 .battles-grid {
   display: flex;
   flex-wrap: wrap;
-  justify-content:space-around;
-  padding: 10px;
+  justify-content: center;
+  padding: 20px; /* Increased padding */
+  gap: 20px; /* Increased spacing between cards */
   overflow-y: auto;
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* IE and Edge */
@@ -127,7 +139,6 @@
 .battle-tile {
   width: calc(100% / 1 - 20px); /* One column on mobile */
   max-width: 300px;
-  margin: 10px;
   box-sizing: border-box;
 }
 
@@ -139,16 +150,18 @@
 
 /* Battle Card */
 .battle-card {
-  background-color: #fff;
+  background-color: #f9f9f9; /* Soft light background color */
   border-radius: 12px;
-  padding: 15px;
+  padding: 20px; /* Increased padding */
   text-align: center;
   cursor: pointer;
   transition: box-shadow 0.3s;
+  overflow: hidden;
 }
 
 .battle-card:hover {
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.2); /* Increased shadow on hover */
+  /* Removed scaling to prevent blurriness */
 }
 
 /* Battle Avatars */
@@ -158,23 +171,37 @@
   justify-content: space-around;
 }
 
-/* VS Text */
-.vs-text {
-  margin: 0 10px;
+/* Battle Avatar Container */
+.battle-avatar-container p-avatar {
+  border: 2px solid #d4d4d4; /* Subtle border */
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Subtle shadow */
+}
+
+/* Battle User Names */
+.battle-user-names {
+  margin-top: 10px;
+  font-size: 1em;
   font-weight: bold;
-  font-size: 1.2em;
+  color: #333;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
 }
 
-.users-grid {
-  /* ... */
-  overflow-y: auto;
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE and Edge */
+.battle-user-names .vs-text {
+  margin: 0 5px;
+  font-weight: bold;
 }
 
-.users-grid::-webkit-scrollbar {
-  width: 0;
-  background: transparent;
+/* Ensure points number is in dark color */
+.battle-avatar-container .user-points span {
+  color: #333; /* Dark color for points number */
+  font-weight: bold;
+}
+
+.battle-avatar-container .user-points i {
+  color: gold; /* Yellow for star */
 }
 
 /* Adjust for Mobile Navbar */
@@ -182,4 +209,18 @@
   .battle-fab {
     bottom: 80px; /* Adjusted to be above the mobile bottom navbar */
   }
+}
+
+/* Typography Enhancements */
+.battle-card .user-name {
+  margin-top: 10px;
+  font-weight: bold;
+  color: #333;
+  font-size: 1.1em;
+}
+
+/* Interactive Elements */
+.user-avatar-container:hover .user-name,
+.battle-card:hover .user-name {
+  color: #d26ac2; /* Change color on hover */
 }
