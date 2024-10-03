@@ -14,6 +14,13 @@ import { ButtonModule } from 'primeng/button';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AvatarModule } from 'primeng/avatar';
 import { AvatarGroupModule } from 'primeng/avatargroup';
+import { MenubarModule } from 'primeng/menubar';
+import { RippleModule } from 'primeng/ripple';
+import { TabMenuModule } from 'primeng/tabmenu';
+import { TieredMenuModule } from 'primeng/tieredmenu';
+import { InputTextModule } from 'primeng/inputtext';
+import { PanelModule } from 'primeng/panel';
+import { FormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -30,7 +37,17 @@ import { AvatarGroupModule } from 'primeng/avatargroup';
     ButtonModule,
     BrowserAnimationsModule,
     AvatarModule,
-    AvatarGroupModule
+    AvatarGroupModule,
+    TabMenuModule,
+    TieredMenuModule,
+    SidebarModule,
+    ButtonModule,
+    MenubarModule,
+    AvatarModule,
+    RippleModule,
+    InputTextModule,
+    PanelModule,
+    FormsModule, // Add FormsModule here
   ],
   providers: [],
   bootstrap: [AppComponent]

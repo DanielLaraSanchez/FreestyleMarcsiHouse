@@ -6,7 +6,7 @@ import { LoginComponent } from './pages/login/login/login.component';
 import { BattlePageComponent } from './pages/battle/battle-page/battle-page.component';
 
 const routes: Routes = [
-  { path: '', component: BattlefieldPageComponent },
+  { path: 'battlefield', component: BattlefieldPageComponent },
   { path: 'signup', component: SignupComponent },
   { path: 'login', component: LoginComponent },
   { path: 'battle', component: BattlePageComponent }

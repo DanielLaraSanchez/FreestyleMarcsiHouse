@@ -1,0 +1,148 @@
+
+  /* Set html and body to full height */
+  html,
+  body {
+    height: 100%;
+  }
+  
+  /* Root component fills the full height */
+  :host {
+    display: block;
+    height: 100%;
+  }
+  
+  /* Desktop Layout */
+  .desktop-layout {
+    display: flex;
+    width: 100%;
+    height: 100vh;
+  }
+  
+  /* Sidebar Styles */
+  .sidebar {
+    width: 250px;
+    background-color: #1e1e3f; /* Dark purple background */
+    color: #ffffff; /* Light text */
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    flex-shrink: 0;
+    padding: 0;
+    margin: 0;
+  }
+  
+  /* Logo and Header */
+  .sidebar-header {
+    padding: 20px;
+    background-color: #1e1e3f;
+  }
+  
+  /* Logo Text */
+  .logo-text {
+    font-size: 24px;
+    color: #d26ac2; /* Pink color for logo text */
+  }
+  
+  /* Sidebar Menu */
+  .sidebar-menu {
+    flex: 1;
+    padding: 0;
+    margin: 0;
+  }
+  
+  /* Menu List */
+  .menu-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  /* Menu Item */
+  .menu-item {
+    margin: 0;
+  }
+  
+  /* Menu Link */
+  .menu-link {
+    display: flex;
+    align-items: center;
+    padding: 12px 20px;
+    color: #ffffff;
+    text-decoration: none;
+    transition: background-color 0.2s, color 0.2s;
+    border-radius: 8px;
+  }
+  
+  /* Menu Icon */
+  .menu-link .icon {
+    font-size: 1.5em;
+    margin-right: 15px;
+  }
+  
+  /* Hover Effect */
+  .menu-link:hover {
+    background-color: #d26ac2;
+    color: #ffffff;
+  }
+  
+  .menu-link:hover .icon {
+    color: #ffffff;
+  }
+  
+  /* Main Content Area */
+  .content-area {
+    flex: 1;
+    overflow: auto;
+    background-color: #f0f0f0;
+    padding: 0;
+    margin: 0;
+  }
+  
+  /* Mobile Bottom Navigation */
+  .mobile-bottom-menu {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background-color: #1e1e3f;
+    z-index: 1000;
+  }
+  
+  /* Mobile Menu Items */
+  .mobile-bottom-menu .menu-items {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+  }
+  
+  .mobile-bottom-menu .menu-item {
+    flex: 1;
+    text-align: center;
+  }
+  
+  .mobile-bottom-menu .menu-item button {
+    width: 100%;
+    height: 60px;
+    border: none;
+    background: none;
+    color: #ffffff;
+  }
+  
+  .mobile-bottom-menu .menu-item button .p-button-icon {
+    font-size: 1.5em;
+  }
+  
+  .mobile-bottom-menu .menu-item button:hover {
+    background-color: #d26ac2;
+    color: #ffffff;
+  }
+  
+  .mobile-bottom-menu .menu-item button:hover .p-button-icon {
+    color: #ffffff;
+  }
+  
+  /* Adjust content area for mobile to prevent overlap with bottom menu */
+  @media (max-width: 767px) {
+    .content-area {
+      padding-bottom: 60px;
+    }
+  }

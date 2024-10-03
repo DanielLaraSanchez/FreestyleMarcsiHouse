@@ -1,5 +1,8 @@
-export interface Message {
-  user: string;
+import { User } from "./user";
 
-  text: string;
+export interface Message {
+id?: number;
+  sender?: User;
+  content?: string;
+  timestamp?: Date;
 }

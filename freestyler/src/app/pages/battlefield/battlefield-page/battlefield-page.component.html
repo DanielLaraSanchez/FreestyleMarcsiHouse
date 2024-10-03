@@ -1,0 +1,46 @@
+<div class="battlefield-container">
+    <!-- Online Users Panel -->
+    <div class="online-users-panel" *ngIf="!isMobile">
+      <p-panel header="Online Users">
+        <div class="online-users-list">
+          <div
+            *ngFor="let user of onlineUsers"
+            class="online-user"
+          >
+            <p-avatar image="{{ user.profilePicture }}" shape="circle"></p-avatar>
+            <span class="user-name">{{ user.name }}</span>
+          </div>
+        </div>
+      </p-panel>
+    </div>
+  
+    <!-- Chat Panel -->
+    <div class="chat-panel">
+      <p-panel header="General Chat" [style]="{ 'height': '100%' }">
+        <!-- Messages -->
+        <div class="messages" id="messages">
+          <div *ngFor="let msg of messages; trackBy: trackByMessageId" class="message">
+            <p-avatar image="{{ msg.sender?.profilePicture }}" shape="circle" class="message-avatar"></p-avatar>
+            <div class="message-text">
+              <div class="message-sender">{{ msg.sender?.name }}</div>
+              <div class="message-content">{{ msg.content }}</div>
+              <div class="message-timestamp">{{ msg.timestamp | date:'shortTime' }}</div>
+            </div>
+          </div>
+        </div>
+
+      </p-panel>
+
+              <!-- Message Input -->
+              <div class="message-input">
+                <input
+                  type="text"
+                  pInputText
+                  placeholder="Type a message..."
+                  [(ngModel)]="newMessage"
+                  (keyup.enter)="sendMessage()"
+                />
+                <button pButton type="button" icon="pi pi-send" (click)="sendMessage()" class="send-button"></button>
+              </div>
+    </div>
+  </div>

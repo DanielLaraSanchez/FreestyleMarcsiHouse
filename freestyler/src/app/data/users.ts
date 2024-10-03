@@ -3,6 +3,7 @@ export const users = [
     id: 1,
     name: 'MC Hammer',
     profilePicture: 'https://randomuser.me/api/portraits/men/1.jpg',
+    isOnline: true,
     stats: {
       points: 100,
       votes: 50,
@@ -14,6 +15,7 @@ export const users = [
     id: 2,
     name: 'Eminem',
     profilePicture: 'https://randomuser.me/api/portraits/men/2.jpg',
+    isOnline: false,
     stats: {
       points: 200,
       votes: 120,
@@ -25,6 +27,7 @@ export const users = [
     id: 3,
     name: 'Jay-Z',
     profilePicture: 'https://randomuser.me/api/portraits/men/3.jpg',
+    isOnline: true,
     stats: {
       points: 300,
       votes: 180,
@@ -36,6 +39,7 @@ export const users = [
     id: 4,
     name: 'Kendrick Lamar',
     profilePicture: 'https://randomuser.me/api/portraits/men/4.jpg',
+    isOnline: true,
     stats: {
       points: 150,
       votes: 90,
@@ -47,6 +51,7 @@ export const users = [
     id: 5,
     name: 'Lil Wayne',
     profilePicture: 'https://randomuser.me/api/portraits/men/5.jpg',
+    isOnline: false,
     stats: {
       points: 250,
       votes: 130,
@@ -58,6 +63,7 @@ export const users = [
     id: 6,
     name: 'Drake',
     profilePicture: 'https://randomuser.me/api/portraits/men/6.jpg',
+    isOnline: true,
     stats: {
       points: 350,
       votes: 200,
@@ -69,6 +75,7 @@ export const users = [
     id: 7,
     name: 'Snoop Dogg',
     profilePicture: 'https://randomuser.me/api/portraits/men/7.jpg',
+    isOnline: true,
     stats: {
       points: 400,
       votes: 220,
@@ -80,6 +87,7 @@ export const users = [
     id: 8,
     name: 'Tupac Shakur',
     profilePicture: 'https://randomuser.me/api/portraits/men/8.jpg',
+    isOnline: false,
     stats: {
       points: 450,
       votes: 250,
@@ -91,6 +99,7 @@ export const users = [
     id: 9,
     name: 'Notorious B.I.G.',
     profilePicture: 'https://randomuser.me/api/portraits/men/9.jpg',
+    isOnline: true,
     stats: {
       points: 500,
       votes: 280,
@@ -102,6 +111,7 @@ export const users = [
     id: 10,
     name: 'Nas',
     profilePicture: 'https://randomuser.me/api/portraits/men/10.jpg',
+    isOnline: false,
     stats: {
       points: 175,
       votes: 95,
@@ -113,6 +123,7 @@ export const users = [
     id: 11,
     name: 'J. Cole',
     profilePicture: 'https://randomuser.me/api/portraits/men/11.jpg',
+    isOnline: true,
     stats: {
       points: 275,
       votes: 160,
@@ -124,6 +135,7 @@ export const users = [
     id: 12,
     name: 'Chance the Rapper',
     profilePicture: 'https://randomuser.me/api/portraits/men/12.jpg',
+    isOnline: false,
     stats: {
       points: 325,
       votes: 180,
@@ -135,6 +147,7 @@ export const users = [
     id: 13,
     name: 'Travis Scott',
     profilePicture: 'https://randomuser.me/api/portraits/men/13.jpg',
+    isOnline: true,
     stats: {
       points: 375,
       votes: 210,
@@ -146,6 +159,7 @@ export const users = [
     id: 14,
     name: 'Tyler, The Creator',
     profilePicture: 'https://randomuser.me/api/portraits/men/14.jpg',
+    isOnline: false,
     stats: {
       points: 425,
       votes: 240,
@@ -157,6 +171,7 @@ export const users = [
     id: 15,
     name: 'Post Malone',
     profilePicture: 'https://randomuser.me/api/portraits/men/15.jpg',
+    isOnline: true,
     stats: {
       points: 475,
       votes: 260,
@@ -168,6 +183,7 @@ export const users = [
     id: 1,
     name: 'MC Hammer',
     profilePicture: 'https://randomuser.me/api/portraits/men/1.jpg',
+    isOnline: true,
     stats: {
       points: 100,
       votes: 50,
@@ -179,6 +195,7 @@ export const users = [
     id: 2,
     name: 'Eminem',
     profilePicture: 'https://randomuser.me/api/portraits/men/2.jpg',
+    isOnline: false,
     stats: {
       points: 200,
       votes: 120,
@@ -190,6 +207,7 @@ export const users = [
     id: 3,
     name: 'Jay-Z',
     profilePicture: 'https://randomuser.me/api/portraits/men/3.jpg',
+    isOnline: true,
     stats: {
       points: 300,
       votes: 180,
@@ -201,6 +219,7 @@ export const users = [
     id: 4,
     name: 'Kendrick Lamar',
     profilePicture: 'https://randomuser.me/api/portraits/men/4.jpg',
+    isOnline: true,
     stats: {
       points: 150,
       votes: 90,
@@ -212,6 +231,7 @@ export const users = [
     id: 5,
     name: 'Lil Wayne',
     profilePicture: 'https://randomuser.me/api/portraits/men/5.jpg',
+    isOnline: false,
     stats: {
       points: 250,
       votes: 130,
@@ -223,6 +243,7 @@ export const users = [
     id: 6,
     name: 'Drake',
     profilePicture: 'https://randomuser.me/api/portraits/men/6.jpg',
+    isOnline: true,
     stats: {
       points: 350,
       votes: 200,
@@ -234,6 +255,7 @@ export const users = [
     id: 7,
     name: 'Snoop Dogg',
     profilePicture: 'https://randomuser.me/api/portraits/men/7.jpg',
+    isOnline: true,
     stats: {
       points: 400,
       votes: 220,
@@ -245,6 +267,7 @@ export const users = [
     id: 8,
     name: 'Tupac Shakur',
     profilePicture: 'https://randomuser.me/api/portraits/men/8.jpg',
+    isOnline: false,
     stats: {
       points: 450,
       votes: 250,
@@ -256,6 +279,7 @@ export const users = [
     id: 9,
     name: 'Notorious B.I.G.',
     profilePicture: 'https://randomuser.me/api/portraits/men/9.jpg',
+    isOnline: true,
     stats: {
       points: 500,
       votes: 280,
@@ -267,6 +291,7 @@ export const users = [
     id: 10,
     name: 'Nas',
     profilePicture: 'https://randomuser.me/api/portraits/men/10.jpg',
+    isOnline: false,
     stats: {
       points: 175,
       votes: 95,
@@ -278,6 +303,7 @@ export const users = [
     id: 11,
     name: 'J. Cole',
     profilePicture: 'https://randomuser.me/api/portraits/men/11.jpg',
+    isOnline: true,
     stats: {
       points: 275,
       votes: 160,
@@ -289,44 +315,12 @@ export const users = [
     id: 12,
     name: 'Chance the Rapper',
     profilePicture: 'https://randomuser.me/api/portraits/men/12.jpg',
+    isOnline: false,
     stats: {
       points: 325,
       votes: 180,
       battles: 50,
       wins: 28,
-    },
-  },
-  {
-    id: 13,
-    name: 'Travis Scott',
-    profilePicture: 'https://randomuser.me/api/portraits/men/13.jpg',
-    stats: {
-      points: 375,
-      votes: 210,
-      battles: 55,
-      wins: 30,
-    },
-  },
-  {
-    id: 14,
-    name: 'Tyler, The Creator',
-    profilePicture: 'https://randomuser.me/api/portraits/men/14.jpg',
-    stats: {
-      points: 425,
-      votes: 240,
-      battles: 65,
-      wins: 35,
-    },
-  },
-  {
-    id: 15,
-    name: 'Post Malone',
-    profilePicture: 'https://randomuser.me/api/portraits/men/15.jpg',
-    stats: {
-      points: 475,
-      votes: 260,
-      battles: 68,
-      wins: 38,
-    },
+    }
   }
-];
+]
