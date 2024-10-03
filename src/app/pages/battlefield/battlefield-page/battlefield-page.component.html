@@ -1,58 +1,75 @@
 <div class="battlefield-container">
-    <!-- Online Users Panel -->
-    <div class="online-users-panel" *ngIf="!isMobile">
-      <div class="online-users-list">
-        <div *ngFor="let user of onlineUsers" class="online-user">
-          <p-avatar image="{{ user.profilePicture }}" shape="circle"></p-avatar>
-          <span class="user-name">{{ user.name }}</span>
-        </div>
-      </div>
-    </div>
-
-        <!-- Online Users Avatars (Mobile View) -->
-        <div class="online-users-avatars" *ngIf="isMobile">
-            <div class="avatars-list">
-              <div *ngFor="let user of onlineUsers" class="avatar-item">
-                <p-avatar
-                  [image]="user.profilePicture"
-                  shape="circle"
-                  size="large"
-                  (click)="viewUserProfile(user)"
-                ></p-avatar>
-              </div>
-            </div>
-        </div>
+    <!-- Floating Action Battle Button -->
+    <button
+      pButton
+      icon="pi pi-plus"
+      class="battle-fab"
+      (click)="startRandomBattle()"
+      pTooltip="Start Random Battle"
+    ></button>
   
-    <!-- Chat Panel -->
-    <div class="chat-panel">
-      <!-- Messages -->
-      <div class="messages" id="messages">
-        <div *ngFor="let msg of messages; trackBy: trackByMessageId" class="message">
-          <p-avatar image="{{ msg.sender?.profilePicture }}" shape="circle" class="message-avatar"></p-avatar>
-          <div class="message-text">
-            <div class="message-sender">{{ msg.sender?.name }}</div>
-            <div class="message-content">{{ msg.content }}</div>
-            <div class="message-timestamp">{{ msg.timestamp | date:'shortTime' }}</div>
+    <!-- Tab View -->
+    <p-tabView class="custom-tabview">
+      <p-tabPanel header="Users Ready to Battle">
+        <!-- Users Grid -->
+        <div class="users-grid">
+          <!-- User Tiles -->
+          <div
+            *ngFor="let user of usersInBattlefield"
+            class="user-tile"
+            (click)="sendBattleRequest(user)"
+          >
+            <div class="user-avatar-container p-ripple">
+              <!-- Star and Points -->
+              <div class="user-points">
+                <i class="pi pi-star-fill"></i>
+                <span>{{ user?.stats?.points }}</span>
+              </div>
+              <!-- User Avatar -->
+              <p-avatar
+                [image]="user?.profilePicture"
+                shape="circle"
+                size="xlarge"
+              ></p-avatar>
+              <!-- User Name -->
+              <div class="user-name">{{ user?.name }}</div>
+            </div>
           </div>
         </div>
-      </div>
-  
-      <!-- Message Input -->
-      <div class="message-input">
-        <input
-          type="text"
-          pInputText
-          placeholder="Type a message..."
-          [(ngModel)]="newMessage"
-          (keyup.enter)="sendMessage()"
-        />
-        <button pButton type="button" icon="pi pi-send" (click)="sendMessage()" class="send-button"></button>
-      </div>
-    </div>
+      </p-tabPanel>
+      <p-tabPanel header="Ongoing Battles">
+        <!-- Battles Grid -->
+        <div class="battles-grid">
+          <!-- Battle Tiles -->
+          <div
+            *ngFor="let battle of ongoingBattles"
+            class="battle-tile"
+            (click)="watchBattle(battle)"
+          >
+            <div class="battle-card p-ripple">
+              <div class="battle-avatars">
+                <!-- User 1 Avatar -->
+                <div class="battle-avatar-container">
+                  <p-avatar
+                    [image]="battle?.user1?.profilePicture"
+                    shape="circle"
+                    size="large"
+                  ></p-avatar>
+                </div>
+                <!-- VS Text -->
+                <span class="vs-text">vs</span>
+                <!-- User 2 Avatar -->
+                <div class="battle-avatar-container">
+                  <p-avatar
+                    [image]="battle?.user2?.profilePicture"
+                    shape="circle"
+                    size="large"
+                  ></p-avatar>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </p-tabPanel>
+    </p-tabView>
   </div>
-
-
-
-  
-  
-  

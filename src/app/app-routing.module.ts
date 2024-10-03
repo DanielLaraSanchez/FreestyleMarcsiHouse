@@ -4,12 +4,15 @@ import { BattlefieldPageComponent } from './pages/battlefield/battlefield-page/b
 import { SignupComponent } from './pages/signup/signup/signup.component';
 import { LoginComponent } from './pages/login/login/login.component';
 import { BattlePageComponent } from './pages/battle/battle-page/battle-page.component';
+import { ChatPageComponent } from './pages/chat/chat-page/chat-page.component';
 
 const routes: Routes = [
   { path: 'battlefield', component: BattlefieldPageComponent },
   { path: 'signup', component: SignupComponent },
   { path: 'login', component: LoginComponent },
-  { path: 'battle', component: BattlePageComponent }
+  { path: 'battle', component: BattlePageComponent },
+  { path: 'chat', component: ChatPageComponent }
+
 
 
 ];

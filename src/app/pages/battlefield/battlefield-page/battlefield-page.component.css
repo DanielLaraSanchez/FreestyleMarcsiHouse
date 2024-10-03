@@ -1,195 +1,185 @@
+/* General Container Styles */
 .battlefield-container {
+  position: relative;
+  padding: 0;
+}
+
+/* Center Tabs */
+.custom-tabview .p-tabview-nav {
+  justify-content: center;
+}
+
+/* Floating Action Battle Button */
+.battle-fab {
+  position: fixed;
+  bottom: 80px; /* Adjusted to be above the mobile navbar */
+  right: 20px;
+  background-color: #d26ac2;
+  color: #fff;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  z-index: 1001; /* Ensure it's above other elements */
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.battle-fab:hover {
+  background-color: #b218a0;
+}
+
+/* Users Grid */
+.users-grid {
   display: flex;
-  height: 100vh;
-  overflow: hidden; /* Prevent scrolling on the main container */
-}
-
-/* Online Users Panel */
-.online-users-panel {
-  width: 250px;
-  background-color: #f7f7f7;
-  border-right: 1px solid #ccc;
-  height: 100%;
-  padding: 5px 2px;
-  overflow: hidden;
-}
-
-.online-users-list {
-  height: 100%;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding: 10px;
   overflow-y: auto;
-}
-
-/* Hide scrollbar in online-users-list */
-.online-users-list::-webkit-scrollbar {
-  width: 0;
-}
-
-.online-users-list {
   scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE 10+ */
+  -ms-overflow-style: none; /* IE and Edge */
 }
 
-/* Online User */
-.online-user {
+.users-grid::-webkit-scrollbar {
+  width: 0;
+  background: transparent;
+}
+
+/* User Tile */
+.user-tile {
+  width: calc(100% / 2 - 20px); /* Two columns on desktop */
+  max-width: 200px;
+  margin: 10px;
+  box-sizing: border-box;
+}
+
+@media (min-width: 768px) {
+  .user-tile {
+    width: calc(100% / 4 - 20px); /* Four columns on tablets */
+  }
+}
+
+@media (min-width: 1024px) {
+  .user-tile {
+    width: calc(100% / 5 - 20px); /* Five columns on desktops */
+  }
+}
+
+.user-avatar-container {
+  position: relative;
+  background-color: #fff;
+  border-radius: 12px;
+  padding: 15px;
+  text-align: center;
+  cursor: pointer;
+  transition: box-shadow 0.3s;
+}
+
+.user-avatar-container:hover {
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+/* Star and Points */
+.user-points {
+  position: absolute;
   display: flex;
   align-items: center;
-  padding: 10px;
-  cursor: pointer;
-  transition: background-color 0.2s;
-  border-radius: 8px;
-}
-
-.online-user:hover {
-  background-color: #ececec;
-}
-
-.user-name {
-  margin-left: 10px;
+  font-size: 0.9em;
+  flex-direction:column;
+  margin-left: 5px;
+  top: 1;
   font-weight: bold;
 }
 
-/* Chat Panel */
-.chat-panel {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
+.user-points i {
+  margin-left: 8px;
+  font-size: 1.2em;
+  color: gold;
+
 }
 
-/* Messages */
-.messages {
-  flex: 1;
+/* User Name */
+.user-name {
+  margin-top: 10px;
+  font-weight: bold;
+  color: #333;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Battles Grid */
+.battles-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content:space-around;
   padding: 10px;
   overflow-y: auto;
-  background-color: #ffffff;
-}
-
-/* Hide scrollbar in messages */
-.messages::-webkit-scrollbar {
-  width: 0;
-}
-
-.messages {
   scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE 10+ */
-}
-
-/* Message */
-.message {
-  display: flex;
-  align-items: flex-start;
-  margin-bottom: 15px;
-}
-
-.message-avatar {
-  margin-right: 10px;
-}
-
-.message-text {
-  background-color: #f0f0f0;
-  padding: 10px;
-  border-radius: 8px;
-  max-width: 80%;
-}
-
-.message-sender {
-  font-weight: bold;
-  margin-bottom: 5px;
-}
-
-.message-content {
-  margin-bottom: 5px;
-}
-
-.message-timestamp {
-  font-size: 0.8em;
-  color: #777;
-}
-
-/* Message Input */
-.message-input {
-  display: flex;
-  padding: 10px;
-  background-color: white;
-  border-top: 1px solid #ccc;
-}
-
-.message-input input {
-  flex: 1;
-  margin-right: 10px;
-}
-
-.send-button {
-  flex-shrink: 0;
-}
-
-/* Mobile Adjustments */
-@media (max-width: 767px) {
-  .battlefield-container {
-    flex-direction: column;
-    max-height: 100vh;
-    min-height: 100vh;
-  }
-
-  .online-users-panel {
-    display: none;
-  }
-
-  .chat-panel {
-    flex: 1;
-    position: relative;
-    max-height: 84vh;
-    min-height: 84vh;
-  }
-
-  .message-input {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-  }
-
-  .messages {
-    max-height: 77vh;
-    min-height: 77vh;
-  }
-}
-
-
-
-
-/* Online Users Avatars (Mobile View) */
-.online-users-avatars {
-  padding: 10px;
-  background-color: #f7f7f7;
-}
-
-.avatars-list {
-  display: flex;
-  overflow-x: auto;
-  padding: 5px;
-}
-
-.avatars-list::-webkit-scrollbar {
-  display: none; /* Hide scrollbar in Chrome, Safari, and Opera */
-}
-
-.avatars-list {
   -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
 }
 
-.avatar-item {
-  margin-right: 10px;
+.battles-grid::-webkit-scrollbar {
+  width: 0;
+  background: transparent;
 }
 
-.avatar-item:last-child {
-  margin-right: 0;
+/* Battle Tile */
+.battle-tile {
+  width: calc(100% / 1 - 20px); /* One column on mobile */
+  max-width: 300px;
+  margin: 10px;
+  box-sizing: border-box;
 }
 
-.avatar-item p-avatar {
+@media (min-width: 768px) {
+  .battle-tile {
+    width: calc(100% / 2 - 20px); /* Two columns on tablets and desktops */
+  }
+}
+
+/* Battle Card */
+.battle-card {
+  background-color: #fff;
+  border-radius: 12px;
+  padding: 15px;
+  text-align: center;
   cursor: pointer;
-  transition: transform 0.2s;
+  transition: box-shadow 0.3s;
 }
 
-.avatar-item p-avatar:hover {
-  transform: scale(1.1);
+.battle-card:hover {
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+/* Battle Avatars */
+.battle-avatars {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+}
+
+/* VS Text */
+.vs-text {
+  margin: 0 10px;
+  font-weight: bold;
+  font-size: 1.2em;
+}
+
+.users-grid {
+  /* ... */
+  overflow-y: auto;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.users-grid::-webkit-scrollbar {
+  width: 0;
+  background: transparent;
+}
+
+/* Adjust for Mobile Navbar */
+@media (max-width: 767px) {
+  .battle-fab {
+    bottom: 80px; /* Adjusted to be above the mobile bottom navbar */
+  }
 }

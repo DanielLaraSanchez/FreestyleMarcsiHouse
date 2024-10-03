@@ -1,79 +1,90 @@
 <!-- Desktop View -->
 <ng-container *ngIf="isDesktop">
-    <div class="desktop-layout">
-      <!-- Sidebar -->
-      <div class="sidebar">
-        <!-- Logo and Header -->
-        <div class="sidebar-header">
-          <span class="inline-flex align-items-center gap-2">
-            <!-- SVG Logo -->
-            <!-- Include your SVG logo code here -->
-            <span class="font-semibold text-2xl logo-text">Freestyler</span>
-          </span>
-        </div>
-        <!-- Menu Content -->
-        <div class="sidebar-menu">
-          <!-- Menu Items -->
-          <ul class="menu-list">
-            <li class="menu-item">
-              <a routerLink="/home" class="menu-link">
-                <i class="pi pi-fw pi-home icon"></i>
-                <span class="menu-text">Home</span>
-              </a>
-            </li>
-            <li class="menu-item">
-              <a routerLink="/battle" class="menu-link">
-                <i class="pi pi-fw pi-microphone icon"></i>
-                <span class="menu-text">Battle</span>
-              </a>
-            </li>
-            <li class="menu-item">
-              <a routerLink="/chat" class="menu-link">
-                <i class="pi pi-fw pi-comments icon"></i>
-                <span class="menu-text">Chat</span>
-              </a>
-            </li>
-            <li class="menu-item">
-              <a routerLink="/profile" class="menu-link">
-                <i class="pi pi-fw pi-user icon"></i>
-                <span class="menu-text">Profile</span>
-              </a>
-            </li>
-            <!-- Add more menu items as needed -->
-          </ul>
-        </div>
+  <div class="desktop-layout">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <!-- Logo and Header -->
+      <div class="sidebar-header">
+        <span class="inline-flex align-items-center gap-2">
+          <!-- SVG Logo -->
+          <!-- Include your SVG logo code here -->
+          <span class="font-semibold text-2xl logo-text">Freestyler</span>
+        </span>
       </div>
-  
-      <!-- Main Content Area -->
-      <div class="content-area">
-        <router-outlet></router-outlet>
+      <!-- Menu Content -->
+      <div class="sidebar-menu">
+        <!-- Menu Items -->
+        <ul class="menu-list">
+          <li class="menu-item">
+            <a routerLink="/home" class="menu-link">
+              <i class="pi pi-fw pi-home icon"></i>
+              <span class="menu-text">Home</span>
+            </a>
+          </li>
+
+          <li class="menu-item">
+            <a routerLink="/battlefield" class="menu-link">
+              <i class="pi pi-fw pi-play icon"></i>
+              <span class="menu-text">Battlefield</span>
+            </a>
+          </li>
+          <li class="menu-item">
+            <a routerLink="/battle" class="menu-link">
+              <i class="pi pi-fw pi-microphone icon"></i>
+              <span class="menu-text">Battle</span>
+            </a>
+          </li>
+          <li class="menu-item">
+            <a routerLink="/chat" class="menu-link">
+              <i class="pi pi-fw pi-comments icon"></i>
+              <span class="menu-text">Chat</span>
+            </a>
+          </li>
+          <li class="menu-item">
+            <a routerLink="/profile" class="menu-link">
+              <i class="pi pi-fw pi-user icon"></i>
+              <span class="menu-text">Profile</span>
+            </a>
+          </li>
+          <!-- Add more menu items as needed -->
+        </ul>
       </div>
     </div>
-  </ng-container>
-  
-  <!-- Mobile View -->
-  <ng-container *ngIf="isMobile">
-    <!-- Main Content -->
+
+    <!-- Main Content Area -->
     <div class="content-area">
       <router-outlet></router-outlet>
     </div>
-  
-    <!-- Fixed Bottom Navigation Menu -->
-    <div class="mobile-bottom-menu">
-      <!-- Mobile Menu Items -->
-      <div class="menu-items">
-        <a routerLink="/home" class="menu-item">
-          <button pButton type="button" icon="pi pi-home" class="p-button p-button-text"></button>
-        </a>
-        <a routerLink="/battle" class="menu-item">
-          <button pButton type="button" icon="pi pi-microphone" class="p-button p-button-text"></button>
-        </a>
-        <a routerLink="/chat" class="menu-item">
-          <button pButton type="button" icon="pi pi-comments" class="p-button p-button-text"></button>
-        </a>
-        <a routerLink="/profile" class="menu-item">
-          <button pButton type="button" icon="pi pi-user" class="p-button p-button-text"></button>
-        </a>
-      </div>
+  </div>
+</ng-container>
+
+<!-- Mobile View -->
+<ng-container *ngIf="isMobile">
+  <!-- Main Content -->
+  <div class="content-area">
+    <router-outlet></router-outlet>
+  </div>
+
+  <!-- Fixed Bottom Navigation Menu -->
+  <div class="mobile-bottom-menu">
+    <!-- Mobile Menu Items -->
+    <div class="menu-items">
+      <a routerLink="/home" class="menu-item">
+        <button pButton type="button" icon="pi pi-home" class="p-button p-button-text"></button>
+      </a>
+      <!-- Add this to your mobile bottom menu -->
+      <a routerLink="/battlefield" class="menu-item">
+        <button pButton type="button" icon="pi pi-play" class="p-button p-button-text"></button>
+      </a>
+      <a routerLink="/battle" class="menu-item">
+        <button pButton type="button" icon="pi pi-microphone" class="p-button p-button-text"></button>
+      </a>
+      <a routerLink="/chat" class="menu-item">
+        <button pButton type="button" icon="pi pi-comments" class="p-button p-button-text"></button>
+      </a>
+      <a routerLink="/profile" class="menu-item">
+        <button pButton type="button" icon="pi pi-user" class="p-button p-button-text"></button>
+      </a>
     </div>
-  </ng-container>
+  </div>
+</ng-container>

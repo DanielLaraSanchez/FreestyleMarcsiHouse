@@ -20,7 +20,17 @@ import { TabMenuModule } from 'primeng/tabmenu';
 import { TieredMenuModule } from 'primeng/tieredmenu';
 import { InputTextModule } from 'primeng/inputtext';
 import { PanelModule } from 'primeng/panel';
+import { CardModule } from 'primeng/card';
+import { OverlayPanelModule } from 'primeng/overlaypanel';
+
+
+
 import { FormsModule } from '@angular/forms';
+import { ChatPageComponent } from './pages/chat/chat-page/chat-page.component';
+import { CarouselModule } from 'primeng/carousel';
+import { ProgressBarModule } from 'primeng/progressbar';
+import { TooltipModule } from 'primeng/tooltip';
+import { TabViewModule } from 'primeng/tabview';
 
 @NgModule({
   declarations: [
@@ -28,7 +38,8 @@ import { FormsModule } from '@angular/forms';
     BattlefieldPageComponent,
     BattlePageComponent,
     LoginComponent,
-    SignupComponent
+    SignupComponent,
+    ChatPageComponent
   ],
   imports: [
     BrowserModule,
@@ -40,12 +51,18 @@ import { FormsModule } from '@angular/forms';
     AvatarGroupModule,
     TabMenuModule,
     TieredMenuModule,
+    OverlayPanelModule,
+    ProgressBarModule,
+    TooltipModule,
+    CardModule,
     SidebarModule,
     ButtonModule,
     MenubarModule,
     AvatarModule,
     RippleModule,
     InputTextModule,
+    TabViewModule,
+    CarouselModule,
     PanelModule,
     FormsModule, // Add FormsModule here
   ],

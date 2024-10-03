@@ -6,4 +6,7 @@ export interface User {
   profilePicture: string;
   stats: Stats;
   isOnline?: boolean;
+  status?: string;
+  isInBattlefield?: boolean;
+
 }
