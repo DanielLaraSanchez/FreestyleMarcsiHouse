@@ -47,7 +47,7 @@
 /* User Tile */
 .user-tile {
   width: calc(100% / 2 - 20px); /* Two columns on mobile */
-  max-width: 240px; /* Adjusted max-width */
+  max-width: 240px;
   box-sizing: border-box;
 }
 
@@ -66,38 +66,38 @@
 /* User Avatar Container */
 .user-avatar-container {
   position: relative;
-  background-color: #f9f9f9; /* Soft light background color */
+  background-color: #fff;
   border-radius: 12px;
-  padding: 20px; /* Increased padding for balance */
+  padding: 20px;
   text-align: center;
   cursor: pointer;
-  transition: box-shadow 0.3s;
+  transition: box-shadow 0.3s, transform 0.3s;
   overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Base shadow */
 }
 
 .user-avatar-container:hover {
-  box-shadow: 0 8px 16px rgba(0,0,0,0.2); /* Increased shadow on hover */
-  /* Removed scaling to prevent blurriness */
+  box-shadow: 0 8px 16px rgba(0,0,0,0.2); /* Stronger shadow on hover */
+  transform: translateY(-2px); /* Slight lift on hover */
 }
 
 /* Profile Picture Enhancement */
 .user-avatar-container p-avatar {
-  border: 2px solid #d4d4d4; /* Subtle border */
+  border: 2px solid #d26ac2; /* Subtle colored border matching app theme */
   border-radius: 50%;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Subtle shadow */
 }
 
 /* Star and Points */
 .user-points {
   display: flex;
   align-items: center;
-  font-size: 0.85em; /* Smaller font size for points */
+  font-size: 0.85em;
   justify-content: center;
   margin-top: 10px;
 }
 
 .user-points i {
-  font-size: 1em; /* Adjust icon size */
+  font-size: 1em;
   margin-right: 5px;
   color: gold; /* Yellow for star */
 }
@@ -112,7 +112,7 @@
   margin-top: 15px;
   font-weight: bold;
   color: #333;
-  font-size: 1.1em; /* Larger font size for readability */
+  font-size: 1.2em; /* Larger font size for emphasis */
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -123,8 +123,8 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  padding: 20px; /* Increased padding */
-  gap: 20px; /* Increased spacing between cards */
+  padding: 20px;
+  gap: 20px;
   overflow-y: auto;
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* IE and Edge */
@@ -150,18 +150,19 @@
 
 /* Battle Card */
 .battle-card {
-  background-color: #f9f9f9; /* Soft light background color */
+  background-color: #fff;
   border-radius: 12px;
-  padding: 20px; /* Increased padding */
+  padding: 20px;
   text-align: center;
   cursor: pointer;
-  transition: box-shadow 0.3s;
+  transition: box-shadow 0.3s, transform 0.3s;
   overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Base shadow */
 }
 
 .battle-card:hover {
-  box-shadow: 0 8px 16px rgba(0,0,0,0.2); /* Increased shadow on hover */
-  /* Removed scaling to prevent blurriness */
+  box-shadow: 0 8px 16px rgba(0,0,0,0.2); /* Stronger shadow on hover */
+  transform: translateY(-2px); /* Slight lift on hover */
 }
 
 /* Battle Avatars */
@@ -169,18 +170,62 @@
   display: flex;
   align-items: center;
   justify-content: space-around;
+  position: relative;
+}
+
+/* Vertical Line Separator */
+.battle-avatars::after {
+  content: '';
+  position: absolute;
+  width: 2px;
+  height: 60%;
+  background-color: #ccc;
+  left: 50%;
+  top: 20%;
+  transform: translateX(-50%);
 }
 
 /* Battle Avatar Container */
+.battle-avatar-container {
+  position: relative;
+}
+
 .battle-avatar-container p-avatar {
-  border: 2px solid #d4d4d4; /* Subtle border */
+  border: 2px solid #d26ac2; /* Subtle colored border matching app theme */
   border-radius: 50%;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Subtle shadow */
+}
+
+.battle-avatar-container .user-points {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background-color: #fff;
+  border-radius: 12px;
+  padding: 2px 6px;
+  display: flex;
+  align-items: center;
+  font-size: 0.8em;
+}
+
+.battle-avatar-container .user-points i {
+  font-size: 1em;
+  margin-right: 3px;
+  color: gold;
+}
+
+.battle-avatar-container .user-points span {
+  color: #333;
+  font-weight: bold;
+}
+
+/* VS Text */
+.vs-text {
+  display: none; /* Hidden since we're using a separator line */
 }
 
 /* Battle User Names */
 .battle-user-names {
-  margin-top: 10px;
+  margin-top: 15px;
   font-size: 1em;
   font-weight: bold;
   color: #333;
@@ -190,18 +235,8 @@
 }
 
 .battle-user-names .vs-text {
-  margin: 0 5px;
+  margin: 0 10px;
   font-weight: bold;
-}
-
-/* Ensure points number is in dark color */
-.battle-avatar-container .user-points span {
-  color: #333; /* Dark color for points number */
-  font-weight: bold;
-}
-
-.battle-avatar-container .user-points i {
-  color: gold; /* Yellow for star */
 }
 
 /* Adjust for Mobile Navbar */

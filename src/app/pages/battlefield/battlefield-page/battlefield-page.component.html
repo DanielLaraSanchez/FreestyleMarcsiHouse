@@ -55,9 +55,12 @@
                   shape="circle"
                   size="large"
                 ></p-avatar>
+                <!-- Star and Points -->
+                <div class="user-points">
+                  <i class="pi pi-star-fill"></i>
+                  <span>{{ battle?.user1?.stats?.points }}</span>
+                </div>
               </div>
-              <!-- VS Text -->
-              <span class="vs-text">vs</span>
               <!-- User 2 Avatar -->
               <div class="battle-avatar-container">
                 <p-avatar
@@ -65,11 +68,17 @@
                   shape="circle"
                   size="large"
                 ></p-avatar>
+                <!-- Star and Points -->
+                <div class="user-points">
+                  <i class="pi pi-star-fill"></i>
+                  <span>{{ battle?.user2?.stats?.points }}</span>
+                </div>
               </div>
             </div>
             <!-- Battle User Names -->
             <div class="battle-user-names">
               <span>{{ battle?.user1?.name }}</span>
+              <span class="vs-text">vs</span>
               <span>{{ battle?.user2?.name }}</span>
             </div>
           </div>
