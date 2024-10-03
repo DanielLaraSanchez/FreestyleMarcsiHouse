@@ -8,6 +8,20 @@
         </div>
       </div>
     </div>
+
+        <!-- Online Users Avatars (Mobile View) -->
+        <div class="online-users-avatars" *ngIf="isMobile">
+            <div class="avatars-list">
+              <div *ngFor="let user of onlineUsers" class="avatar-item">
+                <p-avatar
+                  [image]="user.profilePicture"
+                  shape="circle"
+                  size="large"
+                  (click)="viewUserProfile(user)"
+                ></p-avatar>
+              </div>
+            </div>
+        </div>
   
     <!-- Chat Panel -->
     <div class="chat-panel">
@@ -36,3 +50,9 @@
       </div>
     </div>
   </div>
+
+
+
+  
+  
+  

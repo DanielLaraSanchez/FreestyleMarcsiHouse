@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewChecked, ElementRef, ViewChild } from '@angular/core';
 import { User } from '../../../models/user';
 import { Message } from '../../../models/message';
 import { users } from '../../../data/users';
@@ -9,7 +9,7 @@ import { DeviceDetectorService } from '../../../services/device-detector.service
   templateUrl: './battlefield-page.component.html',
   styleUrls: ['./battlefield-page.component.css'],
 })
-export class BattlefieldPageComponent implements OnInit {
+export class BattlefieldPageComponent implements OnInit, AfterViewChecked {
   isMobile: boolean = false;
   isTablet: boolean = false;
   isDesktop: boolean = false;
@@ -18,6 +18,8 @@ export class BattlefieldPageComponent implements OnInit {
   messages: Message[] = [];
   newMessage: string = '';
   currentUser: User;
+
+  @ViewChild('messagesContainer') private messagesContainer!: ElementRef;
 
   constructor(private deviceService: DeviceDetectorService) {
     // Set the current user (replace with actual authentication logic)
@@ -46,6 +48,16 @@ export class BattlefieldPageComponent implements OnInit {
     this.messages = this.messages;
   }
 
+  ngAfterViewChecked() {
+    this.scrollToBottom();
+  }
+
+  scrollToBottom(): void {
+    try {
+      this.messagesContainer.nativeElement.scrollTop = this.messagesContainer.nativeElement.scrollHeight;
+    } catch (err) {}
+  }
+
   sendMessage() {
     const trimmedMessage = this.newMessage.trim();
     if (trimmedMessage) {
@@ -57,17 +69,15 @@ export class BattlefieldPageComponent implements OnInit {
       };
       this.messages.push(message);
       this.newMessage = '';
-      // Scroll to the bottom of the messages
-      setTimeout(() => {
-        const messageContainer = document.getElementById('messages');
-        if (messageContainer) {
-          messageContainer.scrollTop = messageContainer.scrollHeight;
-        }
-      }, 0);
     }
   }
 
   trackByMessageId(index: number, message: Message): number | undefined {
     return message.id;
+  }
+
+  viewUserProfile(user: User) {
+    // Logic to view user profile or initiate private chat
+    alert(`Viewing profile of ${user.name}`);
   }
 }

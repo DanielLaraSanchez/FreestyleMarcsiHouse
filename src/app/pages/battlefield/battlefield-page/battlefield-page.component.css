@@ -126,8 +126,8 @@
 @media (max-width: 767px) {
   .battlefield-container {
     flex-direction: column;
-    max-height: 92vh;
-    min-height: 92vh;
+    max-height: 100vh;
+    min-height: 100vh;
   }
 
   .online-users-panel {
@@ -137,8 +137,8 @@
   .chat-panel {
     flex: 1;
     position: relative;
-    max-height: 92vh;
-    min-height: 92vh;
+    max-height: 84vh;
+    min-height: 84vh;
   }
 
   .message-input {
@@ -148,8 +148,48 @@
   }
 
   .messages {
-    margin-bottom: 70px; /* Height of the message input */
-    max-height: 92vh;
-    min-height: 92vh;
+    max-height: 77vh;
+    min-height: 77vh;
   }
+}
+
+
+
+
+/* Online Users Avatars (Mobile View) */
+.online-users-avatars {
+  padding: 10px;
+  background-color: #f7f7f7;
+}
+
+.avatars-list {
+  display: flex;
+  overflow-x: auto;
+  padding: 5px;
+}
+
+.avatars-list::-webkit-scrollbar {
+  display: none; /* Hide scrollbar in Chrome, Safari, and Opera */
+}
+
+.avatars-list {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+.avatar-item {
+  margin-right: 10px;
+}
+
+.avatar-item:last-child {
+  margin-right: 0;
+}
+
+.avatar-item p-avatar {
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.avatar-item p-avatar:hover {
+  transform: scale(1.1);
 }

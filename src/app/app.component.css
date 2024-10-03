@@ -140,9 +140,4 @@
     color: #ffffff;
   }
   
-  /* Adjust content area for mobile to prevent overlap with bottom menu */
-  @media (max-width: 767px) {
-    .content-area {
-      padding-bottom: 60px;
-    }
-  }
+
