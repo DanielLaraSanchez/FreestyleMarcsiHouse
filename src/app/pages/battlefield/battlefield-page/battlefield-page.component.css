@@ -126,7 +126,8 @@
 @media (max-width: 767px) {
   .battlefield-container {
     flex-direction: column;
-    height: 100vh;
+    max-height: 92vh;
+    min-height: 92vh;
   }
 
   .online-users-panel {
@@ -136,6 +137,8 @@
   .chat-panel {
     flex: 1;
     position: relative;
+    max-height: 92vh;
+    min-height: 92vh;
   }
 
   .message-input {
@@ -146,5 +149,7 @@
 
   .messages {
     margin-bottom: 70px; /* Height of the message input */
+    max-height: 92vh;
+    min-height: 92vh;
   }
 }
