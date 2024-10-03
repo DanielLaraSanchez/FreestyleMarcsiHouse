@@ -1,0 +1,196 @@
+.battlefield-container {
+    display: flex;
+    height: 100vh;
+    overflow: hidden; /* Prevent scrolling on the main container */
+  }
+  
+  /* Online Users Panel */
+  .online-users-panel {
+    width: 250px;
+    background-color: #f7f7f7;
+    border-right: 1px solid #ccc;
+    height: 100%;
+    padding: 5px 2px;
+    overflow: hidden;
+  }
+  
+  .online-users-list {
+    height: 100%;
+    overflow-y: auto;
+  }
+  
+  /* Hide scrollbar in online-users-list */
+  .online-users-list::-webkit-scrollbar {
+    width: 0;
+  }
+  
+  .online-users-list {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE 10+ */
+  }
+  
+  /* Online User */
+  .online-user {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    border-radius: 8px;
+  }
+  
+  .online-user:hover {
+    background-color: #ececec;
+  }
+  
+  .user-name {
+    margin-left: 10px;
+    font-weight: bold;
+  }
+  
+  /* Chat Panel */
+  .chat-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* Messages */
+  .messages {
+    flex: 1;
+    padding: 10px;
+    overflow-y: auto;
+    background-color: #ffffff;
+  }
+  
+  /* Hide scrollbar in messages */
+  .messages::-webkit-scrollbar {
+    width: 0;
+  }
+  
+  .messages {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE 10+ */
+  }
+  
+  /* Message */
+  .message {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 15px;
+  }
+  
+  .message-avatar {
+    margin-right: 10px;
+  }
+  
+  .message-text {
+    background-color: #f0f0f0;
+    padding: 10px;
+    border-radius: 8px;
+    max-width: 80%;
+  }
+  
+  .message-sender {
+    font-weight: bold;
+    margin-bottom: 5px;
+  }
+  
+  .message-content {
+    margin-bottom: 5px;
+  }
+  
+  .message-timestamp {
+    font-size: 0.8em;
+    color: #777;
+  }
+  
+  /* Message Input */
+  .message-input {
+    display: flex;
+    padding: 10px;
+    background-color: white;
+    border-top: 1px solid #ccc;
+  }
+  
+  .message-input input {
+    flex: 1;
+    margin-right: 10px;
+  }
+  
+  .send-button {
+    flex-shrink: 0;
+  }
+  
+  /* Mobile Adjustments */
+  @media (max-width: 767px) {
+    .battlefield-container {
+      flex-direction: column;
+      max-height: 100vh;
+      min-height: 100vh;
+    }
+  
+    .online-users-panel {
+      display: none;
+    }
+  
+    .chat-panel {
+      flex: 1;
+      position: relative;
+      max-height: 84vh;
+      min-height: 84vh;
+    }
+  
+    .message-input {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+    }
+  
+    .messages {
+      max-height: 77vh;
+      min-height: 77vh;
+    }
+  }
+  
+  
+  
+  
+  /* Online Users Avatars (Mobile View) */
+  .online-users-avatars {
+    padding: 10px;
+    background-color: #f7f7f7;
+  }
+  
+  .avatars-list {
+    display: flex;
+    overflow-x: auto;
+    padding: 5px;
+  }
+  
+  .avatars-list::-webkit-scrollbar {
+    display: none; /* Hide scrollbar in Chrome, Safari, and Opera */
+  }
+  
+  .avatars-list {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+  
+  .avatar-item {
+    margin-right: 10px;
+  }
+  
+  .avatar-item:last-child {
+    margin-right: 0;
+  }
+  
+  .avatar-item p-avatar {
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+  
+  .avatar-item p-avatar:hover {
+    transform: scale(1.1);
+  }
+  
