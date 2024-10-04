@@ -45,6 +45,9 @@ export class ChatPageComponent implements OnInit, AfterViewChecked {
     isOnline: true, // Assuming general is always online
   };
 
+  // Added searchTerm for filtering chats
+  searchTerm: string = '';
+
   constructor(
     private deviceService: DeviceDetectorService,
     public dialogService: DialogService,
@@ -233,5 +236,14 @@ export class ChatPageComponent implements OnInit, AfterViewChecked {
   deselectTab() {
     this.activeTabId = '';
     this.selectedTab = undefined;
+  }
+
+  // Added getter for filtered users based on searchTerm
+  get filteredUsers(): User[] {
+    if (!this.searchTerm) {
+      return this.onlineUsers;
+    }
+    const lowerSearch = this.searchTerm.toLowerCase();
+    return this.onlineUsers.filter(user => user.name.toLowerCase().includes(lowerSearch));
   }
 }

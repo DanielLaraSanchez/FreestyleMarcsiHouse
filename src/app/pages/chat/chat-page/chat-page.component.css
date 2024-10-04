@@ -129,6 +129,7 @@
   animation: slideIn 0.3s ease-in-out;
 }
 
+/* Updated message colors */
 .sent {
   align-self: flex-end;
 }
@@ -137,15 +138,16 @@
   align-self: flex-start;
 }
 
+/* Updated background colors for sent and received messages */
 .sent .message-content {
-  background-color: #007bff;
-  color: #fff;
+  background-color: #ffe4e1; /* Misty Rose - subtle pink */
+  color: #000; /* Black text */
   border-radius: 15px 15px 0 15px;
 }
 
 .received .message-content {
-  background-color: #e5e5ea;
-  color: #000;
+  background-color: #1e3a8a; /* Dark Blue */
+  color: #fff; /* White text */
   border-radius: 15px 15px 15px 0;
 }
 
@@ -264,14 +266,14 @@
 }
 
 .sent .message-content {
-  background-color: #007bff;
-  color: #fff;
+  background-color: #ffe4e1; /* Misty Rose - subtle pink */
+  color: #000; /* Black text */
   border-radius: 15px 15px 0 15px;
 }
 
 .received .message-content {
-  background-color: #e5e5ea;
-  color: #000;
+  background-color: #1e3a8a; /* Dark Blue */
+  color: #fff; /* White text */
   border-radius: 15px 15px 15px 0;
 }
 
