@@ -117,6 +117,11 @@
   .battle-card-wrapper {
     flex: 1 1 100%; /* Full width on mobile */
   }
+
+  .user-card {
+    width: 130px;
+  }
+
 }
 
 /* Adjusted Battle Card Styles */
@@ -145,7 +150,7 @@ app-battle-pair {
   }
 
   .user-card {
-    width: 80px;
+    width: 130px;
     flex: 0 0 auto;
   }
 
