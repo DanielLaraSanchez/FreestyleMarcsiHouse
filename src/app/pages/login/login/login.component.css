@@ -1,0 +1,226 @@
+/* Reset default margin and padding */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  /* Apply full viewport height */
+  html, body {
+    height: 100%;
+    font-family: 'Arial', sans-serif;
+  }
+  
+  /* Background Styling */
+  .background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: linear-gradient(to bottom, #000428, #004e92); /* Dark purple to dark blue */
+  }
+  
+  /* Stars Layer */
+  .stars {
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    background-image: radial-gradient(white 1px, transparent 1px),
+                      radial-gradient(white 1px, transparent 1px);
+    background-position: 0 0, 50px 50px;
+    background-size: 100px 100px;
+    animation: moveStars 50s linear infinite;
+  }
+  
+  /* Twinkling Effect Layer */
+  .twinkling {
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    background-image: radial-gradient(white 2px, transparent 2px),
+                      radial-gradient(white 2px, transparent 2px);
+    background-position: 0 0, 50px 50px;
+    background-size: 100px 100px;
+    animation: twinkle 3s infinite;
+    opacity: 0.5;
+  }
+  
+  /* Animation for moving stars */
+  @keyframes moveStars {
+    from { transform: translateX(0); }
+    to { transform: translateX(-100px); }
+  }
+  
+  /* Animation for twinkling */
+  @keyframes twinkle {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+  }
+  
+  /* Silhouettes of Trees and Mountains */
+  .silhouettes {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 200px; /* Adjust based on your silhouette image */
+    background: url('https://i.imgur.com/your-silhouette-image.png') bottom no-repeat;
+    background-size: cover;
+  }
+  
+  /* Login Form Container */
+  .login-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(40, 40, 70, 0.8); /* Semi-transparent dark purple */
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.3); /* Subtle box shadow for soft glow */
+    width: 90%;
+    max-width: 400px;
+    color: white;
+  }
+  
+  /* Heading */
+  .login-container h2 {
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 2em;
+    color: #ffd700; /* Gold color for contrast */
+  }
+  
+  /* Input Groups */
+  .input-group {
+    position: relative;
+    margin-bottom: 20px;
+  }
+  
+  .input-group .icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #aaa;
+    font-size: 1.2em;
+  }
+  
+  .input-group input {
+    width: 100%;
+    padding: 10px 10px 10px 45px; /* Padding left for the icon */
+    border: none;
+    border-radius: 25px;
+    background-color: rgba(255,255,255,0.2); /* Semi-transparent white */
+    color: white;
+    font-size: 1em;
+  }
+  
+  .input-group input::placeholder {
+    color: #ddd;
+  }
+  
+  .input-group input:focus {
+    outline: none;
+    background-color: rgba(255,255,255,0.3);
+  }
+  
+  /* Options: Remember Me and Forgot Password */
+  .options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .options .remember-me {
+    font-size: 0.9em;
+  }
+  
+  .options .remember-me input {
+    margin-right: 5px;
+  }
+  
+  .options .forgot-password {
+    font-size: 0.9em;
+    color: #ffc0cb; /* Light pink */
+    text-decoration: none;
+  }
+  
+  .options .forgot-password:hover {
+    text-decoration: underline;
+  }
+  
+  /* Login Button */
+  .login-button {
+    width: 100%;
+    padding: 12px 0;
+    background-color: white;
+    border: none;
+    border-radius: 25px;
+    color: #1e3a8a; /* Dark Blue */
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+  }
+  
+  .login-button:hover {
+    background-color: #1e3a8a; /* Dark Blue */
+    color: white;
+  }
+  
+  /* Footer Text */
+  .footer {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 0.9em;
+  }
+  
+  .footer .register-link {
+    color: #ffc0cb; /* Light pink */
+    text-decoration: none;
+  }
+  
+  .footer .register-link:hover {
+    text-decoration: underline;
+  }
+  
+  /* Responsive Adjustments for Mobile */
+  @media (max-width: 767px) {
+    .login-container {
+      padding: 30px;
+    }
+  
+    .conversation-header {
+      padding: 10px;
+    }
+  
+    .chat-name {
+      font-size: 1.2em;
+    }
+  
+    .message-content {
+      font-size: 1em;
+      padding: 10px;
+    }
+  
+    .message-timestamp {
+      font-size: 0.7em;
+    }
+  
+    .message-input input {
+      font-size: 1em;
+      padding: 10px 15px;
+    }
+  
+    .login-button {
+      padding: 10px 0;
+    }
+  
+    /* Silhouettes in Mobile may need adjustment */
+    .silhouettes {
+      height: 150px; /* Adjust based on your silhouette image */
+      background-size: contain; /* Ensure image doesn't stretch */
+    }
+  }

@@ -1,13 +1,4 @@
 <div class="battlefield-container">
-  <!-- Floating Action Battle Button -->
-  <button
-    pButton
-    icon="pi pi-plus"
-    class="battle-fab"
-    (click)="startRandomBattle()"
-    pTooltip="Start Random Battle"
-  ></button>
-
   <div class="battlefield-content">
     <!-- Online Users -->
     <div class="online-users">
@@ -34,6 +25,15 @@
       </div>
     </div>
 
+    <!-- Floating Action Battle Button -->
+    <button
+      pButton
+      icon="pi pi-plus"
+      class="battle-fab"
+      (click)="startRandomBattle()"
+      pTooltip="Start Random Battle"
+    ></button>
+
     <!-- Ongoing Battles -->
     <div class="ongoing-battles">
       <div class="battles-grid">
@@ -44,7 +44,7 @@
           (click)="watchBattle(battle)"
           class="battle-card-wrapper"
         ></app-battle-pair>
+      </div>
     </div>
-  </div>
   </div>
 </div>

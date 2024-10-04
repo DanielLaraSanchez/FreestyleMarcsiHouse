@@ -25,7 +25,7 @@ import { OverlayPanelModule } from 'primeng/overlaypanel';
 
 
 
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ChatPageComponent } from './pages/chat/chat-page/chat-page.component';
 import { CarouselModule } from 'primeng/carousel';
 import { ProgressBarModule } from 'primeng/progressbar';
@@ -67,6 +67,7 @@ import { BattlePairComponent } from './components/battle-pair/battle-pair.compon
     AvatarModule,
     RippleModule,
     InputTextModule,
+    ReactiveFormsModule,
     TabViewModule,
     CarouselModule,
     PanelModule,

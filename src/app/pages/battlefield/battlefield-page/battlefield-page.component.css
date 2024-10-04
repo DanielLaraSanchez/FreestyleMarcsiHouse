@@ -121,7 +121,6 @@
   .user-card {
     width: 130px;
   }
-
 }
 
 /* Adjusted Battle Card Styles */
@@ -200,4 +199,23 @@ app-battle-pair * {
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   font-size: 16px;
+}
+
+/* Floating Action Battle Button */
+.battle-fab {
+  align-self: center;
+  margin: 0 20px;
+  background-color: #68217A; /* Visual Studio 2022 icon color */
+  border: none;
+  color: #fff;
+}
+
+.battle-fab:hover {
+  background-color: #7e3391;
+}
+
+@media (max-width: 767px) {
+  .battle-fab {
+    margin: 20px 0;
+  }
 }
