@@ -1,0 +1,29 @@
+<div class="dialog-content">
+    <p-avatar [image]="user.profilePicture" shape="circle" size="xlarge"></p-avatar>
+    <div class="actions">
+      <button 
+        pButton 
+        type="button" 
+        label="Private Message" 
+        icon="pi pi-envelope" 
+        class="p-button-rounded p-button-secondary action-button" 
+        (click)="sendPrivateMessage()">
+      </button>
+      <button 
+        pButton 
+        type="button" 
+        label="View Profile" 
+        icon="pi pi-user" 
+        class="p-button-rounded p-button-secondary action-button" 
+        (click)="viewProfile()">
+      </button>
+      <button 
+        pButton 
+        type="button" 
+        label="Battle Request" 
+        icon="pi pi-fist-raised" 
+        class="p-button-rounded p-button-secondary action-button" 
+        (click)="sendBattleRequest()">
+      </button>
+    </div>
+  </div>

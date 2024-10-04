@@ -1,42 +1,79 @@
 <div class="battlefield-container">
-    <!-- Online Users Panel -->
-    <div class="online-users-panel" *ngIf="!isMobile">
-      <div class="online-users-list">
-        <div *ngFor="let user of onlineUsers" class="online-user">
-          <p-avatar image="{{ user.profilePicture }}" shape="circle"></p-avatar>
-          <span class="user-name">{{ user.name }}</span>
+  <!-- Desktop Layout -->
+  <div class="desktop-layout" *ngIf="!isMobile">
+    <!-- Contacts List -->
+    <div class="contacts-list">
+      <div class="search-bar">
+        <input type="text" pInputText placeholder="Search or start new chat" />
+      </div>
+      <div class="contacts">
+        <!-- General Chat -->
+        <div 
+          class="contact-item general-chat" 
+          [class.active]="activeTabId === 'general'"
+          (click)="selectTab('general')"
+        >
+          <p-avatar [image]="getUserProfilePicture('general')" shape="circle"></p-avatar>
+          <div class="contact-info">
+            <div class="contact-name">General</div>
+            <div class="contact-preview">{{ getLastMessage('general') }}</div>
+          </div>
+        </div>
+        <!-- Online Users -->
+        <div 
+          *ngFor="let user of onlineUsers" 
+          class="contact-item" 
+          [class.active]="activeTabId === user.id.toString()"
+          (click)="selectTab(user.id.toString())"
+        >
+          <p-avatar [image]="user.profilePicture" shape="circle"></p-avatar>
+          <div class="contact-info">
+            <div class="contact-name">{{ user.name }}</div>
+            <div class="contact-preview">{{ getLastMessage(user.id.toString()) }}</div>
+          </div>
         </div>
       </div>
     </div>
 
-        <!-- Online Users Avatars (Mobile View) -->
-        <div class="online-users-avatars" *ngIf="isMobile">
-            <div class="avatars-list">
-              <div *ngFor="let user of onlineUsers" class="avatar-item">
-                <p-avatar
-                  [image]="user.profilePicture"
-                  shape="circle"
-                  size="large"
-                  (click)="viewUserProfile(user)"
-                ></p-avatar>
-              </div>
-            </div>
+    <!-- Chat Conversation -->
+    <div class="chat-conversation" *ngIf="selectedTab">
+      <div class="conversation-header">
+        <p-avatar [image]="getUserProfilePicture(selectedTab.id)" shape="circle"></p-avatar>
+        <div class="conversation-info">
+          <div class="conversation-name">{{ selectedTab.label }}</div>
+          <div class="conversation-status">{{ getUserStatus(selectedTab.id) }}</div>
         </div>
-  
-    <!-- Chat Panel -->
-    <div class="chat-panel">
-      <!-- Messages -->
-      <div class="messages" id="messages">
-        <div *ngFor="let msg of messages; trackBy: trackByMessageId" class="message">
-          <p-avatar image="{{ msg.sender?.profilePicture }}" shape="circle" class="message-avatar"></p-avatar>
-          <div class="message-text">
-            <div class="message-sender">{{ msg.sender?.name }}</div>
-            <div class="message-content">{{ msg.content }}</div>
-            <div class="message-timestamp">{{ msg.timestamp | date:'shortTime' }}</div>
+        <!-- Only show options button if not the "General" channel -->
+        <button 
+          *ngIf="selectedTab.id !== 'general'"
+          pButton 
+          type="button" 
+          icon="pi pi-ellipsis-v" 
+          class="options-button" 
+          (click)="openUserActions(getUserById(selectedTab.id)!)"
+        ></button>
+      </div>
+      <div class="messages" #messagesContainer>
+        <div 
+          *ngFor="let msg of selectedTab.messages; trackBy: trackByMessageId" 
+          [class.sent]="msg.sender?.id === currentUser.id" 
+          [class.received]="msg.sender?.id !== currentUser.id" 
+          class="message-bubble">
+          <p-avatar 
+            [image]="msg.sender?.profilePicture" 
+            shape="circle" 
+            size="normal" 
+            class="message-avatar">
+          </p-avatar>
+          <div class="message-content">
+            {{ msg.content }}
+            <div class="message-timestamp">
+              {{ msg.timestamp | date:'shortTime' }}
+            </div>
           </div>
         </div>
       </div>
-  
+
       <!-- Message Input -->
       <div class="message-input">
         <input
@@ -51,8 +88,76 @@
     </div>
   </div>
 
+  <!-- Mobile Layout -->
+  <div class="mobile-layout" *ngIf="isMobile">
+    <!-- Chat View -->
+    <div *ngIf="selectedTab" class="mobile-chat-view">
+      <div class="chat-header">
+        <p-avatar [image]="getUserProfilePicture(selectedTab.id)" shape="circle"></p-avatar>
+        <div class="chat-info">
+          <div class="chat-name">{{ selectedTab.label }}</div>
+        </div>
+        <button pButton type="button" icon="pi pi-arrow-left" class="back-button" (click)="deselectTab()"></button>
+      </div>
+      <div class="messages" #messagesContainer>
+        <div 
+          *ngFor="let msg of selectedTab.messages; trackBy: trackByMessageId" 
+          [class.sent]="msg.sender?.id === currentUser.id" 
+          [class.received]="msg.sender?.id !== currentUser.id" 
+          class="message-bubble">
+          <p-avatar [image]="msg.sender?.profilePicture" shape="circle" size="normal" class="message-avatar"></p-avatar>
+          <div class="message-content">
+            {{ msg.content }}
+            <div class="message-timestamp">
+              {{ msg.timestamp | date:'shortTime' }}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="message-input">
+        <input
+          type="text"
+          pInputText
+          placeholder="Type a message..."
+          [(ngModel)]="newMessage"
+          (keyup.enter)="sendMessage()"
+        />
+        <button pButton type="button" icon="pi pi-send" (click)="sendMessage()" class="send-button"></button>
+      </div>
+    </div>
 
-
-  
-  
-  
+    <!-- Contacts List -->
+    <div *ngIf="!selectedTab" class="mobile-contacts-list">
+      <div class="search-bar">
+        <input type="text" pInputText placeholder="Search or start new chat" />
+      </div>
+      <div class="contacts">
+        <!-- General Chat -->
+        <div 
+          class="contact-item general-chat" 
+          [class.active]="activeTabId === 'general'"
+          (click)="selectTab('general')"
+        >
+          <p-avatar [image]="getUserProfilePicture('general')" shape="circle"></p-avatar>
+          <div class="contact-info">
+            <div class="contact-name">General</div>
+            <div class="contact-preview">{{ getLastMessage('general') }}</div>
+          </div>
+        </div>
+        <!-- Online Users -->
+        <div 
+          *ngFor="let user of onlineUsers" 
+          class="contact-item" 
+          [class.active]="activeTabId === user.id.toString()"
+          (click)="selectTab(user.id.toString())"
+        >
+          <p-avatar [image]="user.profilePicture" shape="circle"></p-avatar>
+          <div class="contact-info">
+            <div class="contact-name">{{ user.name }}</div>
+            <div class="contact-preview">{{ getLastMessage(user.id.toString()) }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

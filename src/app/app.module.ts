@@ -31,6 +31,9 @@ import { CarouselModule } from 'primeng/carousel';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { TooltipModule } from 'primeng/tooltip';
 import { TabViewModule } from 'primeng/tabview';
+import { UserActionsDialogComponent } from './components/user-actions-dialog/user-actions-dialog.component';
+import { DynamicDialogModule } from 'primeng/dynamicdialog';
+import { BattlePairComponent } from './components/battle-pair/battle-pair.component';
 
 @NgModule({
   declarations: [
@@ -39,7 +42,9 @@ import { TabViewModule } from 'primeng/tabview';
     BattlePageComponent,
     LoginComponent,
     SignupComponent,
-    ChatPageComponent
+    ChatPageComponent,
+    UserActionsDialogComponent,
+    BattlePairComponent
   ],
   imports: [
     BrowserModule,
@@ -48,6 +53,7 @@ import { TabViewModule } from 'primeng/tabview';
     ButtonModule,
     BrowserAnimationsModule,
     AvatarModule,
+    DynamicDialogModule,
     AvatarGroupModule,
     TabMenuModule,
     TieredMenuModule,

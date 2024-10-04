@@ -1,5 +1,16 @@
 
-  /* Set html and body to full height */
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: Arial, sans-serif;
+}
+
+.p-button {
+  width: 100%;
+}
+ 
+ /* Set html and body to full height */
   html,
   body {
     height: 100%;

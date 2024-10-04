@@ -8,67 +8,43 @@
     pTooltip="Start Random Battle"
   ></button>
 
-  <!-- Tab View -->
-  <p-tabView class="custom-tabview">
-    <p-tabPanel header="Users Ready to Battle">
-      <!-- Users Grid -->
+  <div class="battlefield-content">
+    <!-- Online Users -->
+    <div class="online-users">
       <div class="users-grid">
-        <!-- User Tiles -->
+        <!-- User Cards -->
         <div
           *ngFor="let user of usersInBattlefield"
-          class="user-tile"
+          class="user-card"
           (click)="sendBattleRequest(user)"
+          pRipple
         >
-          <div class="user-avatar-container p-ripple">
+          <div class="user-avatar-container">
             <!-- User Avatar -->
             <p-avatar
               [image]="user?.profilePicture"
               shape="circle"
-              size="xlarge"
+              size="large"
+              [styleClass]="'profile-picture'"
             ></p-avatar>
             <!-- User Name -->
             <div class="user-name">{{ user?.name }}</div>
           </div>
         </div>
       </div>
-    </p-tabPanel>
-    <p-tabPanel header="Ongoing Battles">
-      <!-- Battles Grid -->
+    </div>
+
+    <!-- Ongoing Battles -->
+    <div class="ongoing-battles">
       <div class="battles-grid">
-        <!-- Battle Tiles -->
-        <div
+        <!-- Battle Cards using the updated BattlePairComponent -->
+        <app-battle-pair
           *ngFor="let battle of ongoingBattles"
-          class="battle-tile"
+          [battle]="battle"
           (click)="watchBattle(battle)"
-        >
-          <div class="battle-card p-ripple">
-            <div class="battle-avatars">
-              <!-- User 1 Avatar -->
-              <div class="battle-avatar-container">
-                <p-avatar
-                  [image]="battle?.user1?.profilePicture"
-                  shape="circle"
-                  size="large"
-                ></p-avatar>
-              </div>
-              <!-- User 2 Avatar -->
-              <div class="battle-avatar-container">
-                <p-avatar
-                  [image]="battle?.user2?.profilePicture"
-                  shape="circle"
-                  size="large"
-                ></p-avatar>
-              </div>
-            </div>
-            <!-- Battle User Names -->
-            <div class="battle-user-names">
-              <span>{{ battle?.user1?.name }}</span>
-              <span class="vs-text">vs</span>
-              <span>{{ battle?.user2?.name }}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </p-tabPanel>
-  </p-tabView>
+          class="battle-card-wrapper"
+        ></app-battle-pair>
+    </div>
+  </div>
+  </div>
 </div>

@@ -2,29 +2,38 @@
 .battlefield-container {
   position: relative;
   padding: 0;
+  height: calc(100vh - 80px); /* Adjusted for navbar and FAB height */
+  overflow: hidden;
 }
 
-/* Center Tabs */
-.custom-tabview .p-tabview-nav {
-  justify-content: center;
+/* Battlefield Content Layout */
+.battlefield-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
-/* Floating Action Battle Button */
-.battle-fab {
-  position: fixed;
-  bottom: 80px; /* Adjusted to be above the mobile navbar */
-  right: 20px;
-  background-color: #d26ac2;
-  color: #fff;
-  border-radius: 50%;
-  width: 60px;
-  height: 60px;
-  z-index: 1001;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+@media (min-width: 768px) {
+  .battlefield-content {
+    flex-direction: row;
+  }
 }
 
-.battle-fab:hover {
-  background-color: #b218a0;
+/* Online Users */
+.online-users {
+  padding: 0;
+  overflow: auto;
+  height: 100%;
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .online-users {
+    width: 300px;
+    max-width: 300px;
+    min-width: 240px;
+    overflow-y: auto;
+  }
 }
 
 /* Users Grid */
@@ -32,230 +41,158 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  padding: 20px;
   gap: 20px;
-  overflow-y: auto;
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE and Edge */
+  padding: 20px;
 }
 
-.users-grid::-webkit-scrollbar {
-  width: 0;
-  background: transparent;
+@media (min-width: 768px) {
+  .users-grid {
+    justify-content: flex-start;
+  }
 }
 
-/* User Tile */
-.user-tile {
-  width: calc(100% / 2 - 20px); /* Two columns on mobile */
-  max-width: 240px;
+.user-card {
+  width: calc(33.33% - 20px);
+  max-width: 180px;
   box-sizing: border-box;
 }
 
 @media (min-width: 768px) {
-  .user-tile {
-    width: calc(100% / 4 - 20px); /* Four columns on tablets */
-  }
-}
-
-@media (min-width: 1024px) {
-  .user-tile {
-    width: calc(100% / 5 - 20px); /* Five columns on desktops */
+  .user-card {
+    width: calc(100% - 40px); /* Full width on desktop with padding */
   }
 }
 
 /* User Avatar Container */
 .user-avatar-container {
-  position: relative;
   background-color: #fff;
   border-radius: 12px;
-  padding: 20px;
+  padding: 15px;
   text-align: center;
   cursor: pointer;
-  transition: box-shadow 0.3s, transform 0.3s;
-  overflow: hidden;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Base shadow */
+  transition: box-shadow 0.3s, background-color 0.3s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .user-avatar-container:hover {
-  box-shadow: 0 8px 16px rgba(0,0,0,0.2); /* Stronger shadow on hover */
-  transform: translateY(-2px); /* Slight lift on hover */
-}
-
-/* Profile Picture Enhancement */
-.user-avatar-container p-avatar {
-  border: 2px solid #d26ac2; /* Subtle colored border matching app theme */
-  border-radius: 50%;
-}
-
-/* Star and Points */
-.user-points {
-  display: flex;
-  align-items: center;
-  font-size: 0.85em;
-  justify-content: center;
-  margin-top: 10px;
-}
-
-.user-points i {
-  font-size: 1em;
-  margin-right: 5px;
-  color: gold; /* Yellow for star */
-}
-
-.user-points span {
-  color: #333; /* Dark color for points number */
-  font-weight: bold;
+  background-color: #f9f2f9;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
 /* User Name */
 .user-name {
-  margin-top: 15px;
+  margin-top: 10px;
   font-weight: bold;
   color: #333;
-  font-size: 1.2em; /* Larger font size for emphasis */
+  font-size: 1em;
+  max-width: 100%;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  text-align: center;
+}
+
+/* Ongoing Battles */
+.ongoing-battles {
+  padding: 20px;
+  flex: 1;
+  overflow: auto;
 }
 
 /* Battles Grid */
 .battles-grid {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
-  padding: 20px;
   gap: 20px;
-  overflow-y: auto;
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE and Edge */
+  justify-content: center; /* Center the content */
 }
 
-.battles-grid::-webkit-scrollbar {
-  width: 0;
-  background: transparent;
-}
-
-/* Battle Tile */
-.battle-tile {
-  width: calc(100% / 1 - 20px); /* One column on mobile */
-  max-width: 300px;
+/* Battle Card Wrapper */
+.battle-card-wrapper {
+  flex: 1 1 calc(50% - 40px); /* Adjusted for 2 cards per row with gap */
   box-sizing: border-box;
 }
 
-@media (min-width: 768px) {
-  .battle-tile {
-    width: calc(100% / 2 - 20px); /* Two columns on tablets and desktops */
+@media (max-width: 767px) {
+  .battle-card-wrapper {
+    flex: 1 1 100%; /* Full width on mobile */
   }
 }
 
-/* Battle Card */
-.battle-card {
-  background-color: #fff;
-  border-radius: 12px;
-  padding: 20px;
-  text-align: center;
+/* Adjusted Battle Card Styles */
+app-battle-pair {
   cursor: pointer;
-  transition: box-shadow 0.3s, transform 0.3s;
-  overflow: hidden;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Base shadow */
 }
 
-.battle-card:hover {
-  box-shadow: 0 8px 16px rgba(0,0,0,0.2); /* Stronger shadow on hover */
-  transform: translateY(-2px); /* Slight lift on hover */
+/* Mobile View Adjustments */
+@media (max-width: 767px) {
+  .battlefield-content {
+    flex-direction: column;
+  }
+
+  .online-users {
+    height: auto;
+  }
+
+  .users-grid {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding: 10px 20px;
+  }
+
+  .users-grid::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  .user-card {
+    width: 80px;
+    flex: 0 0 auto;
+  }
+
+  .ongoing-battles {
+    flex: 1;
+    overflow: auto;
+  }
+
+  .battles-grid {
+    flex-direction: column;
+    margin-top: 20px;
+  }
 }
 
-/* Battle Avatars */
-.battle-avatars {
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  position: relative;
-}
-
-/* Vertical Line Separator */
-.battle-avatars::after {
-  content: '';
-  position: absolute;
-  width: 2px;
-  height: 60%;
-  background-color: #ccc;
-  left: 50%;
-  top: 20%;
-  transform: translateX(-50%);
-}
-
-/* Battle Avatar Container */
-.battle-avatar-container {
-  position: relative;
-}
-
-.battle-avatar-container p-avatar {
-  border: 2px solid #d26ac2; /* Subtle colored border matching app theme */
+/* Profile Picture Enhancement */
+.profile-picture {
+  border: 2px solid #d26ac2;
   border-radius: 50%;
 }
 
-.battle-avatar-container .user-points {
-  position: absolute;
-  top: -5px;
-  right: -5px;
-  background-color: #fff;
-  border-radius: 12px;
-  padding: 2px 6px;
-  display: flex;
-  align-items: center;
-  font-size: 0.8em;
+/* Scrollbar Styles */
+.online-users::-webkit-scrollbar,
+.ongoing-battles::-webkit-scrollbar {
+  width: 6px;
 }
 
-.battle-avatar-container .user-points i {
-  font-size: 1em;
-  margin-right: 3px;
-  color: gold;
+.online-users::-webkit-scrollbar-thumb,
+.ongoing-battles::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.1);
 }
 
-.battle-avatar-container .user-points span {
-  color: #333;
-  font-weight: bold;
+/* Remove Headers */
+.online-users h2,
+.ongoing-battles h2 {
+  display: none;
 }
 
-/* VS Text */
-.vs-text {
-  display: none; /* Hidden since we're using a separator line */
+/* Remove Blurriness */
+.user-avatar-container *,
+.battle-card-content *,
+app-battle-pair * {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
-/* Battle User Names */
-.battle-user-names {
-  margin-top: 15px;
-  font-size: 1em;
-  font-weight: bold;
-  color: #333;
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-}
-
-.battle-user-names .vs-text {
-  margin: 0 10px;
-  font-weight: bold;
-}
-
-/* Adjust for Mobile Navbar */
-@media (max-width: 767px) {
-  .battle-fab {
-    bottom: 80px; /* Adjusted to be above the mobile bottom navbar */
-  }
-}
-
-/* Typography Enhancements */
-.battle-card .user-name {
-  margin-top: 10px;
-  font-weight: bold;
-  color: #333;
-  font-size: 1.1em;
-}
-
-/* Interactive Elements */
-.user-avatar-container:hover .user-name,
-.battle-card:hover .user-name {
-  color: #d26ac2; /* Change color on hover */
+/* Consistent Typography */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 16px;
 }

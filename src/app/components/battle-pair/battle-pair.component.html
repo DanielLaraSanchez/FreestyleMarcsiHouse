@@ -1,0 +1,32 @@
+<div class="battle-card p-ripple" pRipple>
+    <!-- Time Indicator Bar -->
+    <div class="time-indicator">
+      <!-- Time Left Text -->
+      <div class="time-text">1:24 seconds</div>
+    </div>
+  
+    <div class="battle-content">
+      <!-- User 1 -->
+      <div class="battle-avatar-container">
+        <p-avatar
+          [image]="battle.user1.profilePicture"
+          shape="circle"
+          size="xlarge"
+        ></p-avatar>
+        <div class="user-name">{{ battle.user1.name }}</div>
+      </div>
+  
+      <!-- VS Symbol -->
+      <div class="vs-text">VS</div>
+  
+      <!-- User 2 -->
+      <div class="battle-avatar-container">
+        <p-avatar
+          [image]="battle.user2.profilePicture"
+          shape="circle"
+          size="xlarge"
+        ></p-avatar>
+        <div class="user-name">{{ battle.user2.name }}</div>
+      </div>
+    </div>
+  </div>
