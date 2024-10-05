@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-const jwt_decode = require('jwt-decode');
+import { jwtDecode } from "jwt-decode";
 const TOKEN_KEY = 'auth-token';
 
 @Injectable({
@@ -41,7 +41,7 @@ export class AuthService {
 
   decodeToken(token: string): any {
     try {
-      return jwt_decode(token);
+      return jwtDecode(token);
     } catch (error) {
       console.error('Error decoding token:', error);
       return null;
