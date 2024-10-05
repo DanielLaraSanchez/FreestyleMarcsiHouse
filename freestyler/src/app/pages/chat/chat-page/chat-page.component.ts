@@ -89,17 +89,16 @@ export class ChatPageComponent implements OnInit, AfterViewChecked {
           next: (user) => {
             this.currentUser = user;
             // Socket connection and user status setup
-            this.signalingService.socketConnected$.subscribe((isConnected) => {
-              if (isConnected) {
-
-                console.log(this.currentUser, "current user")
-
-                // Fetch online users when socket connects
-                this.loadOnlineUsers();
-                // Set up real-time user status updates
-                this.setupUserStatusListeners();
+            this.signalingService.socketConnected$.subscribe(
+              (isConnected) => {
+                if (isConnected) {
+                  // Fetch online users when socket connects
+                  this.loadOnlineUsers();
+                  // Set up real-time user status updates
+                  this.setupUserStatusListeners();
+                }
               }
-            });
+            );
           },
           error: (error) => {
             console.error('Error fetching current user:', error);
@@ -124,16 +123,19 @@ export class ChatPageComponent implements OnInit, AfterViewChecked {
     this.chatService.chatTabs$.subscribe({
       next: (tabs) => {
         this.chatTabs = tabs;
-        this.selectedTab = this.chatTabs.find(
-          (tab) => tab.id === this.activeTabId
-        );
+        this.updateSelectedTab();
       },
     });
   }
 
-
   ngAfterViewChecked() {
     this.scrollToBottom();
+  }
+
+  private updateSelectedTab(): void {
+    this.selectedTab = this.chatTabs.find(
+      (tab) => tab.id === this.activeTabId
+    );
   }
 
   scrollToBottom(): void {
@@ -192,29 +194,29 @@ export class ChatPageComponent implements OnInit, AfterViewChecked {
   }
 
   openPrivateChat(user: User) {
-    // Set the active tab to the selected user's chat
-    this.activeTabId = user._id;
-
-    // Check if the tab exists
-    const existingTab = this.chatTabs.find(
-      (tab) => tab.id === this.activeTabId
-    );
-
-    if (!existingTab) {
-      // If the tab doesn't exist, create it
-      this.chatService.addChatTab({
-        id: user._id,
-        label: user.name,
-        messages: [],
-      });
-    }
-
-    // selectedTab will be updated by the subscription to chatTabs$
+    this.selectTab(user._id);
   }
 
   selectTab(tabId: string) {
     this.activeTabId = tabId;
-    this.selectedTab = this.chatTabs.find((tab) => tab.id === tabId);
+    this.updateSelectedTab();
+
+    if (!this.selectedTab) {
+      // Tab doesn't exist; create it
+      if (tabId === 'general') {
+        // General tab should exist, but just in case
+        this.selectedTab = { id: 'general', label: 'General', messages: [] };
+      } else {
+        const user = this.getUserById(tabId);
+        const label = user?.name || 'Private Chat';
+        const newTab: ChatTab = { id: tabId, label: label, messages: [] };
+        this.chatService.addChatTab(newTab);
+
+        // After adding, update selectedTab
+        this.chatTabs = this.chatService.getChatTabs();
+        this.updateSelectedTab();
+      }
+    }
   }
 
   deselectTab() {
@@ -234,8 +236,7 @@ export class ChatPageComponent implements OnInit, AfterViewChecked {
     if (tabId === 'general') {
       return this.generalUser;
     }
-    const user = this.onlineUsers.find((user) => user._id === tabId);
-    return user ? user : null;
+    return this.onlineUsers.find((user) => user._id === tabId) || null;
   }
 
   getUserProfilePicture(tabId: string): string {
@@ -292,7 +293,6 @@ export class ChatPageComponent implements OnInit, AfterViewChecked {
   private setupUserStatusListeners(): void {
     this.signalingService.userStatus$.subscribe((status) => {
       // Fetch the updated list of online users
-      console.log("here it is now working!!!DA;LKFJDSL;FKJDS")
       this.loadOnlineUsers();
     });
   }
