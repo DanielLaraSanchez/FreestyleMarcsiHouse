@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { default as io, Socket } from 'socket.io-client';
+import { default as io } from 'socket.io-client'; // Correct import
 import { Observable, ReplaySubject } from 'rxjs';
 import { Message } from '../models/message';
 import { AuthService } from './auth.service';
@@ -8,16 +8,16 @@ import { AuthService } from './auth.service';
   providedIn: 'root',
 })
 export class SignalingService {
-  private socket!: typeof Socket;
+  private socket: any;
   private isConnected = false;
-  private socketSubject = new ReplaySubject<typeof Socket>(1);
+  private onMessageSubject = new ReplaySubject<{ tabId: string; message: Message }>(1);
 
   constructor(private authService: AuthService) {
     // Subscribe to token changes
     this.authService.token$.subscribe((token) => {
       if (token) {
         this.connectSocket(token);
-      } else if (this.isConnected) {
+      } else {
         this.disconnectSocket();
       }
     });
@@ -27,6 +27,7 @@ export class SignalingService {
     if (this.isConnected) {
       return; // Already connected
     }
+
     this.socket = io('http://localhost:3000', {
       auth: {
         token: token,
@@ -39,14 +40,17 @@ export class SignalingService {
       this.onMessageSubject.next(data);
     });
 
-    // Emit the socket to subscribers
-    this.socketSubject.next(this.socket);
+    // Handle socket errors if needed
+    this.socket.on('connect_error', (err: any) => {
+      console.error('Socket connection error:', err);
+    });
   }
 
   private disconnectSocket() {
     if (this.socket) {
       this.socket.disconnect();
       this.isConnected = false;
+      this.socket = null;
     }
   }
 
@@ -57,8 +61,6 @@ export class SignalingService {
       console.error('Socket is not connected.');
     }
   }
-
-  private onMessageSubject = new ReplaySubject<{ tabId: string; message: Message }>(1);
 
   onMessage(): Observable<{ tabId: string; message: Message }> {
     return this.onMessageSubject.asObservable();
