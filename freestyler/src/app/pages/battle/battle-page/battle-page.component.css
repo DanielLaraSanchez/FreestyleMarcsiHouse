@@ -1,0 +1,399 @@
+/* Reset default margin and padding */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  /* Apply full viewport height */
+  html, body {
+    height: 100%;
+    font-family: 'Arial', sans-serif;
+  }
+  
+  /* Background Styling */
+  .background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: linear-gradient(to bottom, #000428, #004e92); /* Dark purple to dark blue */
+  }
+  
+  /* Stars Layer */
+  .stars {
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    background-image: radial-gradient(white 1px, transparent 1px),
+                      radial-gradient(white 1px, transparent 1px);
+    background-position: 0 0, 50px 50px;
+    background-size: 100px 100px;
+    animation: moveStars 50s linear infinite;
+  }
+  
+  /* Twinkling Effect Layer */
+  .twinkling {
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    background-image: radial-gradient(white 2px, transparent 2px),
+                      radial-gradient(white 2px, transparent 2px);
+    background-position: 0 0, 50px 50px;
+    background-size: 100px 100px;
+    animation: twinkle 3s infinite;
+    opacity: 0.5;
+  }
+  
+  /* Animation for moving stars */
+  @keyframes moveStars {
+    from { transform: translateX(0); }
+    to { transform: translateX(-100px); }
+  }
+  
+  /* Animation for twinkling */
+  @keyframes twinkle {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+  }
+  
+  /* Silhouettes of Trees and Mountains */
+  .silhouettes {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 200px; /* Adjust based on your silhouette image */
+    background: url('/assets/silhouette.png') bottom no-repeat;
+    background-size: cover;
+  }
+  
+  /* Battle Interface Container */
+  .battle-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* Desktop View */
+  .desktop-view {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 1200px;
+  }
+  
+  /* Battler Sections */
+  .battler {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 45%;
+    background-color: rgba(30, 58, 138, 0.8); /* Dark Blue with opacity */
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 0 15px rgba(255, 105, 180, 0.3); /* Pink glow */
+    position: relative;
+  }
+  
+  .battler img.profile-pic {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 3px solid #ff69b4; /* Hot Pink border */
+    margin-bottom: 15px;
+  }
+  
+  .battler video {
+    width: 100%;
+    border-radius: 15px;
+    box-shadow: 0 0 10px rgba(255, 105, 180, 0.5); /* Hot Pink shadow */
+    margin-bottom: 15px;
+  }
+  
+  .battler-info {
+    text-align: center;
+    margin-bottom: 15px;
+  }
+  
+  .battler-info h3 {
+    margin-bottom: 5px;
+    color: #ffd700; /* Gold color for contrast */
+  }
+  
+  .battler-info p {
+    color: #fff;
+  }
+  
+  /* Voting Buttons */
+  .vote-button {
+    padding: 10px 20px;
+    background-color: #fff;
+    color: #1e3a8a; /* Dark Blue text */
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+  }
+  
+  .vote-button:hover {
+    background-color: #1e3a8a; /* Dark Blue background */
+    color: #fff; /* White text */
+  }
+  
+  /* Central Panel */
+  .central-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 0 10px;
+    position: relative;
+  }
+  
+  .timer {
+    width: 150px;
+    height: 150px;
+    background-color: rgba(255, 182, 193, 0.9); /* Light Pink with opacity */
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2em;
+    color: #1e3a8a; /* Dark Blue */
+    margin-bottom: 15px;
+    box-shadow: 0 0 15px rgba(255, 20, 147, 0.5); /* Deep Pink shadow */
+  }
+  
+  .random-word {
+    font-size: 1.5em;
+    color: #ff69b4; /* Hot Pink */
+    margin-bottom: 15px;
+  }
+  
+  .beat-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .beat-button {
+    padding: 10px 20px;
+    background-color: #ff69b4; /* Hot Pink */
+    color: #fff;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .beat-button:hover {
+    background-color: #ff1493; /* Deep Pink */
+  }
+  
+  /* Mobile View */
+  .mobile-view {
+    display: none;
+  }
+  
+  /* Chatbox */
+  .chatbox {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 300px;
+    max-height: 500px;
+    background-color: rgba(30, 58, 138, 0.85); /* Dark Blue with opacity */
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(255, 105, 180, 0.5); /* Hot Pink shadow */
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .chatbox h4 {
+    text-align: center;
+    padding: 10px;
+    border-bottom: 1px solid #ff69b4; /* Hot Pink border */
+    color: #ffd700; /* Gold color */
+  }
+  
+  .chat-messages {
+    flex: 1;
+    padding: 10px;
+    overflow-y: auto;
+  }
+  
+  .chat-message {
+    margin-bottom: 10px;
+  }
+  
+  .chat-message .username {
+    font-weight: bold;
+    margin-right: 5px;
+    color: #ff69b4; /* Hot Pink */
+  }
+  
+  .chat-message .message {
+    color: #fff;
+  }
+  
+  .chat-input {
+    display: flex;
+    padding: 10px;
+    border-top: 1px solid #ff69b4; /* Hot Pink border */
+  }
+  
+  .chat-input input {
+    flex: 1;
+    padding: 8px;
+    border: none;
+    border-radius: 20px;
+    background-color: rgba(255, 255, 255, 0.2);
+    color: #fff;
+  }
+  
+  .chat-input input::placeholder {
+    color: #ddd;
+  }
+  
+  .chat-input input:focus {
+    outline: none;
+    background-color: rgba(255, 255, 255, 0.3);
+  }
+  
+  .chat-input button {
+    background: none;
+    border: none;
+    color: #ff69b4; /* Hot Pink */
+    font-size: 1.2em;
+    cursor: pointer;
+    margin-left: 10px;
+  }
+  
+  /* Live Stats Progress Bar */
+  .live-stats {
+    position: absolute;
+    bottom: 20px;
+    width: 80%;
+    max-width: 800px;
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .stat {
+    width: 45%;
+  }
+  
+  .stat span {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #ffd700; /* Gold color */
+  }
+  
+  .progress {
+    width: 100%;
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    height: 15px;
+    overflow: hidden;
+  }
+  
+  .progress-bar {
+    height: 100%;
+    background-color: #ff69b4; /* Hot Pink */
+  }
+  
+  /* Mobile View Styling */
+  @media (max-width: 767px) {
+    .desktop-view {
+      display: none;
+    }
+  
+    .mobile-view {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      max-width: 600px;
+    }
+  
+    .battler {
+      width: 90%;
+      margin-bottom: 20px;
+    }
+  
+    .central-panel {
+      margin: 20px 0;
+    }
+  
+    .timer {
+      width: 120px;
+      height: 120px;
+      font-size: 1.5em;
+    }
+  
+    .random-word {
+      font-size: 1.2em;
+    }
+  
+    .beat-button, .beat-option-button {
+      padding: 10px;
+      margin: 0 5px;
+      border-radius: 50%;
+    }
+  
+    /* Beat Controls for Mobile */
+    .beat-controls {
+      flex-direction: column;
+    }
+  
+    /* Chatbox */
+    .chatbox {
+      position: static;
+      width: 90%;
+      max-height: 300px;
+      margin-top: 20px;
+    }
+  
+    /* Live Stats Progress Bar */
+    .live-stats {
+      flex-direction: column;
+      align-items: center;
+    }
+  
+    .stat {
+      width: 90%;
+      margin-bottom: 10px;
+    }
+  
+    /* Ensuring the input bar stays at the bottom */
+    .battle-container {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+  
+    .login-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+  
+    form {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+  
+    .options, .footer {
+      margin-top: 10px;
+    }
+  }
