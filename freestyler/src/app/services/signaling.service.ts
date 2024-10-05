@@ -16,7 +16,7 @@ export class SignalingService {
 
     this.socket = io('http://localhost:3000', {
       auth: {
-        token: `Bearer ${token}`,
+        token: token,
       }
     });
   }
