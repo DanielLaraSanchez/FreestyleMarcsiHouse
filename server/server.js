@@ -40,31 +40,34 @@ app.use(passport.session());
 
 // Routes
 const authRoutes = require('./routes/auth');
+const userRoutes = require('./routes/users');
 app.use('/auth', authRoutes);
-
+app.use('/users', userRoutes);
 const PORT = 3000;
 
 io.on('connection', (socket) => {
   console.log('A user connected');
 
-  // Handle incoming messages
-  socket.on('message', (data) => {
-    const { tabId, message } = data;
-
-    // For private chats, we can use rooms
-    if (tabId !== 'general') {
-      // Join the sender to a room with the tabId (which could be the recipient's ID)
-      socket.join(tabId);
-      // Emit the message to the room (both sender and receiver)
-      io.to(tabId).emit('message', { tabId, message });
-    } else {
-      // For the general chat, broadcast to all connected sockets except the sender
-      socket.broadcast.emit('message', { tabId, message });
+  // Extract user ID from token
+  const token = socket.handshake.auth.token;
+  let userId = null;
+  if (token) {
+    try {
+      const decoded = jwt.verify(token.replace('Bearer ', ''), process.env.JWT_SECRET);
+      userId = decoded.id;
+      // Mark user as online
+      User.findByIdAndUpdate(userId, { isOnline: true }).exec();
+    } catch (err) {
+      console.error('Socket authentication error:', err);
     }
-  });
+  }
 
   socket.on('disconnect', () => {
     console.log('A user disconnected');
+    if (userId) {
+      // Mark user as offline
+      User.findByIdAndUpdate(userId, { isOnline: false }).exec();
+    }
   });
 });
 

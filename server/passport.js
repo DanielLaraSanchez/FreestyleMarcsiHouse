@@ -11,23 +11,41 @@ passport.use(
     },
     async (accessToken, refreshToken, profile, done) => {
       // Find or create the user
-      const { id, displayName, emails, photos } = profile;
       try {
+        const { id, displayName, emails, photos } = profile;
+
         let user = await User.findOne({ googleId: id });
         if (user) {
+          // User exists, update profile picture if changed
+          if (user.profilePicture !== photos[0].value) {
+            user.profilePicture = photos[0].value;
+            await user.save();
+          }
           return done(null, user);
         } else {
-          user = new User({
-            googleId: id,
-            email: emails[0].value,
-            name: displayName,
-            profilePicture: photos[0].value,
-          });
-          await user.save();
-          return done(null, user);
+          // Check if user with the same email exists
+          user = await User.findOne({ email: emails[0].value });
+          if (user) {
+            // Update user with googleId and profile picture
+            user.googleId = id;
+            user.profilePicture = photos[0].value;
+            await user.save();
+            return done(null, user);
+          } else {
+            // Create new user
+            const newUser = new User({
+              googleId: id,
+              email: emails[0].value,
+              name: displayName,
+              profilePicture: photos[0].value,
+              stats: {}, // Initialize stats
+            });
+            await newUser.save();
+            return done(null, newUser);
+          }
         }
       } catch (err) {
-        return done(err, null);
+        return done(err, null); // Handle errors
       }
     }
   )

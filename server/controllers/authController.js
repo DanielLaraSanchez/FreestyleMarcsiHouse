@@ -9,12 +9,18 @@ const AuthController = {
       if (existingUser)
         return res.status(400).json({ message: 'Email already exists' });
 
-      const user = new User({ email, password, name });
+      const user = new User({
+        email,
+        password,
+        name,
+        stats: {}, // Initialize stats
+        profilePicture: '', // Set a default profile picture if needed
+      });
       await user.save();
 
       res.status(201).json({ message: 'User created successfully' });
     } catch (err) {
-      console.log(err, "mal")
+      console.log(err, "Error during signup");
       res.status(500).json({ message: err.message });
     }
   },

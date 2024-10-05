@@ -24,6 +24,7 @@ import { CardModule } from 'primeng/card';
 import { OverlayPanelModule } from 'primeng/overlaypanel';
 
 import { JwtModule, JwtInterceptor } from '@auth0/angular-jwt';
+import { HttpTokenInterceptor } from './services/http.interceptor';
 
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ChatPageComponent } from './pages/chat/chat-page/chat-page.component';
@@ -85,7 +86,9 @@ import { AuthCallbackComponent } from './components/auth-callback/auth-callback.
     PanelModule,
     FormsModule, // Add FormsModule here
   ],
-  providers: [{ provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },],
+  providers: [{ provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: HttpTokenInterceptor, multi: true }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
