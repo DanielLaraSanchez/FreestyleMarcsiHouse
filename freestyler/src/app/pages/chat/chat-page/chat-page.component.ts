@@ -14,6 +14,8 @@ import { ChatTab } from '../../../models/chat-tab';
 import { UserActionsDialogComponent } from '../../../components/user-actions-dialog/user-actions-dialog.component';
 import { UserService } from '../../../services/user.service';
 import { AuthService } from '../../../services/auth.service';
+import { SignalingService } from '../../../services/signaling.service'; // Import SignalingService
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-chat-page',
@@ -61,13 +63,20 @@ export class ChatPageComponent implements OnInit, AfterViewChecked {
     public dialogService: DialogService,
     private chatService: ChatService,
     private userService: UserService,
-    private authService: AuthService
+    private authService: AuthService,
+    private signalingService: SignalingService // Inject SignalingService
   ) {}
 
   ngOnInit(): void {
-    this.deviceService.isMobile$.subscribe((isMobile) => (this.isMobile = isMobile));
-    this.deviceService.isTablet$.subscribe((isTablet) => (this.isTablet = isTablet));
-    this.deviceService.isDesktop$.subscribe((isDesktop) => (this.isDesktop = isDesktop));
+    this.deviceService.isMobile$.subscribe(
+      (isMobile) => (this.isMobile = isMobile)
+    );
+    this.deviceService.isTablet$.subscribe(
+      (isTablet) => (this.isTablet = isTablet)
+    );
+    this.deviceService.isDesktop$.subscribe(
+      (isDesktop) => (this.isDesktop = isDesktop)
+    );
 
     // Fetch current user
     const token = this.authService.getToken();
@@ -76,7 +85,15 @@ export class ChatPageComponent implements OnInit, AfterViewChecked {
       this.userService.getUserById(decodedToken.id).subscribe({
         next: (user) => {
           this.currentUser = user;
-          this.loadOnlineUsers();
+
+          // Wait for socket to connect before loading online users
+          this.signalingService.socketConnected$.subscribe((isConnected) => {
+            if (isConnected) {
+              // Now load online users
+              this.loadOnlineUsers();
+              this.setupUserStatusListeners(); // Set up real-time user status updates
+            }
+          });
         },
         error: (error) => {
           console.error('Error fetching current user:', error);
@@ -93,7 +110,9 @@ export class ChatPageComponent implements OnInit, AfterViewChecked {
     this.chatService.chatTabs$.subscribe({
       next: (tabs) => {
         this.chatTabs = tabs;
-        this.selectedTab = this.chatTabs.find((tab) => tab.id === this.activeTabId);
+        this.selectedTab = this.chatTabs.find(
+          (tab) => tab.id === this.activeTabId
+        );
         // If the activeTabId no longer exists, reset to 'general'
         if (!this.selectedTab) {
           this.activeTabId = 'general';
@@ -111,7 +130,6 @@ export class ChatPageComponent implements OnInit, AfterViewChecked {
     // Fetch online users from backend
     this.userService.getUsers().subscribe({
       next: (users) => {
-        console.log(users)
         // Exclude current user and the general user
         this.onlineUsers = users.filter(
           (user) =>
@@ -119,12 +137,37 @@ export class ChatPageComponent implements OnInit, AfterViewChecked {
             user._id !== this.currentUser._id &&
             user._id !== this.generalUser._id
         );
-        // this.onlineUsers = users;
       },
       error: (error) => {
         console.error('Error fetching users:', error);
       },
     });
+  }
+
+  private setupUserStatusListeners(): void {
+    // Listen to user status updates
+    this.signalingService.userStatus$
+      .pipe(filter((data) => data !== null))
+      .subscribe((data) => {
+        const { userId, status } = data;
+        if (userId !== this.currentUser._id) {
+          const user = this.onlineUsers.find((u) => u._id === userId);
+          if (user) {
+            user.isOnline = status === 'online';
+          } else if (status === 'online') {
+            // Fetch user info from backend
+            this.userService.getUserById(userId).subscribe({
+              next: (fetchedUser) => {
+                fetchedUser.isOnline = true;
+                this.onlineUsers.push(fetchedUser);
+              },
+              error: (error) => {
+                console.error('Error fetching user:', error);
+              },
+            });
+          }
+        }
+      });
   }
 
   scrollToBottom(): void {
@@ -185,7 +228,10 @@ export class ChatPageComponent implements OnInit, AfterViewChecked {
   openPrivateChat(user: User) {
     // Set the active tab to the selected user's chat
     this.activeTabId = user._id;
-    this.selectedTab = this.chatTabs.find((tab) => tab.id === this.activeTabId);
+    this.selectedTab = this.chatTabs.find(
+      (tab) => tab.id === this.activeTabId
+    );
+
     if (!this.selectedTab) {
       // If the tab doesn't exist, create it
       this.chatService.addChatTab({
@@ -193,7 +239,9 @@ export class ChatPageComponent implements OnInit, AfterViewChecked {
         label: user.name,
         messages: [],
       });
-      this.selectedTab = this.chatTabs.find((tab) => tab.id === this.activeTabId);
+      this.selectedTab = this.chatTabs.find(
+        (tab) => tab.id === this.activeTabId
+      );
     }
   }
 

@@ -1,16 +1,26 @@
-import { Injectable } from '@angular/core';
-import { default as io } from 'socket.io-client';
-import { Observable, ReplaySubject, Subscription } from 'rxjs';
+import { Injectable, OnDestroy } from '@angular/core';
+import { default as io, Socket } from 'socket.io-client';
+import { BehaviorSubject, Observable, ReplaySubject, Subscription } from 'rxjs';
 import { Message } from '../models/message';
 import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root',
 })
-export class SignalingService {
-  private socket: any;
+export class SignalingService implements OnDestroy {
+  private socket!: any;
   private isConnected = false;
+
+  // Subjects to emit socket connection status and user status updates
+  private socketConnectedSubject = new BehaviorSubject<boolean>(false);
+  public socketConnected$ = this.socketConnectedSubject.asObservable();
+
+  private userStatusSubject = new ReplaySubject<{ userId: string; status: string }>(1);
+  public userStatus$ = this.userStatusSubject.asObservable();
+
   private onMessageSubject = new ReplaySubject<{ tabId: string; message: Message }>(1);
+  public onMessage$ = this.onMessageSubject.asObservable();
+
   private tokenSubscription!: Subscription;
 
   constructor(private authService: AuthService) {
@@ -34,11 +44,33 @@ export class SignalingService {
         token: token,
       },
     });
-    this.isConnected = true;
+
+    this.socket.on('connect', () => {
+      this.isConnected = true;
+      this.socketConnectedSubject.next(true);
+      console.log('Socket connected:', this.socket.id);
+    });
+
+    this.socket.on('disconnect', () => {
+      this.isConnected = false;
+      this.socketConnectedSubject.next(false);
+      console.log('Socket disconnected');
+    });
 
     // Handle incoming messages
     this.socket.on('message', (data: any) => {
       this.onMessageSubject.next(data);
+    });
+
+    // Handle user online/offline status updates
+    this.socket.on('userOnline', (data: any) => {
+      const { userId } = data;
+      this.userStatusSubject.next({ userId, status: 'online' });
+    });
+
+    this.socket.on('userOffline', (data: any) => {
+      const { userId } = data;
+      this.userStatusSubject.next({ userId, status: 'offline' });
     });
 
     // Handle socket errors if needed
@@ -51,7 +83,9 @@ export class SignalingService {
     if (this.socket) {
       this.socket.disconnect();
       this.isConnected = false;
-      this.socket = null;
+      this.socketConnectedSubject.next(false);
+      this.socket = undefined as any;
+      console.log('Socket disconnected');
     }
   }
 
@@ -64,12 +98,13 @@ export class SignalingService {
   }
 
   onMessage(): Observable<{ tabId: string; message: Message }> {
-    return this.onMessageSubject.asObservable();
+    return this.onMessage$;
   }
 
-  // Remember to clean up the subscription
   ngOnDestroy() {
-    this.tokenSubscription.unsubscribe();
+    if (this.tokenSubscription) {
+      this.tokenSubscription.unsubscribe();
+    }
     this.disconnectSocket();
   }
 }
