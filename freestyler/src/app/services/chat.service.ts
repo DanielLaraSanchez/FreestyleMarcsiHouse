@@ -19,7 +19,7 @@ export class ChatService {
     this.chatTabsSubject.next(initialTabs);
 
     // Listen for messages from the signaling service
-    this.signalingService.onMessage().subscribe({
+    this.signalingService.onMessage$.subscribe({
       next: (data) => {
         const { tabId, message } = data;
         this.addMessageToTab(tabId, message);
@@ -31,16 +31,15 @@ export class ChatService {
   }
 
   private addMessageToTab(tabId: string, message: Message): void {
-    // Access the current value of chatTabs
     const currentTabs = this.chatTabsSubject.getValue();
     let tab = currentTabs.find((t) => t.id === tabId);
     if (!tab) {
       // Create the tab if it doesn't exist
-      tab = { id: tabId, label: tabId, messages: [] };
+      const label = tabId === 'general' ? 'General' : 'Private Chat';
+      tab = { id: tabId, label: label, messages: [] };
       currentTabs.push(tab);
     }
     tab.messages.push(message);
-    // Emit the updated tabs
     this.chatTabsSubject.next([...currentTabs]);
   }
 
@@ -66,7 +65,8 @@ export class ChatService {
     let tab = currentTabs.find((t) => t.id === tabId);
     if (!tab) {
       // Create the tab if it doesn't exist
-      tab = { id: tabId, label: tabId, messages: [] };
+      const label = tabId === 'general' ? 'General' : 'Private Chat';
+      tab = { id: tabId, label: label, messages: [] };
       currentTabs.push(tab);
     }
     tab.messages.push(message);

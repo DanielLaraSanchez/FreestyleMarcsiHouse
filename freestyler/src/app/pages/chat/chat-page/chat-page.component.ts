@@ -179,8 +179,7 @@ export class ChatPageComponent implements OnInit, AfterViewChecked {
     } catch (err) {}
   }
 
-  sendMessage(tabId: string | null = null) {
-    const targetTabId = tabId ? tabId : this.activeTabId;
+  sendMessage() {
     const trimmedMessage = this.newMessage.trim();
     if (trimmedMessage && this.selectedTab) {
       const message: Message = {
@@ -189,8 +188,8 @@ export class ChatPageComponent implements OnInit, AfterViewChecked {
         content: trimmedMessage,
         timestamp: new Date(),
       };
-
-      this.chatService.addMessage(targetTabId, message);
+  
+      this.chatService.addMessage(this.selectedTab.id, message);
       this.newMessage = '';
     }
   }
