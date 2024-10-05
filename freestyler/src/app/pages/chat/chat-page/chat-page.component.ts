@@ -1,4 +1,10 @@
-import { Component, OnInit, AfterViewChecked, ElementRef, ViewChild } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  AfterViewChecked,
+  ElementRef,
+  ViewChild,
+} from '@angular/core';
 import { User } from '../../../models/user';
 import { Message } from '../../../models/message';
 import { DeviceDetectorService } from '../../../services/device-detector.service';
@@ -34,9 +40,10 @@ export class ChatPageComponent implements OnInit, AfterViewChecked {
 
   // Define a dummy user for the "General" channel
   generalUser: User = {
-    _id: '-1',
+    _id: '-1', // Use _id instead of id
     name: 'General',
-    profilePicture: 'https://via.placeholder.com/150/000000/FFFFFF/?text=General',
+    profilePicture:
+      'https://via.placeholder.com/150/000000/FFFFFF/?text=General',
     stats: {
       points: 0,
       votes: 0,
@@ -66,16 +73,16 @@ export class ChatPageComponent implements OnInit, AfterViewChecked {
     const token = this.authService.getToken();
     if (token) {
       const decodedToken = this.authService.decodeToken(token);
-      this.userService.getUserById(decodedToken.id).subscribe(
-        (user) => {
+      this.userService.getUserById(decodedToken.id).subscribe({
+        next: (user) => {
           this.currentUser = user;
           this.loadOnlineUsers();
         },
-        (error) => {
+        error: (error) => {
           console.error('Error fetching current user:', error);
           // Handle error, possibly redirect to login
-        }
-      );
+        },
+      });
     } else {
       // Handle case where there is no token
       console.error('No auth token found, redirecting to login.');
@@ -83,14 +90,16 @@ export class ChatPageComponent implements OnInit, AfterViewChecked {
     }
 
     // Subscribe to chatTabs from ChatService
-    this.chatService.chatTabs$.subscribe((tabs) => {
-      this.chatTabs = tabs;
-      this.selectedTab = this.chatTabs.find((tab) => tab.id === this.activeTabId);
-      // If the activeTabId no longer exists, reset to 'general'
-      if (!this.selectedTab) {
-        this.activeTabId = 'general';
-        this.selectedTab = this.chatTabs.find((tab) => tab.id === 'general');
-      }
+    this.chatService.chatTabs$.subscribe({
+      next: (tabs) => {
+        this.chatTabs = tabs;
+        this.selectedTab = this.chatTabs.find((tab) => tab.id === this.activeTabId);
+        // If the activeTabId no longer exists, reset to 'general'
+        if (!this.selectedTab) {
+          this.activeTabId = 'general';
+          this.selectedTab = this.chatTabs.find((tab) => tab.id === 'general');
+        }
+      },
     });
   }
 
@@ -100,17 +109,20 @@ export class ChatPageComponent implements OnInit, AfterViewChecked {
 
   private loadOnlineUsers(): void {
     // Fetch online users from backend
-    this.userService.getUsers().subscribe(
-      (users) => {
+    this.userService.getUsers().subscribe({
+      next: (users) => {
         // Exclude current user and the general user
         this.onlineUsers = users.filter(
-          (user) => user.isOnline && user._id !== this.currentUser._id && user._id !== this.generalUser._id
+          (user) =>
+            user.isOnline &&
+            user._id !== this.currentUser._id &&
+            user._id !== this.generalUser._id
         );
       },
-      (error) => {
+      error: (error) => {
         console.error('Error fetching users:', error);
-      }
-    );
+      },
+    });
   }
 
   scrollToBottom(): void {
@@ -170,12 +182,12 @@ export class ChatPageComponent implements OnInit, AfterViewChecked {
 
   openPrivateChat(user: User) {
     // Set the active tab to the selected user's chat
-    this.activeTabId = user._id.toString();
+    this.activeTabId = user._id;
     this.selectedTab = this.chatTabs.find((tab) => tab.id === this.activeTabId);
     if (!this.selectedTab) {
       // If the tab doesn't exist, create it
       this.chatService.addChatTab({
-        id: user._id.toString(),
+        id: user._id,
         label: user.name,
         messages: [],
       });
@@ -204,7 +216,7 @@ export class ChatPageComponent implements OnInit, AfterViewChecked {
     if (tabId === 'general') {
       return this.generalUser;
     }
-    const user = this.onlineUsers.find((user) => user._id.toString() === tabId);
+    const user = this.onlineUsers.find((user) => user._id === tabId);
     if (!user) {
       throw new Error(`User with id ${tabId} not found`);
     }
