@@ -113,13 +113,13 @@ export class ChatPageComponent implements OnInit, AfterViewChecked {
       next: (users) => {
         console.log(users)
         // Exclude current user and the general user
-        // this.onlineUsers = users.filter(
-        //   (user) =>
-        //     user.isOnline &&
-        //     user._id !== this.currentUser._id &&
-        //     user._id !== this.generalUser._id
-        // );
-        this.onlineUsers = users;
+        this.onlineUsers = users.filter(
+          (user) =>
+            user.isOnline &&
+            user._id !== this.currentUser._id &&
+            user._id !== this.generalUser._id
+        );
+        // this.onlineUsers = users;
       },
       error: (error) => {
         console.error('Error fetching users:', error);
