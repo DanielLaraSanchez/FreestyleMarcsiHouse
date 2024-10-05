@@ -9,6 +9,8 @@ const passport = require('./passport');
 const session = require('express-session');
 const { Server } = require('socket.io');
 const jwt = require('jsonwebtoken');
+const User = require('./data/models/User');
+
 
 // Correctly initialize Socket.io with the HTTP server and CORS options
 const io = new Server(server, {
