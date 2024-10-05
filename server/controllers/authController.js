@@ -27,16 +27,20 @@ const AuthController = {
 
   login: async (req, res) => {
     const { email, password } = req.body;
-console.log("wqokds")
+console.log("wqokds", req)
     try {
       const user = await User.findOne({ email });
+      console.log(user)
+
       if (!user)
+        console.log("inside no user")
+
         return res.status(400).json({ message: 'Invalid email or password' });
 
       user.comparePassword(password, (err, isMatch) => {
         if (err) throw err;
         if (!isMatch)
-          return res.status(400).json({ message: 'Invalid email or password' });
+          return res.status(400).json({ message: 'Invalid email or password comparePassword' });
 
         // Generate JWT
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
@@ -46,6 +50,7 @@ console.log("wqokds")
         res.json({ token, user: { id: user._id, name: user.name, email: user.email } });
       });
     } catch (err) {
+      console.log(err, "err")
       res.status(500).json({ message: err.message });
     }
   },
