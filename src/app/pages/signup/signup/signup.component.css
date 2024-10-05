@@ -1,0 +1,285 @@
+/* Reset default margin and padding */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  /* Apply full viewport height */
+  html, body {
+    height: 100%;
+    font-family: 'Arial', sans-serif;
+  }
+  
+  /* Background Styling */
+  .background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: linear-gradient(to bottom, #000428, #004e92); /* Dark purple to dark blue */
+  }
+  
+  /* Stars Layer */
+  .stars {
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    background-image: radial-gradient(white 1px, transparent 1px),
+                      radial-gradient(white 1px, transparent 1px);
+    background-position: 0 0, 50px 50px;
+    background-size: 100px 100px;
+    animation: moveStars 50s linear infinite;
+  }
+  
+  /* Twinkling Effect Layer */
+  .twinkling {
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    background-image: radial-gradient(white 2px, transparent 2px),
+                      radial-gradient(white 2px, transparent 2px);
+    background-position: 0 0, 50px 50px;
+    background-size: 100px 100px;
+    animation: twinkle 3s infinite;
+    opacity: 0.5;
+  }
+  
+  /* Animation for moving stars */
+  @keyframes moveStars {
+    from { transform: translateX(0); }
+    to { transform: translateX(-100px); }
+  }
+  
+  /* Animation for twinkling */
+  @keyframes twinkle {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+  }
+  
+  /* Silhouettes of Trees and Mountains */
+  .silhouettes {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 200px; /* Adjust based on your silhouette image */
+    background: url('/assets/silhouette.png') bottom no-repeat;
+    background-size: cover;
+  }
+  
+  /* Signup Form Container */
+  .login-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(40, 40, 70, 0.8); /* Semi-transparent dark purple */
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.3); /* Subtle box shadow for soft glow */
+    width: 90%;
+    max-width: 400px;
+    color: white;
+  }
+  
+  .login-container h2 {
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 2em;
+    color: #ffd700; /* Gold color for contrast */
+  }
+  
+  /* Input Groups */
+  .input-group {
+    position: relative;
+    margin-bottom: 20px;
+  }
+  
+  .input-group .icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #aaa;
+    font-size: 1.2em;
+  }
+  
+  .input-group input {
+    width: 100%;
+    padding: 10px 10px 10px 45px; /* Padding left for the icon */
+    border: none;
+    border-radius: 25px;
+    background-color: rgba(255,255,255,0.2); /* Semi-transparent white */
+    color: white;
+    font-size: 1em;
+  }
+  
+  .input-group input::placeholder {
+    color: #ddd;
+  }
+  
+  .input-group input:focus {
+    outline: none;
+    background-color: rgba(255,255,255,0.3);
+  }
+  
+  /* Error Messages */
+  .error {
+    color: #ff4d4d; /* Light red */
+    font-size: 0.8em;
+    margin-top: -15px;
+    margin-bottom: 10px;
+  }
+  
+  /* Options: Remember Me and Forgot Password */
+  .options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .options .remember-me {
+    font-size: 0.9em;
+  }
+  
+  .options .remember-me input {
+    margin-right: 5px;
+  }
+  
+  .options .forgot-password {
+    font-size: 0.9em;
+    color: #ffc0cb; /* Light pink */
+    text-decoration: none;
+  }
+  
+  .options .forgot-password:hover {
+    text-decoration: underline;
+  }
+  
+  /* Signup Button */
+  .login-button { /* Reused class name for consistency */
+    width: 100%;
+    padding: 12px 0;
+    background-color: white;
+    border: none;
+    border-radius: 25px;
+    color: #1e3a8a; /* Dark Blue */
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+  }
+  
+  .login-button:hover {
+    background-color: #1e3a8a; /* Dark Blue */
+    color: white;
+  }
+  
+  /* Footer Text */
+  .footer {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 0.9em;
+  }
+  
+  .footer .register-link {
+    color: #ffc0cb; /* Light pink */
+    text-decoration: none;
+  }
+  
+  .footer .register-link:hover {
+    text-decoration: underline;
+  }
+  
+  /* Responsive Adjustments for Mobile */
+  @media (max-width: 767px) {
+    .login-container {
+      padding: 30px;
+    }
+  
+    .conversation-header {
+      padding: 10px;
+    }
+  
+    .chat-name {
+      font-size: 1.2em;
+    }
+  
+    .message-content {
+      font-size: 1em;
+      padding: 10px;
+    }
+  
+    .message-timestamp {
+      font-size: 0.7em;
+    }
+  
+    .message-input input {
+      font-size: 1em;
+      padding: 10px 15px;
+    }
+  
+    .login-button {
+      padding: 10px 0;
+    }
+  
+    /* Silhouettes in Mobile may need adjustment */
+    .silhouettes {
+      height: 150px; /* Adjust based on your silhouette image */
+      background-size: contain; /* Ensure image doesn't stretch */
+    }
+  
+    /* Adjustments to prevent input bar from being pushed down */
+    .messages {
+      padding-bottom: 0; /* Removed padding-bottom to prevent interference */
+      /* min-height:75vh; */ /* Removed */
+    }
+  
+    .message-input {
+      /* Removed margin-bottom:60px; */
+      margin-bottom: 0;
+    }
+  
+    .contact-item {
+      padding: 15px; /* Increased padding */
+    }
+  
+    .contact-name {
+      font-size: 1.1em; /* Increased font size */
+    }
+  
+    .contact-preview {
+      font-size: 0.95em; /* Increased font size */
+    }
+  
+    /* Larger Avatars for Mobile */
+    .message-avatar p-avatar,
+    .contact-item p-avatar {
+      width: 50px;
+      height: 50px;
+    }
+  
+    /* Ensure the input bar stays at the bottom */
+    .login-container {
+      display: flex;
+      flex-direction: column;
+      height: auto;
+    }
+  
+    form {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+  
+    .options, .footer {
+      margin-top: 10px;
+    }
+  }
+  
+  /* Optional: Smooth transitions for better UX */
+  input, button, a {
+    transition: all 0.3s ease;
+  }

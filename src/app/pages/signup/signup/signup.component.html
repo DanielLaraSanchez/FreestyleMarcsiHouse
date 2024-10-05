@@ -1,0 +1,109 @@
+<!-- signup.component.html -->
+<div class="background">
+    <!-- Stars Layer -->
+    <div class="stars"></div>
+    <!-- Twinkling Effect Layer -->
+    <div class="twinkling"></div>
+    <!-- Silhouettes of Trees and Mountains -->
+    <div class="silhouettes"></div>
+  
+    <!-- Signup Form Container -->
+    <div class="login-container">
+      <form [formGroup]="signupForm" (ngSubmit)="onSubmit()">
+  
+        <h2>Sign Up</h2>
+  
+        <!-- Username Input Group -->
+        <div class="input-group">
+          <span class="icon">
+            <i class="fa fa-user"></i>
+          </span>
+          <input
+            type="text"
+            formControlName="username"
+            placeholder="Username"
+            required
+            aria-label="Username"
+          />
+        </div>
+        <!-- Display validation error for username -->
+        <div *ngIf="signupForm.get('username')?.invalid && signupForm.get('username')?.touched" class="error">
+          <!-- <span *ngIf="signupForm.get('username')?.errors?.required">Username is required.</span> -->
+          <!-- <span *ngIf="signupForm.get('username')?.errors?.minlength">
+            Username must be at least {{ signupForm.get('username')?.errors?.minlength.requiredLength }} characters.
+          </span> -->
+        </div>
+  
+        <!-- Email Input Group -->
+        <div class="input-group">
+          <span class="icon">
+            <i class="fa fa-envelope"></i>
+          </span>
+          <input
+            type="email"
+            formControlName="email"
+            placeholder="Email"
+            required
+            aria-label="Email"
+          />
+        </div>
+        <!-- Display validation error for email -->
+        <div *ngIf="signupForm.get('email')?.invalid && signupForm.get('email')?.touched" class="error">
+          <!-- <span *ngIf="signupForm.get('email')?.errors?.required">Email is required.</span>
+          <span *ngIf="signupForm.get('email')?.errors?.email">Please enter a valid email address.</span> -->
+        </div>
+  
+        <!-- Password Input Group -->
+        <div class="input-group">
+          <span class="icon">
+            <i class="fa fa-lock"></i>
+          </span>
+          <input
+            type="password"
+            formControlName="password"
+            placeholder="Password"
+            required
+            aria-label="Password"
+          />
+        </div>
+        <!-- Display validation error for password -->
+        <div *ngIf="signupForm.get('password')?.invalid && signupForm.get('password')?.touched" class="error">
+          <!-- <span *ngIf="signupForm.get('password')?.errors?.required">Password is required.</span>
+          <span *ngIf="signupForm.get('password')?.errors?.minlength">
+            Password must be at least {{ signupForm.get('password')?.errors?.minlength.requiredLength }} characters.
+          </span> -->
+        </div>
+  
+        <!-- Confirm Password Input Group -->
+        <div class="input-group">
+          <span class="icon">
+            <i class="fa fa-lock"></i>
+          </span>
+          <input
+            type="password"
+            formControlName="confirmPassword"
+            placeholder="Confirm Password"
+            required
+            aria-label="Confirm Password"
+          />
+        </div>
+        <!-- Display validation error for confirmPassword -->
+        <div *ngIf="signupForm.get('confirmPassword')?.invalid && signupForm.get('confirmPassword')?.touched" class="error">
+          <!-- <span *ngIf="signupForm.get('confirmPassword')?.errors?.required">Please confirm your password.</span>
+          <span *ngIf="signupForm.get('confirmPassword')?.errors?.mismatch">Passwords do not match.</span> -->
+        </div>
+  
+        <!-- Options: Remember Me and Forgot Password (Optional) -->
+        <!-- You can include similar options as in the login form if desired -->
+  
+        <!-- Signup Button -->
+        <button type="submit" class="login-button">Sign Up</button>
+  
+        <!-- Footer Text -->
+        <div class="footer">
+          Already have an account? <a href="/login" class="register-link">Login.</a>
+        </div>
+  
+      </form>
+    </div>
+  </div>
