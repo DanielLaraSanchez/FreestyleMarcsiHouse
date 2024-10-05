@@ -49,10 +49,9 @@ const AuthController = {
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
       expiresIn: '1d',
     });
-
-    // Redirect or respond with token
-    // For simplicity, let's send the token in a JSON response
-    res.json({ token, user: { id: user._id, name: user.name, email: user.email } });
+  
+    // Redirect back to Angular app with token as a query parameter
+    res.redirect(`http://localhost:4200/auth/callback?token=${token}`);
   },
 };
 
