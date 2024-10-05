@@ -1,43 +1,52 @@
+require('./data/db');
 require('dotenv').config();
-const express = require('express');
-const http = require('http');
-const socketio = require('socket.io'); // Use socketio for better clarity
 const cors = require('cors');
-const jwt = require('jsonwebtoken');
-const mongoose = require('mongoose');
-const User = require('./models/User'); // Adjust the path as needed
-
+const express = require('express');
 const app = express();
+const http = require('http');
 const server = http.createServer(app);
-const io = socketio(server, {
+const passport = require('./passport');
+const session = require('express-session');
+const { Server } = require('socket.io');
+const jwt = require('jsonwebtoken');
+const User = require('./data/models/User');
+
+// Correctly initialize Socket.io with the HTTP server and CORS options
+const io = new Server(server, {
   cors: {
     origin: 'http://localhost:4200', // Your Angular app's URL
     methods: ['GET', 'POST'],
-    credentials: true,
+    credentials: true, // Allow credentials if needed
   },
 });
 
 // Middleware
-app.use(cors({
-  origin: 'http://localhost:4200',
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin: 'http://localhost:4200', // Allow your Angular app's origin
+    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allowed methods
+    credentials: true, // Allow credentials (cookies, session)
+  })
+);
 app.use(express.json());
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET, // Use the actual environment variable
+    resave: false,
+    saveUninitialized: false,
+  })
+);
 
-// Import your routes
+app.use(passport.initialize());
+app.use(passport.session());
+
+// Routes
 const authRoutes = require('./routes/auth');
-const userRoutes = require('./routes/users'); // Your user routes
+const userRoutes = require('./routes/users');
 app.use('/auth', authRoutes);
 app.use('/users', userRoutes);
 
-// Connect to MongoDB
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/chatApp', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-}, () => {
-  console.log('Connected to MongoDB');
-});
+const PORT = 3000;
 
 // Map to keep track of userId to socketId
 const userSockets = {};
@@ -45,7 +54,7 @@ const userSockets = {};
 io.on('connection', (socket) => {
   console.log('A user connected:', socket.id);
 
-  // Authenticate the socket
+  // After authentication, store user information in socket
   const token = socket.handshake.auth.token;
   let userId = null;
 
@@ -53,14 +62,17 @@ io.on('connection', (socket) => {
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
       userId = decoded.id;
-      socket.userId = userId;
+      socket.userId = userId; // Attach userId to the socket for future reference
+
+      // Store the mapping of userId to socket.id
       userSockets[userId] = socket.id;
 
       // Mark user as online
-      User.findByIdAndUpdate(userId, { isOnline: true }, { new: true }).exec();
+      User.findByIdAndUpdate(userId, { isOnline: true }).exec();
 
-      // Notify other clients that a user is online
-      socket.broadcast.emit('userOnline', { userId });
+      // Notify all clients that a user is online
+      io.emit('userOnline', { userId });
+
     } catch (err) {
       console.error('Socket authentication error:', err);
       socket.disconnect();
@@ -72,19 +84,21 @@ io.on('connection', (socket) => {
     return;
   }
 
-  // Handle incoming messages
   socket.on('message', (data) => {
     const { tabId, message } = data;
 
     if (tabId === 'general') {
       // Broadcast message to all connected clients except the sender
-      socket.broadcast.emit('message', { tabId, message });
+      socket.broadcast.emit('message', { tabId: 'general', message });
     } else {
       // Handle private messages
-      const recipientSocketId = userSockets[tabId]; // tabId is the recipient's userId
+      const recipientSocketId = userSockets[tabId]; // 'tabId' is recipient's userId
       if (recipientSocketId) {
-        // Send the message to the recipient
-        io.to(recipientSocketId).emit('message', { tabId, message });
+        const payload = {
+          tabId: socket.userId, // The sender's userId
+          message,
+        };
+        io.to(recipientSocketId).emit('message', payload);
       } else {
         console.error(`Recipient socket not found for userId: ${tabId}`);
       }
@@ -98,15 +112,14 @@ io.on('connection', (socket) => {
       delete userSockets[userId];
 
       // Mark user as offline
-      User.findByIdAndUpdate(userId, { isOnline: false }, { new: true }).exec();
+      User.findByIdAndUpdate(userId, { isOnline: false }).exec();
 
-      // Notify other clients that a user is offline
-      socket.broadcast.emit('userOffline', { userId });
+      // Notify all clients that a user is offline
+      io.emit('userOffline', { userId });
     }
   });
 });
 
-const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
