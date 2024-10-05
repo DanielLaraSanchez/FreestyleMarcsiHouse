@@ -14,6 +14,10 @@ export class AuthService {
     return this.http.post('/login', { email, password });
   }
 
+  loginWithGoogle(email: string, password: string): Observable<any> {
+    return this.http.post('http://localhost:3000/auth/google', { email, password });
+  }
+
   signup(name: string, email: string, password: string): Observable<any> {
     return this.http.post(`http://localhost:3000/auth/signup`, { name, email, password });
   }

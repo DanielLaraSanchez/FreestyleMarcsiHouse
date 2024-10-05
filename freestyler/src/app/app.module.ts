@@ -35,6 +35,7 @@ import { UserActionsDialogComponent } from './components/user-actions-dialog/use
 import { DynamicDialogModule } from 'primeng/dynamicdialog';
 import { BattlePairComponent } from './components/battle-pair/battle-pair.component';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
+import { AuthCallbackComponent } from './components/auth-callback/auth-callback.component';
 
 @NgModule({
   declarations: [
@@ -45,7 +46,8 @@ import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
     SignupComponent,
     ChatPageComponent,
     UserActionsDialogComponent,
-    BattlePairComponent
+    BattlePairComponent,
+    AuthCallbackComponent
   ],
   imports: [
     HttpClientModule,
