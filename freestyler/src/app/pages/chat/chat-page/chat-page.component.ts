@@ -1,12 +1,13 @@
 import { Component, OnInit, AfterViewChecked, ElementRef, ViewChild } from '@angular/core';
 import { User } from '../../../models/user';
 import { Message } from '../../../models/message';
-import { users } from '../../../data/users';
 import { DeviceDetectorService } from '../../../services/device-detector.service';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { ChatService } from '../../../services/chat.service';
 import { ChatTab } from '../../../models/chat-tab';
 import { UserActionsDialogComponent } from '../../../components/user-actions-dialog/user-actions-dialog.component';
+import { UserService } from '../../../services/user.service';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-chat-page',
@@ -21,7 +22,7 @@ export class ChatPageComponent implements OnInit, AfterViewChecked {
 
   onlineUsers: User[] = [];
   newMessage: string = '';
-  currentUser: User;
+  currentUser!: User;
 
   chatTabs: ChatTab[] = [];
   activeTabId: string = 'general'; // Default to 'general'
@@ -35,8 +36,7 @@ export class ChatPageComponent implements OnInit, AfterViewChecked {
   generalUser: User = {
     id: -1,
     name: 'General',
-    profilePicture:
-      'https://via.placeholder.com/150/000000/FFFFFF/?text=General',
+    profilePicture: 'https://via.placeholder.com/150/000000/FFFFFF/?text=General',
     stats: {
       points: 0,
       votes: 0,
@@ -52,45 +52,40 @@ export class ChatPageComponent implements OnInit, AfterViewChecked {
   constructor(
     private deviceService: DeviceDetectorService,
     public dialogService: DialogService,
-    private chatService: ChatService
-  ) {
-    // Set the current user (replace with actual authentication logic)
-    this.currentUser = {
-      id: 0,
-      name: 'Me',
-      profilePicture: 'https://randomuser.me/api/portraits/men/0.jpg',
-      stats: {
-        points: 0,
-        votes: 0,
-        battles: 0,
-        wins: 0,
-      },
-      isOnline: true, // Assuming current user is online
-    };
-  }
+    private chatService: ChatService,
+    private userService: UserService,
+    private authService: AuthService
+  ) {}
 
   ngOnInit(): void {
-    this.deviceService.isMobile$.subscribe(
-      (isMobile) => (this.isMobile = isMobile)
-    );
-    this.deviceService.isTablet$.subscribe(
-      (isTablet) => (this.isTablet = isTablet)
-    );
-    this.deviceService.isDesktop$.subscribe(
-      (isDesktop) => (this.isDesktop = isDesktop)
-    );
+    this.deviceService.isMobile$.subscribe((isMobile) => (this.isMobile = isMobile));
+    this.deviceService.isTablet$.subscribe((isTablet) => (this.isTablet = isTablet));
+    this.deviceService.isDesktop$.subscribe((isDesktop) => (this.isDesktop = isDesktop));
 
-    // Initialize online users with mock data, excluding the "General" user
-    this.onlineUsers = users.filter(
-      (user) => user.isOnline && user.id !== this.generalUser.id
-    );
+    // Fetch current user
+    const token = this.authService.getToken();
+    if (token) {
+      const decodedToken = this.authService.decodeToken(token);
+      this.userService.getUserById(decodedToken.id).subscribe(
+        (user) => {
+          this.currentUser = user;
+          this.loadOnlineUsers();
+        },
+        (error) => {
+          console.error('Error fetching current user:', error);
+          // Handle error, possibly redirect to login
+        }
+      );
+    } else {
+      // Handle case where there is no token
+      console.error('No auth token found, redirecting to login.');
+      // Redirect logic here, e.g., this.router.navigate(['/login']);
+    }
 
     // Subscribe to chatTabs from ChatService
     this.chatService.chatTabs$.subscribe((tabs) => {
       this.chatTabs = tabs;
-      this.selectedTab = this.chatTabs.find(
-        (tab) => tab.id === this.activeTabId
-      );
+      this.selectedTab = this.chatTabs.find((tab) => tab.id === this.activeTabId);
       // If the activeTabId no longer exists, reset to 'general'
       if (!this.selectedTab) {
         this.activeTabId = 'general';
@@ -101,6 +96,21 @@ export class ChatPageComponent implements OnInit, AfterViewChecked {
 
   ngAfterViewChecked() {
     this.scrollToBottom();
+  }
+
+  private loadOnlineUsers(): void {
+    // Fetch online users from backend
+    this.userService.getUsers().subscribe(
+      (users) => {
+        // Exclude current user and the general user
+        this.onlineUsers = users.filter(
+          (user) => user.isOnline && user.id !== this.currentUser.id && user.id !== this.generalUser.id
+        );
+      },
+      (error) => {
+        console.error('Error fetching users:', error);
+      }
+    );
   }
 
   scrollToBottom(): void {
@@ -161,9 +171,7 @@ export class ChatPageComponent implements OnInit, AfterViewChecked {
   openPrivateChat(user: User) {
     // Set the active tab to the selected user's chat
     this.activeTabId = user.id.toString();
-    this.selectedTab = this.chatTabs.find(
-      (tab) => tab.id === this.activeTabId
-    );
+    this.selectedTab = this.chatTabs.find((tab) => tab.id === this.activeTabId);
     if (!this.selectedTab) {
       // If the tab doesn't exist, create it
       this.chatService.addChatTab({
@@ -171,9 +179,7 @@ export class ChatPageComponent implements OnInit, AfterViewChecked {
         label: user.name,
         messages: [],
       });
-      this.selectedTab = this.chatTabs.find(
-        (tab) => tab.id === this.activeTabId
-      );
+      this.selectedTab = this.chatTabs.find((tab) => tab.id === this.activeTabId);
     }
   }
 
@@ -198,10 +204,9 @@ export class ChatPageComponent implements OnInit, AfterViewChecked {
     if (tabId === 'general') {
       return this.generalUser;
     }
-    const userId = parseInt(tabId, 10);
-    const user = users.find((user) => user.id === userId);
+    const user = this.onlineUsers.find((user) => user.id.toString() === tabId);
     if (!user) {
-      throw new Error(`User with id ${userId} not found`);
+      throw new Error(`User with id ${tabId} not found`);
     }
     return user;
   }
