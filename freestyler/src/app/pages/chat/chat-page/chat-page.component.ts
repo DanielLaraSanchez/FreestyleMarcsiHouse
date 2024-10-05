@@ -34,7 +34,7 @@ export class ChatPageComponent implements OnInit, AfterViewChecked {
 
   // Define a dummy user for the "General" channel
   generalUser: User = {
-    id: -1,
+    _id: '-1',
     name: 'General',
     profilePicture: 'https://via.placeholder.com/150/000000/FFFFFF/?text=General',
     stats: {
@@ -104,7 +104,7 @@ export class ChatPageComponent implements OnInit, AfterViewChecked {
       (users) => {
         // Exclude current user and the general user
         this.onlineUsers = users.filter(
-          (user) => user.isOnline && user.id !== this.currentUser.id && user.id !== this.generalUser.id
+          (user) => user.isOnline && user._id !== this.currentUser._id && user._id !== this.generalUser._id
         );
       },
       (error) => {
@@ -170,12 +170,12 @@ export class ChatPageComponent implements OnInit, AfterViewChecked {
 
   openPrivateChat(user: User) {
     // Set the active tab to the selected user's chat
-    this.activeTabId = user.id.toString();
+    this.activeTabId = user._id.toString();
     this.selectedTab = this.chatTabs.find((tab) => tab.id === this.activeTabId);
     if (!this.selectedTab) {
       // If the tab doesn't exist, create it
       this.chatService.addChatTab({
-        id: user.id.toString(),
+        id: user._id.toString(),
         label: user.name,
         messages: [],
       });
@@ -204,7 +204,7 @@ export class ChatPageComponent implements OnInit, AfterViewChecked {
     if (tabId === 'general') {
       return this.generalUser;
     }
-    const user = this.onlineUsers.find((user) => user.id.toString() === tabId);
+    const user = this.onlineUsers.find((user) => user._id.toString() === tabId);
     if (!user) {
       throw new Error(`User with id ${tabId} not found`);
     }
