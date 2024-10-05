@@ -34,19 +34,18 @@ const AuthController = {
 
   login: async (req, res) => {
     const { email, password } = req.body;
-console.log("wqokds")
     try {
       const user = await User.findOne({ email });
-      console.log("wqokds")
+      console.log(req.body)
 
       if (!user)
         return res.status(400).json({ message: 'Invalid email or password' });
 
       user.comparePassword(password, (err, isMatch) => {
-        console.log("compared password")
         if (err) throw err;
         if (!isMatch)
           return res.status(400).json({ message: 'Invalid email or password comparePassword' });
+        console.log("compared password")
 
         // Generate JWT
         const token = jwt.sign(

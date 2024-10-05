@@ -88,11 +88,15 @@ export class ChatPageComponent implements OnInit, AfterViewChecked {
         this.userService.getUserById(decodedToken.id).subscribe({
           next: (user) => {
             this.currentUser = user;
-
             // Socket connection and user status setup
             this.signalingService.socketConnected$.subscribe((isConnected) => {
               if (isConnected) {
-                // Real-time user status updates
+
+                console.log(this.currentUser, "current user")
+
+                // Fetch online users when socket connects
+                this.loadOnlineUsers();
+                // Set up real-time user status updates
                 this.setupUserStatusListeners();
               }
             });
@@ -115,75 +119,18 @@ export class ChatPageComponent implements OnInit, AfterViewChecked {
       console.error('No auth token found, redirecting to login.');
       this.router.navigate(['/login']);
     }
-   // Subscribe to chatTabs from ChatService
-   this.chatService.chatTabs$.subscribe({
-    next: (tabs) => {
-      this.chatTabs = tabs;
-      this.selectedTab = this.chatTabs.find(
-        (tab) => tab.id === this.activeTabId
-      );
-    },
-  });
 
-  // Subscribe to onlineUsers$ to get the list of online user IDs
-  this.signalingService.onlineUsers$.subscribe((onlineUserIds) => {
-    this.updateOnlineUsers(onlineUserIds);
-  });
-}
-
-  private updateOnlineUsers(onlineUserIds: string[]): void {
-    // Exclude the current user ID
-    const filteredUserIds = onlineUserIds.filter(
-      (id) => id !== this.currentUser?._id
-    );
-
-    // Fetch user details for the online users
-    if (filteredUserIds.length === 0) {
-      this.onlineUsers = [];
-      return;
-    }
-
-    this.userService.getUsersByIds(filteredUserIds).subscribe({
-      next: (users) => {
-        this.onlineUsers = users;
-      },
-      error: (error) => {
-        console.error('Error fetching online users:', error);
+    // Subscribe to chatTabs from ChatService
+    this.chatService.chatTabs$.subscribe({
+      next: (tabs) => {
+        this.chatTabs = tabs;
+        this.selectedTab = this.chatTabs.find(
+          (tab) => tab.id === this.activeTabId
+        );
       },
     });
   }
 
-  private setupUserStatusListeners(): void {
-    this.signalingService.userStatus$
-      .pipe(filter((data) => data !== null))
-      .subscribe((data) => {
-        const { userId, status } = data;
-        const userIndex = this.onlineUsers.findIndex((u) => u._id === userId);
-
-        if (status === 'online') {
-          // If the user is not in the list, add them
-          if (userIndex === -1 && userId !== this.currentUser._id) {
-            // Fetch user info from backend
-            this.userService.getUserById(userId).subscribe({
-              next: (fetchedUser) => {
-                fetchedUser.isOnline = true; // Boolean value
-                this.onlineUsers.push(fetchedUser);
-              },
-              error: (error) => {
-                console.error('Error fetching user:', error);
-              },
-            });
-          } else if (userIndex !== -1) {
-            this.onlineUsers[userIndex].isOnline = true; // Boolean value
-          }
-        } else if (status === 'offline') {
-          // If the user is in the list, remove them
-          if (userIndex !== -1) {
-            this.onlineUsers.splice(userIndex, 1);
-          }
-        }
-      });
-  }
 
   ngAfterViewChecked() {
     this.scrollToBottom();
@@ -327,5 +274,26 @@ export class ChatPageComponent implements OnInit, AfterViewChecked {
     return this.onlineUsers.filter((user) =>
       user.name.toLowerCase().includes(lowerSearch)
     );
+  }
+
+  private loadOnlineUsers(): void {
+    this.userService.getOnlineUsers().subscribe({
+      next: (users) => {
+        this.onlineUsers = users.filter(
+          (user) => user._id !== this.currentUser._id
+        );
+      },
+      error: (error) => {
+        console.error('Error fetching online users:', error);
+      },
+    });
+  }
+
+  private setupUserStatusListeners(): void {
+    this.signalingService.userStatus$.subscribe((status) => {
+      // Fetch the updated list of online users
+      console.log("here it is now working!!!DA;LKFJDSL;FKJDS")
+      this.loadOnlineUsers();
+    });
   }
 }

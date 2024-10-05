@@ -62,8 +62,8 @@ export class AuthService {
   }
 
   logout(): void {
-    // localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(TOKEN_KEY);
     this.tokenSubject.next(null); // Emit null to indicate logout
-    // this.currentUserId = null;
+    this.currentUserId = null;
   }
 }

@@ -1,8 +1,10 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { default as io } from 'socket.io-client';
-import { BehaviorSubject, ReplaySubject, Subscription } from 'rxjs';
+import { BehaviorSubject, Subject, Subscription } from 'rxjs';
 import { Message } from '../models/message';
 import { AuthService } from './auth.service';
+
+const SOCKET_URL = 'http://localhost:3000'; // Adjust as needed
 
 @Injectable({
   providedIn: 'root',
@@ -15,14 +17,11 @@ export class SignalingService implements OnDestroy {
   private socketConnectedSubject = new BehaviorSubject<boolean>(false);
   public socketConnected$ = this.socketConnectedSubject.asObservable();
 
-  private userStatusSubject = new ReplaySubject<{ userId: string; status: string }>(1);
+  private userStatusSubject = new Subject<{ status: string; userId: string }>();
   public userStatus$ = this.userStatusSubject.asObservable();
 
-  private onMessageSubject = new ReplaySubject<{ tabId: string; message: Message }>(1);
+  private onMessageSubject = new Subject<{ tabId: string; message: Message }>();
   public onMessage$ = this.onMessageSubject.asObservable();
-
-  private onlineUsersSubject = new BehaviorSubject<string[]>([]);
-  public onlineUsers$ = this.onlineUsersSubject.asObservable();
 
   private tokenSubscription!: Subscription;
 
@@ -30,28 +29,26 @@ export class SignalingService implements OnDestroy {
     // Subscribe to authentication status changes
     this.tokenSubscription = this.authService.token$.subscribe((token) => {
       if (token) {
-        this.connectSocket();
+        this.connectSocket(token);
       } else {
         this.disconnectSocket();
       }
     });
   }
 
-  private connectSocket() {
+  private connectSocket(token: string) {
     if (this.isConnected) {
       return; // Already connected
     }
 
-    const userId = this.authService.getCurrentUserId();
-    console.log(userId)
-    if (!userId) {
-      console.error('No userId found, cannot connect socket.');
+    if (!token) {
+      console.error('No token found, cannot connect socket.');
       return;
     }
 
-    this.socket = io('http://localhost:3000', {
-      auth: {
-        userId: userId,
+    this.socket = io(SOCKET_URL, {
+      query: {
+        token: token,
       },
     });
 
@@ -67,27 +64,20 @@ export class SignalingService implements OnDestroy {
       console.log('Socket disconnected');
     });
 
-    // Handle incoming messages
-    this.socket.on('message', (data: any) => {
-      this.onMessageSubject.next(data);
-    });
-
     // Handle user online/offline status updates
     this.socket.on('userOnline', (data: any) => {
-      console.log("its workinggggg")
       const { userId } = data;
-      this.userStatusSubject.next({ userId, status: 'online' });
+      this.userStatusSubject.next({ status: 'online', userId });
     });
 
     this.socket.on('userOffline', (data: any) => {
       const { userId } = data;
-      this.userStatusSubject.next({ userId, status: 'offline' });
+      this.userStatusSubject.next({ status: 'offline', userId });
     });
 
-    // Handle online users list
-    this.socket.on('onlineUsers', (data: any) => {
-      console.log(data.onlineUsers)
-      this.onlineUsersSubject.next(data.onlineUsers);
+    // Handle incoming messages
+    this.socket.on('message', (data: any) => {
+      this.onMessageSubject.next(data);
     });
 
     // Handle socket errors if needed

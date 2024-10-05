@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
+import { filter } from 'rxjs/operators';
 import { ChatTab } from '../models/chat-tab';
 import { Message } from '../models/message';
 import { SignalingService } from './signaling.service';
@@ -18,16 +19,15 @@ export class ChatService {
     ];
     this.chatTabsSubject.next(initialTabs);
 
-    // Listen for messages from the signaling service
-    this.signalingService.onMessage$.subscribe({
-      next: (data) => {
-        const { tabId, message } = data;
-        this.addMessageToTab(tabId, message);
-      },
-      error: (error) => {
-        console.error('Error receiving message:', error);
-      },
-    });
+    // Subscribe to incoming messages
+    this.signalingService.onMessage$
+      .pipe(filter((data) => data !== null))
+      .subscribe((data) => {
+        if (data) {
+          const { tabId, message } = data;
+          this.addMessageToTab(tabId, message);
+        }
+      });
   }
 
   private addMessageToTab(tabId: string, message: Message): void {

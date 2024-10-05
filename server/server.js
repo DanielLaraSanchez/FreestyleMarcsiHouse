@@ -8,30 +8,30 @@ const server = http.createServer(app);
 const passport = require('./passport');
 const session = require('express-session');
 const { Server } = require('socket.io');
+const jwt = require('jsonwebtoken');
 const User = require('./data/models/User');
 
-// Initialize Socket.io without authentication, but include userId in handshake
+// Initialize Socket.io
 const io = new Server(server, {
   cors: {
-    origin: 'http://localhost:4200', // Your Angular app's URL
+    origin: 'http://localhost:4200',
     methods: ['GET', 'POST'],
-    credentials: true, // Allow credentials if needed
+    credentials: true,
   },
 });
-
 
 // Middleware
 app.use(
   cors({
-    origin: 'http://localhost:4200', // Allow your Angular app's origin
-    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allowed methods
-    credentials: true, // Allow credentials (cookies, session)
+    origin: 'http://localhost:4200',
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true,
   })
 );
 app.use(express.json());
 app.use(
   session({
-    secret: process.env.SESSION_SECRET, // Use the actual environment variable
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
   })
@@ -48,36 +48,58 @@ app.use('/users', userRoutes);
 
 const PORT = 3000;
 
-// Map to keep track of userId to socketId
-const userSockets = new Map(); // Use Map for better management
-const onlineUsers = new Set(); // Set to keep track of online user IDs
+// Map to keep track of userId to Set of socket IDs
+const userSockets = new Map();
 
 io.on('connection', (socket) => {
+  console.log('A user connected:', socket.id);
 
-  const userId = socket.handshake.auth.userId;
-  if (!userId) {
-    console.error('No userId provided in socket handshake.');
+  // Get token from query parameters
+  const token = socket.handshake.query.token;
+  if (!token) {
+    console.error('No token provided in socket handshake.');
     socket.disconnect();
     return;
   }
 
-  // Ensure userId is a string
-  socket.userId = userId.toString();
+  // Decode the token without verifying
+  const decoded = jwt.decode(token);
+  if (!decoded || !decoded.id) {
+    console.error('Invalid token. Could not extract user ID.');
+    socket.disconnect();
+    return;
+  }
 
-  // Store the mapping of userId to socket.id
-  userSockets.set(socket.userId, socket.id);
+  const userId = decoded.id;
+  socket.userId = userId;
 
-  // Add user to onlineUsers set
-  onlineUsers.add(socket.userId);
-  console.log('A user connected:', socket.id, "there are:", onlineUsers.size, "connected");
+  // Add socket ID to userSockets map
+  if (!userSockets.has(userId)) {
+    userSockets.set(userId, new Set());
+  }
+  userSockets.get(userId).add(socket.id);
 
-  // Notify other clients that a user is online
-  socket.emit('userOnline', { userId: socket.userId });
-
-  // Send the list of online users to the newly connected user
-  socket.emit('onlineUsers', { onlineUsers: Array.from(onlineUsers) });
-
-  console.log(`User ${socket.userId} connected via socket ${socket.id}`);
+  // If this is the first connection for the user, set them as online in the database
+  if (userSockets.get(userId).size === 1) {
+    // User just came online
+    User.findByIdAndUpdate(
+      userId,
+      { isOnline: true },
+      { new: true }
+    )
+      .then((user) => {
+        if (user) {
+          // Emit 'userOnline' event to all clients
+          io.emit('userOnline', { userId: user._id });
+          console.log(`User ${user._id} is now online.`);
+        }
+      })
+      .catch((err) => {
+        console.error('Error updating user status:', err);
+      });
+  } else {
+    console.log(`User ${userId} already online with other sockets.`);
+  }
 
   // Handle incoming messages
   socket.on('message', (data) => {
@@ -88,32 +110,57 @@ io.on('connection', (socket) => {
       io.emit('message', { tabId: 'general', message });
     } else {
       // Handle private messages
-      const recipientSocketId = userSockets.get(tabId); // 'tabId' is recipient's userId
-      if (recipientSocketId) {
+      const recipientUserId = tabId; // 'tabId' is recipient's userId
+      const recipientSockets = userSockets.get(recipientUserId);
+      if (recipientSockets && recipientSockets.size > 0) {
         const payload = {
           tabId: socket.userId, // The sender's userId
           message,
         };
-        io.to(recipientSocketId).emit('message', payload);
+        // Send the message to all recipient's sockets
+        recipientSockets.forEach((socketId) => {
+          io.to(socketId).emit('message', payload);
+        });
         // Also send the message to the sender's own tab
         socket.emit('message', payload);
       } else {
-        console.error(`Recipient socket not found for userId: ${tabId}`);
+        console.error(`Recipient not found or not online: ${tabId}`);
       }
     }
   });
 
   socket.on('disconnect', () => {
     console.log('A user disconnected:', socket.id);
-    if (socket.userId) {
-      // Remove user from userSockets
-      userSockets.delete(socket.userId);
 
-      // Remove user from onlineUsers set
-      onlineUsers.delete(socket.userId);
+    const userId = socket.userId;
+    const sockets = userSockets.get(userId);
+    if (sockets) {
+      sockets.delete(socket.id);
+      if (sockets.size === 0) {
+        // Remove user from userSockets map
+        userSockets.delete(userId);
 
-      // Notify other clients that a user is offline
-      socket.broadcast.emit('userOffline', { userId: socket.userId });
+        // Update user's status in the database
+        User.findByIdAndUpdate(
+          userId,
+          { isOnline: false },
+          { new: true }
+        )
+          .then((user) => {
+            if (user) {
+              // Emit 'userOffline' event to all clients
+              io.emit('userOffline', { userId: user._id });
+              console.log(`User ${user._id} is now offline.`);
+            }
+          })
+          .catch((err) => {
+            console.error('Error updating user status:', err);
+          });
+      } else {
+        console.log(`User ${userId} still has other active sockets.`);
+      }
+    } else {
+      console.error(`No sockets found for user ${userId}`);
     }
   });
 });

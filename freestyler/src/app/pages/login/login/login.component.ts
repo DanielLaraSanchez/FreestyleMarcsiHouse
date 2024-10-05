@@ -37,7 +37,7 @@ this.loginForm = this.fb.group({
     this.auth.login(email, password).subscribe({
       next: (data) => {
         this.auth.saveToken(data.token);
-        console.log("happening for login normal")
+        console.log("happening for login normal", data)
         this.router.navigate(['/chat']); // Redirect after login
       },
       error: (error) => {
