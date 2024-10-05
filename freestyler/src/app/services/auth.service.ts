@@ -1,13 +1,16 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { jwtDecode } from "jwt-decode";
+import { Observable, BehaviorSubject } from 'rxjs';
+import {jwtDecode} from 'jwt-decode'; // Correcting the import
 const TOKEN_KEY = 'auth-token';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
+  private tokenSubject = new BehaviorSubject<string | null>(this.getToken());
+  public token$ = this.tokenSubject.asObservable();
+
   constructor(private http: HttpClient) {}
 
   login(email: string, password: string): Observable<any> {
@@ -25,6 +28,7 @@ export class AuthService {
 
   saveToken(token: string): void {
     localStorage.setItem(TOKEN_KEY, token);
+    this.tokenSubject.next(token);
   }
 
   getToken(): string | null {
@@ -37,6 +41,7 @@ export class AuthService {
 
   logout(): void {
     localStorage.removeItem(TOKEN_KEY);
+    this.tokenSubject.next(null);
   }
 
   decodeToken(token: string): any {
