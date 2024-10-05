@@ -20,7 +20,7 @@ export class AuthCallbackComponent implements OnInit {
       if (token) {
         // Save the token and navigate to the home page
         this.authService.saveToken(token);
-        this.router.navigate(['/']);
+        this.router.navigate(['/chat']);
       } else {
         // Handle error
         console.error('No token received');
