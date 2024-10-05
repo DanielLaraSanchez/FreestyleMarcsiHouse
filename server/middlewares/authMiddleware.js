@@ -1,14 +1,25 @@
 const jwt = require('jsonwebtoken');
+const User = require('../data/models/User');
 
-const authMiddleware = (req, res, next) => {
+const authMiddleware = async (req, res, next) => {
   const token = req.headers['authorization']?.split(' ')[1]; // Bearer token
   if (!token) return res.status(401).json({ message: 'Access token missing' });
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded;
+    const user = await User.findById(decoded.id);
+
+    console.log('Auth Middleware - Token decoded:', decoded);
+    console.log('Auth Middleware - User tokenVersion:', user.tokenVersion);
+
+    if (!user || user.tokenVersion !== decoded.tokenVersion) {
+      return res.status(401).json({ message: 'Invalid token' });
+    }
+
+    req.user = user;
     next();
   } catch (err) {
+    console.log('Auth Middleware - Error verifying token:', err);
     res.status(401).json({ message: 'Invalid token' });
   }
 };

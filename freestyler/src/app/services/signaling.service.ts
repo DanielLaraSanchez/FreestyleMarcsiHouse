@@ -1,6 +1,6 @@
 import { Injectable, OnDestroy } from '@angular/core';
-import { default as io, Socket } from 'socket.io-client';
-import { BehaviorSubject, Observable, ReplaySubject, Subscription } from 'rxjs';
+import { default as io } from 'socket.io-client';
+import { BehaviorSubject, ReplaySubject, Subscription } from 'rxjs';
 import { Message } from '../models/message';
 import { AuthService } from './auth.service';
 
@@ -21,27 +21,37 @@ export class SignalingService implements OnDestroy {
   private onMessageSubject = new ReplaySubject<{ tabId: string; message: Message }>(1);
   public onMessage$ = this.onMessageSubject.asObservable();
 
+  private onlineUsersSubject = new BehaviorSubject<string[]>([]);
+  public onlineUsers$ = this.onlineUsersSubject.asObservable();
+
   private tokenSubscription!: Subscription;
 
   constructor(private authService: AuthService) {
-    // Subscribe to token changes
+    // Subscribe to authentication status changes
     this.tokenSubscription = this.authService.token$.subscribe((token) => {
       if (token) {
-        this.connectSocket(token);
+        this.connectSocket();
       } else {
         this.disconnectSocket();
       }
     });
   }
 
-  private connectSocket(token: string) {
+  private connectSocket() {
     if (this.isConnected) {
       return; // Already connected
     }
 
+    const userId = this.authService.getCurrentUserId();
+    console.log(userId)
+    if (!userId) {
+      console.error('No userId found, cannot connect socket.');
+      return;
+    }
+
     this.socket = io('http://localhost:3000', {
       auth: {
-        token: token,
+        userId: userId,
       },
     });
 
@@ -64,6 +74,7 @@ export class SignalingService implements OnDestroy {
 
     // Handle user online/offline status updates
     this.socket.on('userOnline', (data: any) => {
+      console.log("its workinggggg")
       const { userId } = data;
       this.userStatusSubject.next({ userId, status: 'online' });
     });
@@ -71,6 +82,12 @@ export class SignalingService implements OnDestroy {
     this.socket.on('userOffline', (data: any) => {
       const { userId } = data;
       this.userStatusSubject.next({ userId, status: 'offline' });
+    });
+
+    // Handle online users list
+    this.socket.on('onlineUsers', (data: any) => {
+      console.log(data.onlineUsers)
+      this.onlineUsersSubject.next(data.onlineUsers);
     });
 
     // Handle socket errors if needed
@@ -95,10 +112,6 @@ export class SignalingService implements OnDestroy {
     } else {
       console.error('Socket is not connected.');
     }
-  }
-
-  onMessage(): Observable<{ tabId: string; message: Message }> {
-    return this.onMessage$;
   }
 
   ngOnDestroy() {

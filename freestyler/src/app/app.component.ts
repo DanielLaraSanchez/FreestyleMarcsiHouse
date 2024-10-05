@@ -2,6 +2,7 @@ import { Component, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { MenuItem } from 'primeng/api';
 import { DeviceDetectorService } from './services/device-detector.service';
+import { SignalingService } from './services/signaling.service';
 
 @Component({
   selector: 'app-root',

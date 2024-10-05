@@ -8,10 +8,9 @@ const server = http.createServer(app);
 const passport = require('./passport');
 const session = require('express-session');
 const { Server } = require('socket.io');
-const jwt = require('jsonwebtoken');
 const User = require('./data/models/User');
 
-// Correctly initialize Socket.io with the HTTP server and CORS options
+// Initialize Socket.io without authentication, but include userId in handshake
 const io = new Server(server, {
   cors: {
     origin: 'http://localhost:4200', // Your Angular app's URL
@@ -19,6 +18,7 @@ const io = new Server(server, {
     credentials: true, // Allow credentials if needed
   },
 });
+
 
 // Middleware
 app.use(
@@ -49,56 +49,54 @@ app.use('/users', userRoutes);
 const PORT = 3000;
 
 // Map to keep track of userId to socketId
-const userSockets = {};
+const userSockets = new Map(); // Use Map for better management
+const onlineUsers = new Set(); // Set to keep track of online user IDs
 
 io.on('connection', (socket) => {
-  console.log('A user connected:', socket.id);
 
-  // After authentication, store user information in socket
-  const token = socket.handshake.auth.token;
-  let userId = null;
-
-  if (token) {
-    try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      userId = decoded.id;
-      socket.userId = userId; // Attach userId to the socket for future reference
-
-      // Store the mapping of userId to socket.id
-      userSockets[userId] = socket.id;
-
-      // Mark user as online
-      User.findByIdAndUpdate(userId, { isOnline: true }).exec();
-
-      // Notify all clients that a user is online
-      io.emit('userOnline', { userId });
-
-    } catch (err) {
-      console.error('Socket authentication error:', err);
-      socket.disconnect();
-      return;
-    }
-  } else {
-    console.error('No token provided in socket handshake auth');
+  const userId = socket.handshake.auth.userId;
+  if (!userId) {
+    console.error('No userId provided in socket handshake.');
     socket.disconnect();
     return;
   }
 
+  // Ensure userId is a string
+  socket.userId = userId.toString();
+
+  // Store the mapping of userId to socket.id
+  userSockets.set(socket.userId, socket.id);
+
+  // Add user to onlineUsers set
+  onlineUsers.add(socket.userId);
+  console.log('A user connected:', socket.id, "there are:", onlineUsers.size, "connected");
+
+  // Notify other clients that a user is online
+  socket.emit('userOnline', { userId: socket.userId });
+
+  // Send the list of online users to the newly connected user
+  socket.emit('onlineUsers', { onlineUsers: Array.from(onlineUsers) });
+
+  console.log(`User ${socket.userId} connected via socket ${socket.id}`);
+
+  // Handle incoming messages
   socket.on('message', (data) => {
     const { tabId, message } = data;
 
     if (tabId === 'general') {
-      // Broadcast message to all connected clients except the sender
-      socket.broadcast.emit('message', { tabId: 'general', message });
+      // Broadcast message to all connected clients including the sender
+      io.emit('message', { tabId: 'general', message });
     } else {
       // Handle private messages
-      const recipientSocketId = userSockets[tabId]; // 'tabId' is recipient's userId
+      const recipientSocketId = userSockets.get(tabId); // 'tabId' is recipient's userId
       if (recipientSocketId) {
         const payload = {
           tabId: socket.userId, // The sender's userId
           message,
         };
         io.to(recipientSocketId).emit('message', payload);
+        // Also send the message to the sender's own tab
+        socket.emit('message', payload);
       } else {
         console.error(`Recipient socket not found for userId: ${tabId}`);
       }
@@ -107,15 +105,15 @@ io.on('connection', (socket) => {
 
   socket.on('disconnect', () => {
     console.log('A user disconnected:', socket.id);
-    if (userId) {
+    if (socket.userId) {
       // Remove user from userSockets
-      delete userSockets[userId];
+      userSockets.delete(socket.userId);
 
-      // Mark user as offline
-      User.findByIdAndUpdate(userId, { isOnline: false }).exec();
+      // Remove user from onlineUsers set
+      onlineUsers.delete(socket.userId);
 
-      // Notify all clients that a user is offline
-      io.emit('userOffline', { userId });
+      // Notify other clients that a user is offline
+      socket.broadcast.emit('userOffline', { userId: socket.userId });
     }
   });
 });

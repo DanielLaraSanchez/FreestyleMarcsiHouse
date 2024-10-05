@@ -1,12 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const UserController = require('../controllers/userController');
-const authMiddleware = require('../middlewares/authMiddleware');
 
-// Get a list of users
-router.get('/', authMiddleware, UserController.getAllUsers);
+// Existing routes
+router.get('/', UserController.getAllUsers);
+router.get('/:id', UserController.getUserById);
 
-// Get a single user by ID
-router.get('/:id', authMiddleware, UserController.getUserById);
+// Add this route
+router.post('/getByIds', UserController.getUsersByIds);
 
 module.exports = router;

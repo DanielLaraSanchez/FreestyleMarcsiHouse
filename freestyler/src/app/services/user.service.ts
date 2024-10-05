@@ -1,23 +1,25 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { User } from '../models/user';
 import { Observable } from 'rxjs';
+
+const API_URL = 'http://localhost:3000';
 
 @Injectable({
   providedIn: 'root',
 })
 export class UserService {
-  private apiUrl = 'http://localhost:3000/users'; // Adjust the URL as needed
-
   constructor(private http: HttpClient) {}
 
-  // Get all users
-  getUsers(): Observable<User[]> {
-    return this.http.get<User[]>(this.apiUrl);
+  getUsers(): Observable<any> {
+    return this.http.get(`${API_URL}/users`);
   }
 
-  // Get a user by ID
-  getUserById(id: string): Observable<User> {
-    return this.http.get<User>(`${this.apiUrl}/${id}`);
+  getUserById(id: string): Observable<any> {
+    return this.http.get(`${API_URL}/users/${id}`);
+  }
+
+  // Add this method
+  getUsersByIds(ids: string[]): Observable<any> {
+    return this.http.post(`${API_URL}/users/getByIds`, { ids });
   }
 }

@@ -21,6 +21,20 @@ const UserController = {
       res.status(500).json({ message: err.message });
     }
   },
+
+  // Add this method
+  getUsersByIds: async (req, res) => {
+    const { ids } = req.body;
+    try {
+      const users = await User.find(
+        { _id: { $in: ids } },
+        '-password -email -googleId'
+      );
+      res.json(users);
+    } catch (err) {
+      res.status(500).json({ message: err.message });
+    }
+  },
 };
 
 module.exports = UserController;

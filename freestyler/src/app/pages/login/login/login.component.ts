@@ -30,13 +30,14 @@ this.loginForm = this.fb.group({
     //   // Handle form validation errors
     //   return;
     // }
-  
+
     const email = this.loginForm.get('email')?.value;
     const password = this.loginForm.get('password')?.value;
-  
+
     this.auth.login(email, password).subscribe({
       next: (data) => {
         this.auth.saveToken(data.token);
+        console.log("happening for login normal")
         this.router.navigate(['/chat']); // Redirect after login
       },
       error: (error) => {

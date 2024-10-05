@@ -5,8 +5,8 @@ const User = require('./data/models/User');
 passport.use(
   new GoogleStrategy(
     {
-      clientID: '22638002158-v7r9rsf3vjdn59vqsdsavt8mncui3k8m.apps.googleusercontent.com', // Replace with your Google Client ID
-      clientSecret: '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', // Replace with your Google Client Secret
+      clientID: '22638002158-v7r9rsf3vjdn59vqsdsavt8mncui3k8m.apps.googleusercontent.com', // Your Google Client ID
+      clientSecret: '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', // Your Google Client Secret
       callbackURL: '/auth/google/callback',
     },
     async (accessToken, refreshToken, profile, done) => {
@@ -19,8 +19,12 @@ passport.use(
           // User exists, update profile picture if changed
           if (user.profilePicture !== photos[0].value) {
             user.profilePicture = photos[0].value;
-            await user.save();
           }
+
+          // Increment tokenVersion to invalidate previous tokens
+          user.tokenVersion += 1;
+          await user.save();
+
           return done(null, user);
         } else {
           // Check if user with the same email exists
@@ -29,7 +33,11 @@ passport.use(
             // Update user with googleId and profile picture
             user.googleId = id;
             user.profilePicture = photos[0].value;
+
+            // Increment tokenVersion
+            user.tokenVersion += 1;
             await user.save();
+
             return done(null, user);
           } else {
             // Create new user
@@ -39,6 +47,7 @@ passport.use(
               name: displayName,
               profilePicture: photos[0].value,
               stats: {}, // Initialize stats
+              tokenVersion: 1, // Initialize tokenVersion
             });
             await newUser.save();
             return done(null, newUser);

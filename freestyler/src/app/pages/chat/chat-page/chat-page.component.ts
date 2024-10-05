@@ -14,8 +14,9 @@ import { ChatTab } from '../../../models/chat-tab';
 import { UserActionsDialogComponent } from '../../../components/user-actions-dialog/user-actions-dialog.component';
 import { UserService } from '../../../services/user.service';
 import { AuthService } from '../../../services/auth.service';
-import { SignalingService } from '../../../services/signaling.service'; // Import SignalingService
+import { SignalingService } from '../../../services/signaling.service';
 import { filter } from 'rxjs/operators';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-chat-page',
@@ -64,7 +65,8 @@ export class ChatPageComponent implements OnInit, AfterViewChecked {
     private chatService: ChatService,
     private userService: UserService,
     private authService: AuthService,
-    private signalingService: SignalingService // Inject SignalingService
+    private signalingService: SignalingService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -82,92 +84,109 @@ export class ChatPageComponent implements OnInit, AfterViewChecked {
     const token = this.authService.getToken();
     if (token) {
       const decodedToken = this.authService.decodeToken(token);
-      this.userService.getUserById(decodedToken.id).subscribe({
-        next: (user) => {
-          this.currentUser = user;
+      if (decodedToken && decodedToken.id) {
+        this.userService.getUserById(decodedToken.id).subscribe({
+          next: (user) => {
+            this.currentUser = user;
 
-          // Wait for socket to connect before loading online users
-          this.signalingService.socketConnected$.subscribe((isConnected) => {
-            if (isConnected) {
-              // Now load online users
-              this.loadOnlineUsers();
-              this.setupUserStatusListeners(); // Set up real-time user status updates
-            }
-          });
-        },
-        error: (error) => {
-          console.error('Error fetching current user:', error);
-          // Handle error, possibly redirect to login
-        },
-      });
+            // Socket connection and user status setup
+            this.signalingService.socketConnected$.subscribe((isConnected) => {
+              if (isConnected) {
+                // Real-time user status updates
+                this.setupUserStatusListeners();
+              }
+            });
+          },
+          error: (error) => {
+            console.error('Error fetching current user:', error);
+            // Handle error, possibly redirect to login
+            this.authService.logout();
+            this.router.navigate(['/login']);
+          },
+        });
+      } else {
+        // Invalid token
+        console.error('Invalid token');
+        this.authService.logout();
+        this.router.navigate(['/login']);
+      }
     } else {
       // Handle case where there is no token
       console.error('No auth token found, redirecting to login.');
-      // Redirect logic here, e.g., this.router.navigate(['/login']);
+      this.router.navigate(['/login']);
+    }
+   // Subscribe to chatTabs from ChatService
+   this.chatService.chatTabs$.subscribe({
+    next: (tabs) => {
+      this.chatTabs = tabs;
+      this.selectedTab = this.chatTabs.find(
+        (tab) => tab.id === this.activeTabId
+      );
+    },
+  });
+
+  // Subscribe to onlineUsers$ to get the list of online user IDs
+  this.signalingService.onlineUsers$.subscribe((onlineUserIds) => {
+    this.updateOnlineUsers(onlineUserIds);
+  });
+}
+
+  private updateOnlineUsers(onlineUserIds: string[]): void {
+    // Exclude the current user ID
+    const filteredUserIds = onlineUserIds.filter(
+      (id) => id !== this.currentUser?._id
+    );
+
+    // Fetch user details for the online users
+    if (filteredUserIds.length === 0) {
+      this.onlineUsers = [];
+      return;
     }
 
-    // Subscribe to chatTabs from ChatService
-    this.chatService.chatTabs$.subscribe({
-      next: (tabs) => {
-        this.chatTabs = tabs;
-        this.selectedTab = this.chatTabs.find(
-          (tab) => tab.id === this.activeTabId
-        );
-        // If the activeTabId no longer exists, reset to 'general'
-        if (!this.selectedTab) {
-          this.activeTabId = 'general';
-          this.selectedTab = this.chatTabs.find((tab) => tab.id === 'general');
-        }
-      },
-    });
-  }
-
-  ngAfterViewChecked() {
-    this.scrollToBottom();
-  }
-
-  private loadOnlineUsers(): void {
-    // Fetch online users from backend
-    this.userService.getUsers().subscribe({
+    this.userService.getUsersByIds(filteredUserIds).subscribe({
       next: (users) => {
-        // Exclude current user and the general user
-        this.onlineUsers = users.filter(
-          (user) =>
-            user.isOnline &&
-            user._id !== this.currentUser._id &&
-            user._id !== this.generalUser._id
-        );
+        this.onlineUsers = users;
       },
       error: (error) => {
-        console.error('Error fetching users:', error);
+        console.error('Error fetching online users:', error);
       },
     });
   }
 
   private setupUserStatusListeners(): void {
-    // Listen to user status updates
     this.signalingService.userStatus$
       .pipe(filter((data) => data !== null))
       .subscribe((data) => {
         const { userId, status } = data;
-        if (userId !== this.currentUser._id) {
-          const user = this.onlineUsers.find((u) => u._id === userId);
-          if (user) {
-            user.isOnline = status === 'online';
-          } else if (status === 'online') {
+        const userIndex = this.onlineUsers.findIndex((u) => u._id === userId);
+
+        if (status === 'online') {
+          // If the user is not in the list, add them
+          if (userIndex === -1 && userId !== this.currentUser._id) {
             // Fetch user info from backend
             this.userService.getUserById(userId).subscribe({
               next: (fetchedUser) => {
-                fetchedUser.isOnline = true;
+                fetchedUser.isOnline = true; // Boolean value
                 this.onlineUsers.push(fetchedUser);
               },
               error: (error) => {
                 console.error('Error fetching user:', error);
               },
             });
+          } else if (userIndex !== -1) {
+            this.onlineUsers[userIndex].isOnline = true; // Boolean value
+          }
+        } else if (status === 'offline') {
+          // If the user is in the list, remove them
+          if (userIndex !== -1) {
+            this.onlineUsers.splice(userIndex, 1);
           }
         }
       });
+  }
+
+  ngAfterViewChecked() {
+    this.scrollToBottom();
   }
 
   scrollToBottom(): void {
@@ -188,8 +207,9 @@ export class ChatPageComponent implements OnInit, AfterViewChecked {
         content: trimmedMessage,
         timestamp: new Date(),
       };
-  
-      this.chatService.addMessage(this.selectedTab.id, message);
+
+      // Instead of adding the message directly, rely on receiving it back from the server
+      this.chatService.sendMessage(this.selectedTab.id, message);
       this.newMessage = '';
     }
   }
@@ -227,21 +247,22 @@ export class ChatPageComponent implements OnInit, AfterViewChecked {
   openPrivateChat(user: User) {
     // Set the active tab to the selected user's chat
     this.activeTabId = user._id;
-    this.selectedTab = this.chatTabs.find(
+
+    // Check if the tab exists
+    const existingTab = this.chatTabs.find(
       (tab) => tab.id === this.activeTabId
     );
 
-    if (!this.selectedTab) {
+    if (!existingTab) {
       // If the tab doesn't exist, create it
       this.chatService.addChatTab({
         id: user._id,
         label: user.name,
         messages: [],
       });
-      this.selectedTab = this.chatTabs.find(
-        (tab) => tab.id === this.activeTabId
-      );
     }
+
+    // selectedTab will be updated by the subscription to chatTabs$
   }
 
   selectTab(tabId: string) {
@@ -249,8 +270,9 @@ export class ChatPageComponent implements OnInit, AfterViewChecked {
     this.selectedTab = this.chatTabs.find((tab) => tab.id === tabId);
   }
 
-  closeTab(tabId: string) {
-    // Removed close functionality as per user request
+  deselectTab() {
+    this.activeTabId = '';
+    this.selectedTab = undefined;
   }
 
   getNextMessageId(tabId: string): number {
@@ -261,15 +283,12 @@ export class ChatPageComponent implements OnInit, AfterViewChecked {
     return 1;
   }
 
-  getUserById(tabId: string): User {
+  getUserById(tabId: string): User | null {
     if (tabId === 'general') {
       return this.generalUser;
     }
     const user = this.onlineUsers.find((user) => user._id === tabId);
-    if (!user) {
-      throw new Error(`User with id ${tabId} not found`);
-    }
-    return user;
+    return user ? user : null;
   }
 
   getUserProfilePicture(tabId: string): string {
@@ -277,7 +296,9 @@ export class ChatPageComponent implements OnInit, AfterViewChecked {
       return this.generalUser.profilePicture;
     }
     const user = this.getUserById(tabId);
-    return user ? user.profilePicture : 'https://via.placeholder.com/150';
+    return user && user.profilePicture
+      ? user.profilePicture
+      : 'https://via.placeholder.com/150';
   }
 
   getUserStatus(tabId: string): string {
@@ -285,7 +306,7 @@ export class ChatPageComponent implements OnInit, AfterViewChecked {
       return 'Always Online';
     }
     const user = this.getUserById(tabId);
-    return user ? (user.isOnline ? 'Online' : 'Offline') : '';
+    return user ? (user.isOnline ? 'Online' : 'Offline') : 'Unknown';
   }
 
   getLastMessage(tabId: string | undefined): string {
@@ -295,16 +316,6 @@ export class ChatPageComponent implements OnInit, AfterViewChecked {
       return tab.messages[tab.messages.length - 1].content || '';
     }
     return 'No messages yet';
-  }
-
-  toggleNotifications() {
-    // Implement notification toggle logic
-    alert('Notification toggle clicked');
-  }
-
-  deselectTab() {
-    this.activeTabId = '';
-    this.selectedTab = undefined;
   }
 
   // Added getter for filtered users based on searchTerm

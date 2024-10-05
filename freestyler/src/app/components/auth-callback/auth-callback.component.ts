@@ -18,12 +18,14 @@ export class AuthCallbackComponent implements OnInit {
     this.route.queryParams.subscribe(params => {
       const token = params['token'];
       if (token) {
-        // Save the token and navigate to the home page
+        console.log('AuthCallbackComponent: Token received:', token);
+        // Save the token and navigate to the chat page
         this.authService.saveToken(token);
+        console.log("happening for google")
         this.router.navigate(['/chat']);
       } else {
         // Handle error
-        console.error('No token received');
+        console.error('AuthCallbackComponent: No token received');
         this.router.navigate(['/login']);
       }
     });

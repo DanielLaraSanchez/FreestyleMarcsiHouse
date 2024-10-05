@@ -16,7 +16,14 @@ const AuthController = {
         stats: {}, // Initialize stats
         profilePicture: '', // Set a default profile picture if needed
       });
+      user.tokenVersion += 1;
       await user.save();
+
+      const token = jwt.sign(
+        { id: user._id, tokenVersion: user.tokenVersion },
+        process.env.JWT_SECRET,
+        { expiresIn: '1d' }
+      );
 
       res.status(201).json({ message: 'User created successfully' });
     } catch (err) {
@@ -42,9 +49,11 @@ console.log("wqokds")
           return res.status(400).json({ message: 'Invalid email or password comparePassword' });
 
         // Generate JWT
-        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-          expiresIn: '1d',
-        });
+        const token = jwt.sign(
+          { id: user._id, tokenVersion: user.tokenVersion },
+          process.env.JWT_SECRET,
+          { expiresIn: '1d' }
+        );
 
         res.json({ token, user: { id: user._id, name: user.name, email: user.email } });
       });
@@ -56,7 +65,8 @@ console.log("wqokds")
   googleCallback: (req, res) => {
     // User is authenticated, generate JWT
     const user = req.user;
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+    
+    const token = jwt.sign({ id: user._id, tokenVersion: user.tokenVersion }, process.env.JWT_SECRET, {
       expiresIn: '1d',
     });
   

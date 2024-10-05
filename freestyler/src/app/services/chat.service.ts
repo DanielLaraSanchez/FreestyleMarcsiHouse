@@ -35,7 +35,10 @@ export class ChatService {
     let tab = currentTabs.find((t) => t.id === tabId);
     if (!tab) {
       // Create the tab if it doesn't exist
-      const label = tabId === 'general' ? 'General' : 'Private Chat';
+      const label =
+        tabId === 'general'
+          ? 'General'
+          : message.sender?.name || 'Private Chat';
       tab = { id: tabId, label: label, messages: [] };
       currentTabs.push(tab);
     }
@@ -59,18 +62,8 @@ export class ChatService {
     this.chatTabsSubject.next(currentTabs);
   }
 
-  addMessage(tabId: string | undefined, message: Message) {
+  sendMessage(tabId: string | undefined, message: Message) {
     if (!tabId) return;
-    const currentTabs = this.chatTabsSubject.getValue();
-    let tab = currentTabs.find((t) => t.id === tabId);
-    if (!tab) {
-      // Create the tab if it doesn't exist
-      const label = tabId === 'general' ? 'General' : 'Private Chat';
-      tab = { id: tabId, label: label, messages: [] };
-      currentTabs.push(tab);
-    }
-    tab.messages.push(message);
-    this.chatTabsSubject.next([...currentTabs]);
 
     // Emit message via signaling service
     this.signalingService.sendMessage(tabId, message);

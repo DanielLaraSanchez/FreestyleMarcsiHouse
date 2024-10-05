@@ -1,18 +1,17 @@
 const express = require('express');
 const router = express.Router();
-const AuthController = require('../controllers/authController');
 const passport = require('passport');
+const AuthController = require('../controllers/authController');
 
+// Define routes
 router.post('/signup', AuthController.signup);
 router.post('/login', AuthController.login);
-
-// Google OAuth routes
-router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'], prompt:'select_account' }));
-
+router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 router.get(
   '/google/callback',
-  passport.authenticate('google', { failureRedirect: '/login' }),
+  passport.authenticate('google', { session: false }),
   AuthController.googleCallback
 );
 
+// Export the router
 module.exports = router;

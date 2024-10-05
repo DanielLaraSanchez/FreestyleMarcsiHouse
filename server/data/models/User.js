@@ -1,45 +1,43 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
-const StatsSchema = require('./Stats');
 
-const SALT_WORK_FACTOR = 10;
-
-const UserSchema = new mongoose.Schema({
-  googleId: { type: String }, // For Google OAuth users
-  email: { type: String, required: true, unique: true },
-  password: { type: String },
-  name: { type: String, required: true },
-  profilePicture: { type: String },
-  stats: { type: StatsSchema, default: () => ({}) },
+const userSchema = new mongoose.Schema({
+  googleId: String,
+  email: { type: String, unique: true },
+  password: String,
+  name: String,
+  profilePicture: String,
+  stats: {
+    points: { type: Number, default: 0 },
+    votes: { type: Number, default: 0 },
+    battles: { type: Number, default: 0 },
+    wins: { type: Number, default: 0 },
+  },
   isOnline: { type: Boolean, default: false },
-  status: { type: String },
-  isInBattlefield: { type: Boolean, default: false },
+  tokenVersion: { type: Number, default: 1 }, // Initialize tokenVersion
 });
 
 // Hash password before saving
-UserSchema.pre('save', function (next) {
+userSchema.pre('save', function (next) {
   const user = this;
-
   if (!user.isModified('password')) return next();
-
-  bcrypt.genSalt(SALT_WORK_FACTOR, (err, salt) => {
+  bcrypt.hash(user.password, 10, function (err, hash) {
     if (err) return next(err);
-
-    bcrypt.hash(user.password, salt, (error, hash) => {
-      if (error) return next(error);
-
-      user.password = hash;
-      next();
-    });
+    user.password = hash;
+    next();
   });
 });
 
-// Method to compare password
-UserSchema.methods.comparePassword = function (candidatePassword, cb) {
-  bcrypt.compare(candidatePassword, this.password, (err, isMatch) => {
+// Compare password method
+userSchema.methods.comparePassword = function (candidatePassword, cb) {
+  if (!this.password) {
+    // No password set (e.g., Google account)
+    return cb(null, false);
+  }
+  bcrypt.compare(candidatePassword, this.password, function (err, isMatch) {
     if (err) return cb(err);
     cb(null, isMatch);
   });
 };
 
-module.exports = mongoose.model('User', UserSchema);
+module.exports = mongoose.model('User', userSchema);

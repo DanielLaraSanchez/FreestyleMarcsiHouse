@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { BreakpointObserver } from '@angular/cdk/layout';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
@@ -12,17 +12,17 @@ export class DeviceDetectorService {
   public isDesktop$: Observable<boolean>;
 
   constructor(private breakpointObserver: BreakpointObserver) {
-    // Observe each breakpoint individually and map to result.matches
+    // Custom breakpoints to improve detection
     this.isMobile$ = this.breakpointObserver
-      .observe(Breakpoints.Handset)
+      .observe('(max-width: 767px)')
       .pipe(map((result) => result.matches));
 
     this.isTablet$ = this.breakpointObserver
-      .observe(Breakpoints.Tablet)
+      .observe('(min-width: 768px) and (max-width: 1023px)')
       .pipe(map((result) => result.matches));
 
     this.isDesktop$ = this.breakpointObserver
-      .observe(Breakpoints.Web)
+      .observe('(min-width: 1024px)')
       .pipe(map((result) => result.matches));
   }
 }
