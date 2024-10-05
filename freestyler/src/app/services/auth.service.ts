@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
-import {jwtDecode} from 'jwt-decode'; // Correcting the import
+import { jwtDecode }from 'jwt-decode'; // Correct import statement
+
 const TOKEN_KEY = 'auth-token';
 
 @Injectable({
@@ -18,7 +19,6 @@ export class AuthService {
   }
 
   loginWithGoogle(): void {
-    // Redirect the browser to the backend endpoint that initiates Google authentication
     window.location.href = 'http://localhost:3000/auth/google';
   }
 
@@ -28,7 +28,7 @@ export class AuthService {
 
   saveToken(token: string): void {
     localStorage.setItem(TOKEN_KEY, token);
-    this.tokenSubject.next(token);
+    this.tokenSubject.next(token); // Emit the new token
   }
 
   getToken(): string | null {
@@ -41,7 +41,7 @@ export class AuthService {
 
   logout(): void {
     localStorage.removeItem(TOKEN_KEY);
-    this.tokenSubject.next(null);
+    this.tokenSubject.next(null); // Emit null to indicate logout
   }
 
   decodeToken(token: string): any {
