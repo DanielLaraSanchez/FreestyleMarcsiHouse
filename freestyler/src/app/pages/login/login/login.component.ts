@@ -58,4 +58,8 @@ this.loginForm = this.fb.group({
       return null;
     }
   }
+
+  loginWithGoogle() {
+    this.auth.loginWithGoogle();
+  }
 }

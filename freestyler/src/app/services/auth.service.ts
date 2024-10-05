@@ -14,8 +14,9 @@ export class AuthService {
     return this.http.post('/login', { email, password });
   }
 
-  loginWithGoogle(email: string, password: string): Observable<any> {
-    return this.http.post('http://localhost:3000/auth/google', { email, password });
+  loginWithGoogle(): void {
+    // Redirect the browser to the backend endpoint that initiates Google authentication
+    window.location.href = 'http://localhost:3000/auth/google';
   }
 
   signup(name: string, email: string, password: string): Observable<any> {
