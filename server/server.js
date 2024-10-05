@@ -51,42 +51,53 @@ const PORT = 3000;
 io.on('connection', (socket) => {
   console.log('A user connected');
 
-  // Extract token from socket handshake
+  // After authentication, store user information in socket
   const token = socket.handshake.auth.token;
-  console.log('Received token:', token);
-
   let userId = null;
 
   if (token) {
     try {
-      // Remove "Bearer " prefix if present
-      const tokenWithoutBearer = token.startsWith('Bearer ') ? token.slice(7) : token;
-
-      const decoded = jwt.verify(tokenWithoutBearer, process.env.JWT_SECRET);
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
       userId = decoded.id;
+      socket.userId = userId; // Attach userId to the socket for future reference
 
       // Mark user as online
       User.findByIdAndUpdate(userId, { isOnline: true }).exec();
 
+      // Notify other clients that a user is online
+      socket.broadcast.emit('userOnline', { userId });
+
     } catch (err) {
       console.error('Socket authentication error:', err);
-
-      // Disconnect the socket if authentication fails
       socket.disconnect();
       return;
     }
   } else {
-    // No token provided
     console.error('No token provided in socket handshake auth');
     socket.disconnect();
     return;
   }
+
+  socket.on('message', (data) => {
+    const { tabId, message } = data;
+
+    if (tabId === 'general') {
+      // Broadcast message to all connected clients except the sender
+      socket.broadcast.emit('message', { tabId, message });
+    } else {
+      // Handle private messages (if applicable)
+      io.to(tabId).emit('message', { tabId, message });
+    }
+  });
 
   socket.on('disconnect', () => {
     console.log('A user disconnected');
     if (userId) {
       // Mark user as offline
       User.findByIdAndUpdate(userId, { isOnline: false }).exec();
+
+      // Notify other clients that a user is offline
+      socket.broadcast.emit('userOffline', { userId });
     }
   });
 });
