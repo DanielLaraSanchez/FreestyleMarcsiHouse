@@ -19,9 +19,29 @@ export class ChatService {
     this.chatTabsSubject.next(initialTabs);
 
     // Listen for messages from the signaling service
-    this.signalingService.onMessage().subscribe((data) => {
-      this.receiveMessage(data);
+    this.signalingService.onMessage().subscribe({
+      next: (data) => {
+        const { tabId, message } = data;
+        this.addMessageToTab(tabId, message);
+      },
+      error: (error) => {
+        console.error('Error receiving message:', error);
+      },
     });
+  }
+
+  private addMessageToTab(tabId: string, message: Message): void {
+    // Access the current value of chatTabs
+    const currentTabs = this.chatTabsSubject.getValue();
+    let tab = currentTabs.find((t) => t.id === tabId);
+    if (!tab) {
+      // Create the tab if it doesn't exist
+      tab = { id: tabId, label: tabId, messages: [] };
+      currentTabs.push(tab);
+    }
+    tab.messages.push(message);
+    // Emit the updated tabs
+    this.chatTabsSubject.next([...currentTabs]);
   }
 
   getChatTabs(): ChatTab[] {
@@ -29,42 +49,30 @@ export class ChatService {
   }
 
   addChatTab(tab: ChatTab) {
-    const currentTabs = this.getChatTabs();
+    const currentTabs = this.chatTabsSubject.getValue();
     this.chatTabsSubject.next([...currentTabs, tab]);
   }
 
   removeChatTab(tabId: string) {
-    const currentTabs = this.getChatTabs().filter((tab) => tab.id !== tabId);
+    const currentTabs = this.chatTabsSubject
+      .getValue()
+      .filter((tab) => tab.id !== tabId);
     this.chatTabsSubject.next(currentTabs);
   }
 
   addMessage(tabId: string | undefined, message: Message) {
     if (!tabId) return;
-    const currentTabs = this.getChatTabs();
-    const tabIndex = currentTabs.findIndex((tab) => tab.id === tabId);
-    if (tabIndex !== -1) {
-      currentTabs[tabIndex].messages.push(message);
-      this.chatTabsSubject.next([...currentTabs]);
+    const currentTabs = this.chatTabsSubject.getValue();
+    let tab = currentTabs.find((t) => t.id === tabId);
+    if (!tab) {
+      // Create the tab if it doesn't exist
+      tab = { id: tabId, label: tabId, messages: [] };
+      currentTabs.push(tab);
     }
+    tab.messages.push(message);
+    this.chatTabsSubject.next([...currentTabs]);
 
     // Emit message via signaling service
     this.signalingService.sendMessage(tabId, message);
-  }
-
-  private receiveMessage(data: { tabId: string; message: Message }) {
-    const { tabId, message } = data;
-    const currentTabs = this.getChatTabs();
-    const tabIndex = currentTabs.findIndex((tab) => tab.id === tabId);
-    if (tabIndex !== -1) {
-      currentTabs[tabIndex].messages.push(message);
-    } else {
-      // If the tab does not exist, create it
-      this.addChatTab({
-        id: tabId,
-        label: tabId,
-        messages: [message],
-      });
-    }
-    this.chatTabsSubject.next([...currentTabs]);
   }
 }

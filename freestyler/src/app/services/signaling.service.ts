@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { default as io } from 'socket.io-client'; // Correct import
-import { Observable, ReplaySubject } from 'rxjs';
+import { default as io } from 'socket.io-client';
+import { Observable, ReplaySubject, Subscription } from 'rxjs';
 import { Message } from '../models/message';
 import { AuthService } from './auth.service';
 
@@ -11,10 +11,11 @@ export class SignalingService {
   private socket: any;
   private isConnected = false;
   private onMessageSubject = new ReplaySubject<{ tabId: string; message: Message }>(1);
+  private tokenSubscription!: Subscription;
 
   constructor(private authService: AuthService) {
     // Subscribe to token changes
-    this.authService.token$.subscribe((token) => {
+    this.tokenSubscription = this.authService.token$.subscribe((token) => {
       if (token) {
         this.connectSocket(token);
       } else {
@@ -64,5 +65,11 @@ export class SignalingService {
 
   onMessage(): Observable<{ tabId: string; message: Message }> {
     return this.onMessageSubject.asObservable();
+  }
+
+  // Remember to clean up the subscription
+  ngOnDestroy() {
+    this.tokenSubscription.unsubscribe();
+    this.disconnectSocket();
   }
 }
