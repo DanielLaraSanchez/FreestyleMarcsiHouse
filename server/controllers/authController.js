@@ -57,7 +57,7 @@ const AuthController = {
     });
   
     // Redirect back to Angular app with token as a query parameter
-    res.redirect(`http://localhost:4200/auth/callback?token=${token}`);
+    res.redirect(`http://localhost:4200/auth/google/callback?token=${token}`);
   },
 };
 

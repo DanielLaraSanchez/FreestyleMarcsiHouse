@@ -1,4 +1,4 @@
-const User = require('../models/User');
+const User = require('../data/models/User');
 
 const UserController = {
   // Get all users (exclude sensitive fields)
