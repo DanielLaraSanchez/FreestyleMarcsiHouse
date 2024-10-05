@@ -7,7 +7,7 @@ router.post('/signup', AuthController.signup);
 router.post('/login', AuthController.login);
 
 // Google OAuth routes
-router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'], prompt:'select_account' }));
 
 router.get(
   '/google/callback',
