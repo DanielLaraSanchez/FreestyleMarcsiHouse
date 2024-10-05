@@ -51,18 +51,35 @@ const PORT = 3000;
 io.on('connection', (socket) => {
   console.log('A user connected');
 
-  // Extract user ID from token
+  // Extract token from socket handshake
   const token = socket.handshake.auth.token;
+  console.log('Received token:', token);
+
   let userId = null;
+
   if (token) {
     try {
-      const decoded = jwt.verify(token.replace('Bearer ', ''), process.env.JWT_SECRET);
+      // Remove "Bearer " prefix if present
+      const tokenWithoutBearer = token.startsWith('Bearer ') ? token.slice(7) : token;
+
+      const decoded = jwt.verify(tokenWithoutBearer, process.env.JWT_SECRET);
       userId = decoded.id;
+
       // Mark user as online
       User.findByIdAndUpdate(userId, { isOnline: true }).exec();
+
     } catch (err) {
       console.error('Socket authentication error:', err);
+
+      // Disconnect the socket if authentication fails
+      socket.disconnect();
+      return;
     }
+  } else {
+    // No token provided
+    console.error('No token provided in socket handshake auth');
+    socket.disconnect();
+    return;
   }
 
   socket.on('disconnect', () => {
