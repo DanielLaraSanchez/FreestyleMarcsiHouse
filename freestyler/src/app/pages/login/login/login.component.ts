@@ -26,15 +26,23 @@ this.loginForm = this.fb.group({
   }
 
   onSubmit() {
-    this.auth.login(this.email, this.password).subscribe(
-      (data) => {
+    // if (this.loginForm.invalid) {
+    //   // Handle form validation errors
+    //   return;
+    // }
+  
+    const email = this.loginForm.get('email')?.value;
+    const password = this.loginForm.get('password')?.value;
+  
+    this.auth.login(email, password).subscribe({
+      next: (data) => {
         this.auth.saveToken(data.token);
-        this.router.navigate(['/']); // Redirect after login
+        this.router.navigate(['/chat']); // Redirect after login
       },
-      (error) => {
+      error: (error) => {
         this.errorMessage = error.error.message;
-      }
-    );
+      },
+    });
   }
 
   // Custom validator to check if password and confirmPassword match
