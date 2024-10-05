@@ -14,8 +14,8 @@
       </div>
       <div class="contacts">
         <!-- General Chat -->
-        <div 
-          class="contact-item general-chat" 
+        <div
+          class="contact-item general-chat"
           [class.active]="activeTabId === 'general'"
           (click)="selectTab('general')"
         >
@@ -26,16 +26,16 @@
           </div>
         </div>
         <!-- Online Users -->
-        <div 
-          *ngFor="let user of filteredUsers" 
-          class="contact-item" 
-          [class.active]="activeTabId === user.id.toString()"
-          (click)="selectTab(user.id.toString())"
+        <div
+          *ngFor="let user of filteredUsers"
+          class="contact-item"
+          [class.active]="activeTabId === user._id.toString()"
+          (click)="selectTab(user._id.toString())"
         >
           <p-avatar [image]="user.profilePicture" shape="circle"></p-avatar>
           <div class="contact-info">
             <div class="contact-name">{{ user.name }}</div>
-            <div class="contact-preview">{{ getLastMessage(user.id.toString()) }}</div>
+            <div class="contact-preview">{{ getLastMessage(user._id.toString()) }}</div>
           </div>
         </div>
       </div>
@@ -50,25 +50,25 @@
           <div class="conversation-status">{{ getUserStatus(selectedTab.id) }}</div>
         </div>
         <!-- Only show options button if not the "General" channel -->
-        <button 
+        <button
           *ngIf="selectedTab.id !== 'general'"
-          pButton 
-          type="button" 
-          icon="pi pi-ellipsis-v" 
-          class="options-button" 
+          pButton
+          type="button"
+          icon="pi pi-ellipsis-v"
+          class="options-button"
           (click)="openUserActions(getUserById(selectedTab.id)!)"
         ></button>
       </div>
       <div class="messages" #messagesContainer>
-        <div 
-          *ngFor="let msg of selectedTab.messages; trackBy: trackByMessageId" 
-          [class.sent]="msg.sender?.id === currentUser.id" 
-          [class.received]="msg.sender?.id !== currentUser.id" 
+        <div
+          *ngFor="let msg of selectedTab.messages; trackBy: trackByMessageId"
+          [class.sent]="msg.sender?._id === currentUser._id"
+          [class.received]="msg.sender?._id !== currentUser._id"
           class="message-bubble">
-          <p-avatar 
-            [image]="msg.sender?.profilePicture" 
-            shape="circle" 
-            size="normal" 
+          <p-avatar
+            [image]="msg.sender?.profilePicture"
+            shape="circle"
+            size="normal"
             class="message-avatar">
           </p-avatar>
           <div class="message-content">
@@ -106,10 +106,10 @@
         <button pButton type="button" icon="pi pi-arrow-left" class="back-button" (click)="deselectTab()"></button>
       </div>
       <div class="messages" #messagesContainer>
-        <div 
-          *ngFor="let msg of selectedTab.messages; trackBy: trackByMessageId" 
-          [class.sent]="msg.sender?.id === currentUser.id" 
-          [class.received]="msg.sender?.id !== currentUser.id" 
+        <div
+          *ngFor="let msg of selectedTab.messages; trackBy: trackByMessageId"
+          [class.sent]="msg.sender?._id === currentUser._id"
+          [class.received]="msg.sender?._id !== currentUser._id"
           class="message-bubble">
           <p-avatar [image]="msg.sender?.profilePicture" shape="circle" size="normal" class="message-avatar"></p-avatar>
           <div class="message-content">
@@ -145,8 +145,8 @@
       </div>
       <div class="contacts">
         <!-- General Chat -->
-        <div 
-          class="contact-item general-chat" 
+        <div
+          class="contact-item general-chat"
           [class.active]="activeTabId === 'general'"
           (click)="selectTab('general')"
         >
@@ -157,16 +157,16 @@
           </div>
         </div>
         <!-- Online Users -->
-        <div 
-          *ngFor="let user of filteredUsers" 
-          class="contact-item" 
-          [class.active]="activeTabId === user.id.toString()"
-          (click)="selectTab(user.id.toString())"
+        <div
+          *ngFor="let user of filteredUsers"
+          class="contact-item"
+          [class.active]="activeTabId === user._id.toString()"
+          (click)="selectTab(user._id.toString())"
         >
           <p-avatar [image]="user.profilePicture" shape="circle"></p-avatar>
           <div class="contact-info">
             <div class="contact-name">{{ user.name }}</div>
-            <div class="contact-preview">{{ getLastMessage(user.id.toString()) }}</div>
+            <div class="contact-preview">{{ getLastMessage(user._id.toString()) }}</div>
           </div>
         </div>
       </div>

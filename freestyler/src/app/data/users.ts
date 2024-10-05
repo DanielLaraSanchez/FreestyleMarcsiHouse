@@ -1,6 +1,6 @@
 export const users = [
   {
-    id: 1,
+    _id: "1",
     name: 'MC Hammer',
     profilePicture: 'https://randomuser.me/api/portraits/men/1.jpg',
     isOnline: true,
@@ -11,9 +11,10 @@ export const users = [
       battles: 10,
       wins: 5,
     },
+    status: 'Available', // Example status
   },
   {
-    id: 2,
+    _id: "2",
     name: 'Eminem',
     profilePicture: 'https://randomuser.me/api/portraits/men/2.jpg',
     isOnline: false,
@@ -24,9 +25,10 @@ export const users = [
       battles: 30,
       wins: 20,
     },
+    status: 'Busy', // Example status
   },
   {
-    id: 3,
+    _id: "3",
     name: 'Jay-Z',
     profilePicture: 'https://randomuser.me/api/portraits/men/3.jpg',
     isOnline: true,
@@ -37,9 +39,10 @@ export const users = [
       battles: 40,
       wins: 25,
     },
+    status: 'Available', // Example status
   },
   {
-    id: 4,
+    _id: "4",
     name: 'Kendrick Lamar',
     profilePicture: 'https://randomuser.me/api/portraits/men/4.jpg',
     isOnline: true,
@@ -50,9 +53,10 @@ export const users = [
       battles: 20,
       wins: 10,
     },
+    status: 'In Game', // Example status
   },
   {
-    id: 5,
+    _id: "5",
     name: 'Lil Wayne',
     profilePicture: 'https://randomuser.me/api/portraits/men/5.jpg',
     isOnline: false,
@@ -63,9 +67,10 @@ export const users = [
       battles: 35,
       wins: 15,
     },
+    status: 'Offline', // Example status
   },
   {
-    id: 6,
+    _id: "6",
     name: 'Drake',
     profilePicture: 'https://randomuser.me/api/portraits/men/6.jpg',
     isOnline: true,
@@ -76,9 +81,10 @@ export const users = [
       battles: 50,
       wins: 30,
     },
+    status: 'Playing', // Example status
   },
   {
-    id: 7,
+    _id: "7",
     name: 'Snoop Dogg',
     profilePicture: 'https://randomuser.me/api/portraits/men/7.jpg',
     isOnline: true,
@@ -89,9 +95,10 @@ export const users = [
       battles: 55,
       wins: 35,
     },
+    status: 'Available', // Example status
   },
   {
-    id: 8,
+    _id: "8",
     name: 'Tupac Shakur',
     profilePicture: 'https://randomuser.me/api/portraits/men/8.jpg',
     isOnline: false,
@@ -102,9 +109,10 @@ export const users = [
       battles: 60,
       wins: 40,
     },
+    status: 'Unavailable', // Example status
   },
   {
-    id: 9,
+    _id: "9",
     name: 'Notorious B.I.G.',
     profilePicture: 'https://randomuser.me/api/portraits/men/9.jpg',
     isOnline: true,
@@ -115,9 +123,10 @@ export const users = [
       battles: 70,
       wins: 45,
     },
+    status: 'Chilled', // Example status
   },
   {
-    id: 10,
+    _id: "10",
     name: 'Nas',
     profilePicture: 'https://randomuser.me/api/portraits/men/10.jpg',
     isOnline: false,
@@ -128,9 +137,10 @@ export const users = [
       battles: 25,
       wins: 12,
     },
+    status: 'Busy', // Example status
   },
   {
-    id: 11,
+    _id: "11",
     name: 'J. Cole',
     profilePicture: 'https://randomuser.me/api/portraits/men/11.jpg',
     isOnline: true,
@@ -141,9 +151,10 @@ export const users = [
       battles: 45,
       wins: 22,
     },
+    status: 'Available', // Example status
   },
   {
-    id: 12,
+    _id: "12",
     name: 'Chance the Rapper',
     profilePicture: 'https://randomuser.me/api/portraits/men/12.jpg',
     isOnline: false,
@@ -154,9 +165,10 @@ export const users = [
       battles: 50,
       wins: 28,
     },
+    status: 'Unavailable', // Example status
   },
   {
-    id: 13,
+    _id: "13",
     name: 'Ice Cube',
     profilePicture: 'https://randomuser.me/api/portraits/men/13.jpg',
     isOnline: true,
@@ -167,9 +179,10 @@ export const users = [
       battles: 45,
       wins: 23,
     },
+    status: 'Chilled', // Example status
   },
   {
-    id: 14,
+    _id: "14",
     name: '50 Cent',
     profilePicture: 'https://randomuser.me/api/portraits/men/14.jpg',
     isOnline: false,
@@ -180,9 +193,10 @@ export const users = [
       battles: 55,
       wins: 30,
     },
+    status: 'Playing', // Example status
   },
   {
-    id: 15,
+    _id: "15",
     name: 'Ludacris',
     profilePicture: 'https://randomuser.me/api/portraits/men/15.jpg',
     isOnline: true,
@@ -193,9 +207,10 @@ export const users = [
       battles: 50,
       wins: 28,
     },
+    status: 'In action', // Example status
   },
   {
-    id: 16,
+    _id: "16",
     name: 'Kanye West',
     profilePicture: 'https://randomuser.me/api/portraits/men/16.jpg',
     isOnline: false,
@@ -206,9 +221,10 @@ export const users = [
       battles: 60,
       wins: 35,
     },
+    status: 'Offline', // Example status
   },
   {
-    id: 17,
+    _id: "17",
     name: 'Busta Rhymes',
     profilePicture: 'https://randomuser.me/api/portraits/men/17.jpg',
     isOnline: true,
@@ -219,9 +235,10 @@ export const users = [
       battles: 65,
       wins: 38,
     },
+    status: 'Busy', // Example status
   },
   {
-    id: 18,
+    _id: "18",
     name: 'Ice-T',
     profilePicture: 'https://randomuser.me/api/portraits/men/18.jpg',
     isOnline: false,
@@ -232,9 +249,10 @@ export const users = [
       battles: 50,
       wins: 28,
     },
+    status: 'Unavailable', // Example status
   },
   {
-    id: 19,
+    _id: "19",
     name: 'LL Cool J',
     profilePicture: 'https://randomuser.me/api/portraits/men/19.jpg',
     isOnline: true,
@@ -245,9 +263,10 @@ export const users = [
       battles: 45,
       wins: 22,
     },
+    status: 'In Game', // Example status
   },
   {
-    id: 20,
+    _id: "20",
     name: 'Common',
     profilePicture: 'https://randomuser.me/api/portraits/men/20.jpg',
     isOnline: false,
@@ -258,9 +277,10 @@ export const users = [
       battles: 40,
       wins: 20,
     },
+    status: 'Offline', // Example status
   },
   {
-    id: 21,
+    _id: "21",
     name: 'KRS-One',
     profilePicture: 'https://randomuser.me/api/portraits/men/21.jpg',
     isOnline: true,
@@ -271,9 +291,10 @@ export const users = [
       battles: 35,
       wins: 18,
     },
+    status: 'In action', // Example status
   },
   {
-    id: 22,
+    _id: "22",
     name: 'Big Daddy Kane',
     profilePicture: 'https://randomuser.me/api/portraits/men/22.jpg',
     isOnline: false,
@@ -284,9 +305,10 @@ export const users = [
       battles: 50,
       wins: 26,
     },
+    status: 'Unavailable', // Example status
   },
   {
-    id: 23,
+    _id: "23",
     name: 'Rakim',
     profilePicture: 'https://randomuser.me/api/portraits/men/23.jpg',
     isOnline: true,
@@ -297,9 +319,10 @@ export const users = [
       battles: 55,
       wins: 30,
     },
+    status: 'Chilled', // Example status
   },
   {
-    id: 24,
+    _id: "24",
     name: 'Dr. Dre',
     profilePicture: 'https://randomuser.me/api/portraits/men/24.jpg',
     isOnline: false,
@@ -310,9 +333,10 @@ export const users = [
       battles: 60,
       wins: 35,
     },
+    status: 'Playing', // Example status
   },
   {
-    id: 25,
+    _id: "25",
     name: 'Method Man',
     profilePicture: 'https://randomuser.me/api/portraits/men/25.jpg',
     isOnline: true,
@@ -323,9 +347,10 @@ export const users = [
       battles: 45,
       wins: 25,
     },
+    status: 'Available', // Example status
   },
   {
-    id: 26,
+    _id: "26",
     name: 'Redman',
     profilePicture: 'https://randomuser.me/api/portraits/men/26.jpg',
     isOnline: false,
@@ -336,9 +361,10 @@ export const users = [
       battles: 50,
       wins: 28,
     },
+    status: 'Unavailable', // Example status
   },
   {
-    id: 27,
+    _id: "27",
     name: 'DMX',
     profilePicture: 'https://randomuser.me/api/portraits/men/27.jpg',
     isOnline: true,
@@ -349,9 +375,10 @@ export const users = [
       battles: 55,
       wins: 32,
     },
+    status: 'Chilled', // Example status
   },
   {
-    id: 28,
+    _id: "28",
     name: 'Ghostface Killah',
     profilePicture: 'https://randomuser.me/api/portraits/men/28.jpg',
     isOnline: false,
@@ -362,9 +389,10 @@ export const users = [
       battles: 60,
       wins: 35,
     },
+    status: 'Playing', // Example status
   },
   {
-    id: 29,
+    _id: "29",
     name: 'Raekwon',
     profilePicture: 'https://randomuser.me/api/portraits/men/29.jpg',
     isOnline: true,
@@ -375,9 +403,10 @@ export const users = [
       battles: 45,
       wins: 24,
     },
+    status: 'Available', // Example status
   },
   {
-    id: 30,
+    _id: "30",
     name: 'RZA',
     profilePicture: 'https://randomuser.me/api/portraits/men/30.jpg',
     isOnline: false,
@@ -388,9 +417,10 @@ export const users = [
       battles: 50,
       wins: 28,
     },
+    status: 'Unavailable', // Example status
   },
   {
-    id: 31,
+    _id: "31",
     name: 'Mobb Deep',
     profilePicture: 'https://randomuser.me/api/portraits/men/31.jpg',
     isOnline: true,
@@ -401,9 +431,10 @@ export const users = [
       battles: 50,
       wins: 27,
     },
+    status: 'In Game', // Example status
   },
   {
-    id: 32,
+    _id: "32",
     name: 'Q-Tip',
     profilePicture: 'https://randomuser.me/api/portraits/men/32.jpg',
     isOnline: false,
@@ -414,109 +445,5 @@ export const users = [
       battles: 55,
       wins: 30,
     },
-  },
-  {
-    id: 33,
-    name: 'Chuck D',
-    profilePicture: 'https://randomuser.me/api/portraits/men/33.jpg',
-    isOnline: true,
-    isInBattlefield: false,
-    stats: {
-      points: 390,
-      votes: 200,
-      battles: 55,
-      wins: 30,
-    },
-  },
-  {
-    id: 34,
-    name: 'Big Pun',
-    profilePicture: 'https://randomuser.me/api/portraits/men/34.jpg',
-    isOnline: false,
-    isInBattlefield: true,
-    stats: {
-      points: 400,
-      votes: 210,
-      battles: 60,
-      wins: 32,
-    },
-  },
-  {
-    id: 35,
-    name: 'Big L',
-    profilePicture: 'https://randomuser.me/api/portraits/men/35.jpg',
-    isOnline: true,
-    isInBattlefield: true,
-    stats: {
-      points: 410,
-      votes: 220,
-      battles: 65,
-      wins: 35,
-    },
-  },
-  {
-    id: 36,
-    name: 'Slick Rick',
-    profilePicture: 'https://randomuser.me/api/portraits/men/36.jpg',
-    isOnline: false,
-    isInBattlefield: false,
-    stats: {
-      points: 420,
-      votes: 230,
-      battles: 70,
-      wins: 38,
-    },
-  },
-  {
-    id: 37,
-    name: 'Jadakiss',
-    profilePicture: 'https://randomuser.me/api/portraits/men/37.jpg',
-    isOnline: true,
-    isInBattlefield: false,
-    stats: {
-      points: 450,
-      votes: 240,
-      battles: 75,
-      wins: 40,
-    },
-  },
-  {
-    id: 38,
-    name: 'Nate Dogg',
-    profilePicture: 'https://randomuser.me/api/portraits/men/38.jpg',
-    isOnline: false,
-    isInBattlefield: true,
-    stats: {
-      points: 460,
-      votes: 250,
-      battles: 80,
-      wins: 43,
-    },
-  },
-  {
-    id: 39,
-    name: 'Warren G',
-    profilePicture: 'https://randomuser.me/api/portraits/men/39.jpg',
-    isOnline: true,
-    isInBattlefield: true,
-    stats: {
-      points: 470,
-      votes: 260,
-      battles: 85,
-      wins: 45,
-    },
-  },
-  {
-    id: 40,
-    name: 'Fat Joe',
-    profilePicture: 'https://randomuser.me/api/portraits/men/40.jpg',
-    isOnline: false,
-    isInBattlefield: false,
-    stats: {
-      points: 480,
-      votes: 270,
-      battles: 90,
-      wins: 48,
-    },
-  },
-];
+    status: 'Offline', // Example status
+  }]

@@ -27,7 +27,7 @@ const AuthController = {
 
   login: async (req, res) => {
     const { email, password } = req.body;
-
+console.log("wqokds")
     try {
       const user = await User.findOne({ email });
       if (!user)
