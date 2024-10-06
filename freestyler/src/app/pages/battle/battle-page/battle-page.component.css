@@ -1,353 +1,90 @@
-/* src/app/pages/battle/battle-page.component.css */
-
-/* Reset default margin and padding */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-/* Apply full viewport height */
-html, body {
-  height: 100%;
-  font-family: 'Roboto', sans-serif;
-  overflow: hidden; /* Prevent scrolling */
-}
-
-/* Background Styling with Neon Accents */
-.background {
-  position: fixed;
-  top: 0;
-  left: 0;
+/* General Styles */
+.battle-page-container {
+  position: relative;
   width: 100%;
-  height: 100%;
-  background: #000; /* Pure black background */
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  height: 100vh;
+  background-color: #000;
   overflow: hidden;
 }
 
-.neon-background {
-  position: absolute;
-  width: 200%;
-  height: 200%;
-  background: linear-gradient(135deg, #ff0080, #ff8c00, #00bfff, #8a2be2);
-  background-size: 400% 400%;
-  animation: neonAnimation 20s ease infinite;
-  opacity: 0.2;
-  z-index: 0;
-}
-
-@keyframes neonAnimation {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-/* Battle Interface Container */
-.battle-container {
+/* Main Video Styles */
+.main-video-container {
   position: relative;
-  width: 90%;
-  height: 90%;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  z-index: 1; /* Ensure it is above the neon background */
-}
-
-/* Mobile Layout */
-.mobile-layout {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
   width: 100%;
+  height: 100%;
 }
 
-.desktop-layout {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-}
-
-/* Battler Sections */
-.battler-section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin: 10px;
-}
-
-.battler {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-}
-
-/* Video Frame */
-.video-frame {
+.video-wrapper {
   position: relative;
-  width: 160px; /* Larger size for mobile */
-  height: 160px;
-  border-radius: 50%;
-  overflow: hidden;
-  border: 5px solid #00bfff; /* Neon Blue border */
-  margin-bottom: 10px;
-  background-color: #333;
-  transition: transform 0.3s ease;
+  width: 100%;
+  height: 100%;
 }
 
-.profile-pic {
+.video-wrapper video {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.video-off {
+.progress-svg {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(50, 50, 50, 0.7);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #ff4500; /* Neon Orange Icon */
-  font-size: 2em;
 }
 
-/* Circular Timer Overlay */
-.timer-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 160px;
-  height: 160px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.progress-back,
+.progress {
+  fill: none;
+  stroke-width: 1.5; /* Reduced thickness */
+  stroke-linecap: square;
 }
 
-/* Timer Text */
-.timer-text {
-  fill: #fff;
-  font-size: 1em;
-  dominant-baseline: middle;
-  text-anchor: middle;
+.progress-back {
+  stroke: rgba(255, 255, 255, 0.2);
 }
 
-/* Smaller Circular Timer for PIP */
-.timer-overlay.small {
-  width: 80px;
-  height: 80px;
+.progress {
+  stroke: #00bfa5; /* An elegant, subtle color */
+  transition: stroke-dashoffset 1s linear;
 }
 
-/* Central Battle Timer */
-.central-timer {
-  position: relative;
-  width: 220px;
-  height: 220px;
-  margin-bottom: 20px;
-}
-
-.central-timer .timer-overlay {
-  width: 220px;
-  height: 220px;
-}
-
-.central-timer .timer-overlay svg {
-  transform: rotate(-90deg); /* Correct the orientation */
-}
-
-.central-timer .central-timer-text {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  fill: #ff1a1a;
-  font-size: 1.5em;
-}
-
-/* Random Word Prompt */
-.random-word {
-  background: rgba(0, 191, 255, 0.8); /* Neon Blue background */
-  color: #fff;
-  padding: 10px 20px;
-  border-radius: 20px;
-  font-size: 1.2em;
-  margin: 15px 0;
-  animation: floatFade 5s linear infinite;
-}
-
-@keyframes floatFade {
-  0% { opacity: 0; transform: translateY(10px); }
-  50% { opacity: 1; transform: translateY(-10px); }
-  100% { opacity: 0; transform: translateY(-30px); }
-}
-
-/* Controls */
-.controls {
-  display: flex;
-  gap: 15px;
-  margin-top: 20px;
-}
-
-.control-button {
-  background: transparent;
-  border: none;
-  color: #00bfff; /* Neon Blue */
-  font-size: 1.5em;
-  cursor: pointer;
-  transition: color 0.3s;
-}
-
-.control-button:hover {
-  color: #ff4500; /* Neon Orange on Hover */
-}
-
-.end-call {
-  color: #ff4d4d; /* Neon Red */
-}
-
-.end-call:hover {
-  color: #ff1a1a; /* Darker Neon Red on Hover */
-}
-
-/* Draggable PIP for Mobile */
-.pip {
+/* Small Video Styles */
+.small-video-container {
   position: absolute;
   bottom: 20px;
   right: 20px;
-  width: 80px;
-  height: 80px;
-  z-index: 2; /* Above the main battler */
-  cursor: grab;
-  transition: transform 0.1s ease;
 }
 
-/* Prevent text selection during drag */
-.pip:active {
-  cursor: grabbing;
+.small-video-container video {
+  width: 200px;
+  height: 200px;
+  object-fit: cover;
+  border: 2px solid #fff;
+  border-radius: 8px;
 }
 
-/* Desktop Layout Specific Styles */
-.desktop-layout .battler-section {
-  width: 25%; /* Adjusted for dual battlers and central timer */
-}
-
-.desktop-layout .timer-overlay svg {
-  width: 180px;
-  height: 180px;
-}
-
-.desktop-layout .battler-section .battler {
-  transition: transform 0.3s ease;
-}
-
-.desktop-layout .battler:hover .video-frame {
-  transform: scale(1.05);
-}
-
-.central-panel {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  margin: 0 20px;
-}
-
-/* Responsive Design for Desktop */
-@media (min-width: 1024px) {
-  .battle-container {
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .battler-section {
-    width: 25%;
-  }
-
-  .video-frame {
-    width: 180px; /* Larger size for desktop */
-    height: 180px;
-  }
-
-  .timer-overlay {
-    width: 180px;
-    height: 180px;
-  }
-
-  .controls {
-    gap: 20px;
-  }
-
-  .control-button {
-    font-size: 1.8em;
-  }
-
-  .central-timer {
-    width: 220px;
-    height: 220px;
-  }
-
-  .central-timer .central-timer-text {
-    font-size: 1.8em;
-  }
-
-  .random-word {
-    font-size: 1.2em;
-    padding: 12px 24px;
-  }
-}
-
-/* Responsive Design for Mobile */
 @media (max-width: 767px) {
-  .battle-container {
-    flex-direction: column;
-    align-items: center;
+  .small-video-container {
+    bottom: 80px;
+  }
+
+  .small-video-container video {
+    width: 100px;
+    height: 100px;
+  }
+}
+
+@media (min-width: 768px) {
+  .main-video-container {
+    display: flex;
     justify-content: center;
+    align-items: center;
   }
 
-  .mobile-layout .battler-section {
-    width: 80%;
-  }
-
-  .video-frame {
-    width: 160px;
-    height: 160px;
-  }
-
-  .timer-overlay {
-    width: 160px;
-    height: 160px;
-  }
-
-  .controls {
-    gap: 10px;
-  }
-
-  .control-button {
-    font-size: 1.2em;
-  }
-
-  .central-timer {
-    width: 160px;
-    height: 160px;
-  }
-
-  .central-timer .central-timer-text {
-    font-size: 1.2em;
-  }
-
-  .random-word {
-    font-size: 1em;
-    padding: 8px 16px;
+  .video-wrapper {
+    width: 63%;
+    height: auto;
   }
 }

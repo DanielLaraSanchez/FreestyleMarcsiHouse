@@ -18,11 +18,12 @@ const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'signup', component: SignupComponent },
   { path: 'auth/google/callback', component: AuthCallbackComponent },
+  { path: 'battle', component: BattlePageComponent},
 
   // Protected routes
   { path: 'chat', component: ChatPageComponent, canActivate: [AuthGuard] },
   { path: 'battlefield', component: BattlefieldPageComponent, canActivate: [AuthGuard] },
-  { path: 'battle', component: BattlePageComponent, canActivate: [AuthGuard]},
+  // { path: 'battle', component: BattlePageComponent, canActivate: [AuthGuard]},
 
 
   { path: '**', redirectTo: 'login' },

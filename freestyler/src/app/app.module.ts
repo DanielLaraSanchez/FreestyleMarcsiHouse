@@ -22,6 +22,8 @@ import { InputTextModule } from 'primeng/inputtext';
 import { PanelModule } from 'primeng/panel';
 import { CardModule } from 'primeng/card';
 import { OverlayPanelModule } from 'primeng/overlaypanel';
+import { KnobModule } from 'primeng/knob';
+
 
 import { JwtModule, JwtInterceptor } from '@auth0/angular-jwt';
 import { HttpTokenInterceptor } from './services/http.interceptor';
@@ -66,6 +68,7 @@ import { AuthCallbackComponent } from './components/auth-callback/auth-callback.
     AppRoutingModule,
     SidebarModule,
     ButtonModule,
+    KnobModule,
     BrowserAnimationsModule,
     AvatarModule,
     DynamicDialogModule,
