@@ -30,6 +30,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ChatPageComponent } from './pages/chat/chat-page/chat-page.component';
 import { CarouselModule } from 'primeng/carousel';
 import { ProgressBarModule } from 'primeng/progressbar';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+
 import { TooltipModule } from 'primeng/tooltip';
 import { TabViewModule } from 'primeng/tabview';
 import { UserActionsDialogComponent } from './components/user-actions-dialog/user-actions-dialog.component';
@@ -76,6 +78,7 @@ import { AuthCallbackComponent } from './components/auth-callback/auth-callback.
     CardModule,
     SidebarModule,
     ButtonModule,
+    ProgressSpinnerModule,
     MenubarModule,
     AvatarModule,
     RippleModule,

@@ -1,159 +1,174 @@
 <div class="background">
-    <!-- Stars Layer -->
-    <div class="stars"></div>
-    <!-- Twinkling Effect Layer -->
-    <div class="twinkling"></div>
-    <!-- Silhouettes of Trees and Mountains -->
-    <div class="silhouettes"></div>
+  <!-- Neon Animated Background -->
+  <div class="neon-background"></div>
 
-    <!-- Battle Interface Container -->
-    <div class="battle-container">
-      <!-- Desktop View -->
-      <div class="desktop-view" *ngIf="!isMobileView">
-        <!-- Battler 1 -->
-        <div class="battler battler1">
-          <img [src]="battler1.profilePicture" alt="{{battler1.name}} Profile" class="profile-pic">
-          <!-- <video [src]="battler1.videoStream" controls muted></video> -->
-          <div class="battler-info">
-            <h3>{{ battler1.name }}</h3>
-            <!-- <p>Rank: {{ battler1.rank }}</p> -->
+  <!-- Battle Interface Container -->
+  <div class="battle-container">
+    <!-- Mobile Layout -->
+    <div class="mobile-layout" *ngIf="!isDesktop">
+      <!-- Active Battler (Full-Screen) -->
+      <div class="battler-section">
+        <div class="battler active">
+          <div class="video-frame">
+            <img *ngIf="!battler1.isVideoOff" [src]="battler1.profilePicture" alt="{{ battler1.name }}" class="profile-pic">
+            <div class="video-off" *ngIf="battler1.isVideoOff">
+              <i class="fa fa-video-slash"></i>
+            </div>
+            <!-- Circular Timer Overlay -->
+            <div class="timer-overlay">
+              <svg width="160" height="160">
+                <circle cx="80" cy="80" r="75" stroke="#00bfff" stroke-width="8" fill="none"
+                  [attr.stroke-dasharray]="battler1DashArray"
+                  [attr.stroke-dashoffset]="battler1DashOffset">
+                </circle>
+              </svg>
+            </div>
           </div>
-          <button class="vote-button" (click)="vote(battler1)">Vote</button>
-        </div>
-
-        <!-- Central Timer and Random Word -->
-        <div class="central-panel">
-          <div class="timer">
-            <span>{{ timer }}</span>
-          </div>
-          <div class="random-word">
-            <span>"{{ randomWord }}"</span>
-          </div>
-          <div class="beat-controls">
-            <button class="beat-button" (click)="toggleBeat()">
-              <i class="fa" [ngClass]="{'fa-play': backgroundBeat === 'beat1', 'fa-pause': backgroundBeat === 'beat2'}"></i>
-            </button>
-            <!-- Placeholder for beat selection/upload buttons -->
-            <button class="beat-option-button">
-              <i class="fa fa-music"></i>
-            </button>
-            <button class="beat-option-button">
-              <i class="fa fa-upload"></i>
-            </button>
-          </div>
-        </div>
-
-        <!-- Battler 2 -->
-        <div class="battler battler2">
-          <img [src]="battler2.profilePicture" alt="{{battler2.name}} Profile" class="profile-pic">
-          <!-- <video [src]="battler2.videoStream" controls muted></video> -->
-          <div class="battler-info">
-            <h3>{{ battler2.name }}</h3>
-            <!-- <p>Rank: {{ battler2.rank }}</p> -->
-          </div>
-          <button class="vote-button" (click)="vote(battler2)">Vote</button>
+          <h3>{{ battler1.name }}</h3>
         </div>
       </div>
 
-      <!-- Mobile View -->
-      <div class="mobile-view" *ngIf="isMobileView">
-        <!-- Battler 1 -->
-        <div class="battler battler1">
-          <img [src]="battler1.profilePicture" alt="{{battler1.name}} Profile" class="profile-pic">
-          <!-- <video [src]="battler1.videoStream" controls muted></video> -->
-          <div class="battler-info">
-            <h3>{{ battler1.name }}</h3>
-            <!-- <p>Rank: {{ battler1.rank }}</p> -->
+      <!-- Picture-in-Picture Opponent -->
+      <div #pip class="pip">
+        <div class="battler">
+          <div class="video-frame">
+            <img *ngIf="!battler2.isVideoOff" [src]="battler2.profilePicture" alt="{{ battler2.name }}" class="profile-pic">
+            <div class="video-off" *ngIf="battler2.isVideoOff">
+              <i class="fa fa-video-slash"></i>
+            </div>
+            <!-- Circular Timer Overlay -->
+            <div class="timer-overlay small">
+              <svg width="80" height="80">
+                <circle cx="40" cy="40" r="35" stroke="#00bfff" stroke-width="5" fill="none"
+                  [attr.stroke-dasharray]="battler2DashArray"
+                  [attr.stroke-dashoffset]="battler2DashOffset">
+                </circle>
+              </svg>
+            </div>
           </div>
-          <button class="vote-button" (click)="vote(battler1)">Vote</button>
-        </div>
-
-        <!-- Central Timer and Random Word -->
-        <div class="central-panel">
-          <div class="timer">
-            <span>{{ timer }}</span>
-          </div>
-          <div class="random-word">
-            <span>"{{ randomWord }}"</span>
-          </div>
-          <div class="beat-controls">
-            <button class="beat-button" (click)="toggleBeat()">
-              <i class="fa" [ngClass]="{'fa-play': backgroundBeat === 'beat1', 'fa-pause': backgroundBeat === 'beat2'}"></i>
-            </button>
-            <!-- Beat Controls Accessible from Main Screen -->
-            <button class="beat-option-button">
-              <i class="fa fa-music"></i>
-            </button>
-            <button class="beat-option-button">
-              <i class="fa fa-upload"></i>
-            </button>
-          </div>
-        </div>
-
-        <!-- Battler 2 -->
-        <div class="battler battler2">
-          <img [src]="battler2.profilePicture" alt="{{battler2.name}} Profile" class="profile-pic">
-          <!-- <video [src]="battler2.videoStream" controls muted></video> -->
-          <div class="battler-info">
-            <h3>{{ battler2.name }}</h3>
-            <!-- <p>Rank: {{ battler2.rank }}</p> -->
-          </div>
-          <button class="vote-button" (click)="vote(battler2)">Vote</button>
-        </div>
-
-        <!-- Beat Controls for Mobile -->
-        <div class="beat-controls">
-          <button class="beat-button" (click)="toggleBeat()">
-            <i class="fa" [ngClass]="{'fa-play': backgroundBeat === 'beat1', 'fa-pause': backgroundBeat === 'beat2'}"></i>
-          </button>
-          <!-- Beat Selection/Upload Buttons -->
-          <button class="beat-option-button">
-            <i class="fa fa-music"></i>
-          </button>
-          <button class="beat-option-button">
-            <i class="fa fa-upload"></i>
-          </button>
         </div>
       </div>
 
-      <!-- Chatbox -->
-      <div class="chatbox">
-        <h4>Spectators Chat</h4>
-        <div class="chat-messages">
-          <!-- Mock chat messages -->
-          <div class="chat-message">
-            <span class="username">User1:</span>
-            <span class="message">Great flow!</span>
+      <!-- Random Word Prompt -->
+      <div class="random-word">
+        <span>"{{ randomWord }}"</span>
+      </div>
+
+      <!-- Controls -->
+      <div class="controls">
+        <button pButton label="{{ battler1.isMuted ? 'Unmute' : 'Mute' }}" icon="pi pi-volume-up" (click)="toggleMute(battler1)" aria-label="Toggle Mute Battler 1"></button>
+        <button pButton label="{{ battler1.isVideoOff ? 'Start Video' : 'Stop Video' }}" icon="pi pi-video" (click)="toggleVideo(battler1)" aria-label="Toggle Video Battler 1"></button>
+        <button pButton label="End Battle" icon="pi pi-trash" class="end-call" (click)="endCall()" aria-label="End Battle"></button>
+      </div>
+    </div>
+
+    <!-- Desktop Layout -->
+    <div class="desktop-layout" *ngIf="isDesktop">
+      <!-- Battler 1 -->
+      <div class="battler-section">
+        <div class="battler">
+          <div class="video-frame">
+            <img *ngIf="!battler1.isVideoOff" [src]="battler1.profilePicture" alt="{{ battler1.name }}" class="profile-pic">
+            <div class="video-off" *ngIf="battler1.isVideoOff">
+              <i class="fa fa-video-slash"></i>
+            </div>
+            <!-- Circular Timer Overlay -->
+            <div class="timer-overlay">
+              <svg width="180" height="180">
+                <circle cx="90" cy="90" r="85" stroke="#00bfff" stroke-width="8" fill="none"
+                  [attr.stroke-dasharray]="battler1DashArray"
+                  [attr.stroke-dashoffset]="battler1DashOffset">
+                </circle>
+              </svg>
+            </div>
           </div>
-          <div class="chat-message">
-            <span class="username">User2:</span>
-            <span class="message">Nice rhyme scheme!</span>
-          </div>
-          <div class="chat-message">
-            <span class="username">User3:</span>
-            <span class="message">🔥🔥🔥</span>
-          </div>
-        </div>
-        <div class="chat-input">
-          <input type="text" placeholder="Type a message...">
-          <button><i class="fa fa-paper-plane"></i></button>
+          <h3>{{ battler1.name }}</h3>
+          <button pButton label="{{ battler1.isMuted ? 'Unmute' : 'Mute' }}" icon="pi pi-volume-up" (click)="toggleMute(battler1)" aria-label="Toggle Mute Battler 1"></button>
         </div>
       </div>
 
-      <!-- Live Stats Progress Bar -->
-      <div class="live-stats">
-        <div class="stat battler1-stat">
-          <span>{{ battler1.name }}:</span>
-          <div class="progress">
-            <div class="progress-bar" [style.width.%]="calculateVotePercentage(battler1)"></div>
+      <!-- Central Battle Timer -->
+      <div class="central-panel">
+        <div class="central-timer">
+          <svg width="220" height="220">
+            <circle cx="110" cy="110" r="105" stroke="#ff1a1a" stroke-width="10" fill="none"
+              [attr.stroke-dasharray]="totalDashArray"
+              [attr.stroke-dashoffset]="totalDashOffset">
+            </circle>
+          </svg>
+          <div class="timer-text central">
+            <!-- {{ Math.floor(totalTimer / 60) }}m -->
           </div>
         </div>
-        <div class="stat battler2-stat">
-          <span>{{ battler2.name }}:</span>
-          <div class="progress">
-            <div class="progress-bar" [style.width.%]="calculateVotePercentage(battler2)"></div>
+
+        <!-- Random Word Prompt -->
+        <div class="random-word">
+          <span>"{{ randomWord }}"</span>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls">
+          <button pButton label="{{ battler1.isMuted ? 'Unmute' : 'Mute' }}" icon="pi pi-volume-up" (click)="toggleMute(battler1)" aria-label="Toggle Mute Battler 1"></button>
+          <button pButton label="{{ battler1.isVideoOff ? 'Start Video' : 'Stop Video' }}" icon="pi pi-video" (click)="toggleVideo(battler1)" aria-label="Toggle Video Battler 1"></button>
+          <button pButton label="{{ battler2.isMuted ? 'Unmute' : 'Mute' }}" icon="pi pi-volume-up" (click)="toggleMute(battler2)" aria-label="Toggle Mute Battler 2"></button>
+          <button pButton label="{{ battler2.isVideoOff ? 'Start Video' : 'Stop Video' }}" icon="pi pi-video" (click)="toggleVideo(battler2)" aria-label="Toggle Video Battler 2"></button>
+          <button pButton label="End Battle" icon="pi pi-trash" class="end-call" (click)="endCall()" aria-label="End Battle"></button>
+        </div>
+      </div>
+
+      <!-- Battler 2 -->
+      <div class="battler-section">
+        <div class="battler">
+          <div class="video-frame">
+            <img *ngIf="!battler2.isVideoOff" [src]="battler2.profilePicture" alt="{{ battler2.name }}" class="profile-pic">
+            <div class="video-off" *ngIf="battler2.isVideoOff">
+              <i class="fa fa-video-slash"></i>
+            </div>
+            <!-- Circular Timer Overlay -->
+            <div class="timer-overlay">
+              <svg width="180" height="180">
+                <circle cx="90" cy="90" r="85" stroke="#00bfff" stroke-width="8" fill="none"
+                  [attr.stroke-dasharray]="battler2DashArray"
+                  [attr.stroke-dashoffset]="battler2DashOffset">
+                </circle>
+              </svg>
+            </div>
           </div>
+          <h3>{{ battler2.name }}</h3>
+          <button pButton label="{{ battler2.isMuted ? 'Unmute' : 'Mute' }}" icon="pi pi-volume-up" (click)="toggleMute(battler2)" aria-label="Toggle Mute Battler 2"></button>
         </div>
       </div>
     </div>
   </div>
+
+  <!-- Draggable PIP Shadow (Mobile Only) -->
+  <div
+    #pip
+    class="pip"
+    (mousedown)="startDrag($event)"
+    (mousemove)="onDrag($event)"
+    (mouseup)="endDrag()"
+    (touchstart)="startDrag($event)"
+    (touchmove)="onDrag($event)"
+    (touchend)="endDrag()"
+  >
+    <div class="battler">
+      <div class="video-frame">
+        <img *ngIf="!battler2.isVideoOff" [src]="battler2.profilePicture" alt="{{ battler2.name }}" class="profile-pic">
+        <div class="video-off" *ngIf="battler2.isVideoOff">
+          <i class="fa fa-video-slash"></i>
+        </div>
+        <!-- Circular Timer Overlay -->
+        <div class="timer-overlay small">
+          <svg width="80" height="80">
+            <circle cx="40" cy="40" r="35" stroke="#00bfff" stroke-width="5" fill="none"
+              [attr.stroke-dasharray]="battler2DashArray"
+              [attr.stroke-dashoffset]="battler2DashOffset">
+            </circle>
+          </svg>
+        </div>
+      </div>
+      <h4>{{ battler2.name }}</h4>
+    </div>
+  </div>
+</div>
