@@ -112,20 +112,26 @@ io.on('connection', (socket) => {
       // Handle private messages
       const recipientUserId = tabId; // 'tabId' is recipient's userId
       const recipientSockets = userSockets.get(recipientUserId);
+
+      const payloadToRecipient = {
+        tabId: socket.userId, // The sender's userId
+        message,
+      };
+      const payloadToSender = {
+        tabId: tabId, // The recipient's userId
+        message,
+      };
+
       if (recipientSockets && recipientSockets.size > 0) {
-        const payload = {
-          tabId: socket.userId, // The sender's userId
-          message,
-        };
         // Send the message to all recipient's sockets
         recipientSockets.forEach((socketId) => {
-          io.to(socketId).emit('message', payload);
+          io.to(socketId).emit('message', payloadToRecipient);
         });
-        // Also send the message to the sender's own tab
-        socket.emit('message', payload);
       } else {
         console.error(`Recipient not found or not online: ${tabId}`);
       }
+      // Send the message back to the sender's own tab
+      socket.emit('message', payloadToSender);
     }
   });
 
