@@ -20,6 +20,18 @@
       <button class="control-button" (click)="vote()">
         <i class="pi pi-thumbs-up"></i>
       </button>
+      <!-- Knob Stopwatch -->
+      <p-knob
+        [(ngModel)]="knobValue"
+        [readonly]="true"
+        [valueColor]="'#e91e63'"
+        [rangeColor]="'#EEEEEE'"
+        [textColor]="'#ffffff'"
+        [size]="80"
+        [strokeWidth]="10"
+        [showValue]="false"
+        styleClass="timer-knob"
+      ></p-knob>
     </div>
   </div>
 

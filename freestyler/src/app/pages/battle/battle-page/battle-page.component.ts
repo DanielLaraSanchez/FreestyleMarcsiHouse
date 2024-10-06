@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { DeviceDetectorService } from '../../../services/device-detector.service';
+import { interval, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-battle-page',
@@ -36,6 +37,12 @@ export class BattlePageComponent implements OnInit, OnDestroy {
   words: string[] = ['Flow', 'Beat', 'Rhythm', 'Verse', 'Mic'];
   currentWord: string = '';
 
+  // Timer properties
+  totalTime: number = 60; // Total time in seconds
+  timeLeft: number = this.totalTime;
+  timerSubscription!: Subscription;
+  knobValue: number = 0;
+
   constructor(
     private deviceService: DeviceDetectorService
   ) { }
@@ -53,10 +60,12 @@ export class BattlePageComponent implements OnInit, OnDestroy {
 
     this.startCamera();
     this.generateRandomWord();
+    this.startTimer();
   }
 
   ngOnDestroy(): void {
     this.stopCamera();
+    this.stopTimer();
   }
 
   startCamera() {
@@ -102,5 +111,27 @@ export class BattlePageComponent implements OnInit, OnDestroy {
   generateRandomWord() {
     const randomIndex = Math.floor(Math.random() * this.words.length);
     this.currentWord = this.words[randomIndex];
+  }
+
+  startTimer() {
+    this.timeLeft = this.totalTime;
+    this.knobValue = 0;
+
+    const timer = interval(1000);
+    this.timerSubscription = timer.subscribe(() => {
+      if (this.timeLeft > 0) {
+        this.timeLeft--;
+        this.knobValue = ((this.totalTime - this.timeLeft) / this.totalTime) * 100;
+      } else {
+        this.stopTimer();
+        // Perform any action when time is up
+      }
+    });
+  }
+
+  stopTimer() {
+    if (this.timerSubscription) {
+      this.timerSubscription.unsubscribe();
+    }
   }
 }

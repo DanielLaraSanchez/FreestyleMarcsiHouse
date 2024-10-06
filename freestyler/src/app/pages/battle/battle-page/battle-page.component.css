@@ -25,67 +25,13 @@
   border-radius: 10px; /* Rounded corners */
 }
 
-/* Overlay Styles */
-.overlay {
-  position: absolute;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 10px 20px;
-  border-radius: 10px;
-  color: #fff;
-  font-size: 24px;
-  font-weight: bold;
-  z-index: 2;
-  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
-}
-
-/* Random Word Display */
-.random-word {
-  top: 20px;
-  text-align: center;
-  background-color: rgba(0, 0, 0, 0.5); /* Updated to match buttons */
-  backdrop-filter: blur(5px);
-  color: #fff;
-}
-
-/* Button Container */
-.button-container {
-  position: absolute;
-  display: flex;
-  z-index: 2;
-}
-
-/* Control Buttons */
-.control-button {
-  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
-  border: none;
-  padding: 12px;
-  color: #fff;
-  font-size: 24px;
-  cursor: pointer;
-  transition: background-color 0.3s ease, color 0.3s ease;
-  border-radius: 8px; /* Rounded corners */
-  margin: 5px; /* Space between buttons */
-}
-
-.control-button:hover {
-  background-color: rgba(255, 255, 255, 0.1); /* Slight change on hover */
-  color: #fff;
-}
-
-/* Icon Styling */
-.control-button .pi {
-  font-size: 32px;
-}
-
 /* Small Video Styles */
 .small-video-container {
   position: absolute;
   bottom: 20px;
   right: 20px;
-  width: 200px;
-  height: 200px;
+  width: 220px;
+  height: 220px;
   border-radius: 10px;
   overflow: hidden;
   z-index: 2;
@@ -98,6 +44,62 @@
   object-fit: cover;
 }
 
+/* Overlay Styles */
+.overlay {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 10px 20px;
+  border-radius: 10px;
+  color: #fff;
+  font-size: 24px;
+  font-weight: bold;
+  z-index: 2;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+/* Random Word Display */
+.random-word {
+  text-align: center;
+  backdrop-filter: blur(5px);
+  color: #fff;
+}
+
+/* Control Buttons */
+.control-button {
+  background-color: rgba(0, 0, 0, 0.5);
+  border: none;
+  padding: 12px;
+  color: #fff;
+  font-size: 24px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  border-radius: 8px;
+  margin: 5px;
+}
+
+.control-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.control-button .pi {
+  font-size: 32px;
+}
+
+/* Knob Stopwatch Styles */
+.timer-knob {
+  margin: 5px;
+}
+
+/* Button Container */
+.button-container {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  z-index: 2;
+}
+
 /* Responsive Design */
 @media (max-width: 767px) {
   /* Adjust buttons to be vertical on the right side */
@@ -106,7 +108,6 @@
     right: 10px;
     top: 50%;
     transform: translateY(-50%);
-    align-items: center;
   }
 
   .control-button {
@@ -115,9 +116,13 @@
     margin-bottom: 15px;
   }
 
+  .timer-knob {
+    margin-bottom: 15px;
+  }
+
   .small-video-container {
-    width: 120px;
-    height: 120px;
+    width: 168px;
+    height: 168px;
     bottom: 80px;
     right: 10px;
   }
@@ -126,6 +131,14 @@
     font-size: 20px;
     padding: 8px 16px;
     top: 20px;
+  }
+
+  /* Main video fills the screen on mobile */
+  .main-video-container {
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
   }
 }
 
@@ -136,6 +149,12 @@
     height: 80%;
     top: 10%;
     left: 10%;
+  }
+
+  /* Larger small video */
+  .small-video-container {
+    width: 264px;
+    height: 264px;
   }
 
   /* Buttons remain horizontal at the bottom center */
@@ -151,7 +170,35 @@
     font-size: 24px;
   }
 
+  .timer-knob {
+    margin-left: 15px;
+  }
+
   .overlay {
     font-size: 24px;
   }
+}
+
+/* Knob Specific Styles */
+.timer-knob .p-knob {
+  width: 80px;
+  height: 80px;
+}
+
+.timer-knob .p-knob .p-knob-range {
+  stroke: #EEEEEE;
+}
+
+.timer-knob .p-knob .p-knob-value {
+  stroke: #e91e63;
+}
+
+.timer-knob .p-knob .p-knob-text {
+  fill: #ffffff;
+}
+
+/* Additional Styling for Knob */
+.timer-knob .p-knob-text {
+  font-size: 20px;
+  font-weight: bold;
 }
