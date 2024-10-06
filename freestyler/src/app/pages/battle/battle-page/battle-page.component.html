@@ -5,7 +5,7 @@
     <div class="twinkling"></div>
     <!-- Silhouettes of Trees and Mountains -->
     <div class="silhouettes"></div>
-  
+
     <!-- Battle Interface Container -->
     <div class="battle-container">
       <!-- Desktop View -->
@@ -20,7 +20,7 @@
           </div>
           <button class="vote-button" (click)="vote(battler1)">Vote</button>
         </div>
-  
+
         <!-- Central Timer and Random Word -->
         <div class="central-panel">
           <div class="timer">
@@ -42,7 +42,7 @@
             </button>
           </div>
         </div>
-  
+
         <!-- Battler 2 -->
         <div class="battler battler2">
           <img [src]="battler2.profilePicture" alt="{{battler2.name}} Profile" class="profile-pic">
@@ -54,7 +54,7 @@
           <button class="vote-button" (click)="vote(battler2)">Vote</button>
         </div>
       </div>
-  
+
       <!-- Mobile View -->
       <div class="mobile-view" *ngIf="isMobileView">
         <!-- Battler 1 -->
@@ -67,7 +67,7 @@
           </div>
           <button class="vote-button" (click)="vote(battler1)">Vote</button>
         </div>
-  
+
         <!-- Central Timer and Random Word -->
         <div class="central-panel">
           <div class="timer">
@@ -89,7 +89,7 @@
             </button>
           </div>
         </div>
-  
+
         <!-- Battler 2 -->
         <div class="battler battler2">
           <img [src]="battler2.profilePicture" alt="{{battler2.name}} Profile" class="profile-pic">
@@ -100,7 +100,7 @@
           </div>
           <button class="vote-button" (click)="vote(battler2)">Vote</button>
         </div>
-  
+
         <!-- Beat Controls for Mobile -->
         <div class="beat-controls">
           <button class="beat-button" (click)="toggleBeat()">
@@ -115,7 +115,7 @@
           </button>
         </div>
       </div>
-  
+
       <!-- Chatbox -->
       <div class="chatbox">
         <h4>Spectators Chat</h4>
@@ -139,7 +139,7 @@
           <button><i class="fa fa-paper-plane"></i></button>
         </div>
       </div>
-  
+
       <!-- Live Stats Progress Bar -->
       <div class="live-stats">
         <div class="stat battler1-stat">

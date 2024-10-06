@@ -6,13 +6,13 @@
     <div class="twinkling"></div>
     <!-- Silhouettes of Trees and Mountains -->
     <div class="silhouettes"></div>
-  
+
     <!-- Signup Form Container -->
     <div class="login-container">
       <form [formGroup]="signupForm" (ngSubmit)="onSubmit()">
-  
+
         <h2>Sign Up</h2>
-  
+
         <!-- Username Input Group -->
         <div class="input-group">
           <span class="icon">
@@ -33,7 +33,7 @@
             Username must be at least {{ signupForm.get('username')?.errors?.minlength.requiredLength }} characters.
           </span> -->
         </div>
-  
+
         <!-- Email Input Group -->
         <div class="input-group">
           <span class="icon">
@@ -52,7 +52,7 @@
           <!-- <span *ngIf="signupForm.get('email')?.errors?.required">Email is required.</span>
           <span *ngIf="signupForm.get('email')?.errors?.email">Please enter a valid email address.</span> -->
         </div>
-  
+
         <!-- Password Input Group -->
         <div class="input-group">
           <span class="icon">
@@ -73,7 +73,7 @@
             Password must be at least {{ signupForm.get('password')?.errors?.minlength.requiredLength }} characters.
           </span> -->
         </div>
-  
+
         <!-- Confirm Password Input Group -->
         <div class="input-group">
           <span class="icon">
@@ -92,18 +92,24 @@
           <!-- <span *ngIf="signupForm.get('confirmPassword')?.errors?.required">Please confirm your password.</span>
           <span *ngIf="signupForm.get('confirmPassword')?.errors?.mismatch">Passwords do not match.</span> -->
         </div>
-  
+
         <!-- Options: Remember Me and Forgot Password (Optional) -->
         <!-- You can include similar options as in the login form if desired -->
-  
+
         <!-- Signup Button -->
         <button type="submit" class="login-button">Sign Up</button>
-  
+
+              <!-- Google Sign-In Button -->
+      <button class="google-button" (click)="loginWithGoogle()">
+        <img src="./logo-google.png" alt="Google Logo" class="google-logo" />
+        <span class="google-text">Sign in with Google</span>
+      </button>
+
         <!-- Footer Text -->
         <div class="footer">
           Already have an account? <a href="/login" class="register-link">Login.</a>
         </div>
-  
+
       </form>
     </div>
   </div>

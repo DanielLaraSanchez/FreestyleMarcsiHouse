@@ -4,13 +4,13 @@
     padding: 0;
     box-sizing: border-box;
   }
-  
+
   /* Apply full viewport height */
   html, body {
     height: 100%;
     font-family: 'Arial', sans-serif;
   }
-  
+
   /* Background Styling */
   .background {
     position: fixed;
@@ -21,7 +21,7 @@
     overflow: hidden;
     background: linear-gradient(to bottom, #000428, #004e92); /* Dark purple to dark blue */
   }
-  
+
   /* Stars Layer */
   .stars {
     width: 100%;
@@ -33,7 +33,7 @@
     background-size: 100px 100px;
     animation: moveStars 50s linear infinite;
   }
-  
+
   /* Twinkling Effect Layer */
   .twinkling {
     width: 100%;
@@ -46,19 +46,19 @@
     animation: twinkle 3s infinite;
     opacity: 0.5;
   }
-  
+
   /* Animation for moving stars */
   @keyframes moveStars {
     from { transform: translateX(0); }
     to { transform: translateX(-100px); }
   }
-  
+
   /* Animation for twinkling */
   @keyframes twinkle {
     0%, 100% { opacity: 0.5; }
     50% { opacity: 1; }
   }
-  
+
   /* Silhouettes of Trees and Mountains */
   .silhouettes {
     position: absolute;
@@ -68,7 +68,7 @@
     background: url('/assets/silhouette.png') bottom no-repeat;
     background-size: cover;
   }
-  
+
   /* Signup Form Container */
   .login-container {
     position: absolute;
@@ -83,20 +83,20 @@
     max-width: 400px;
     color: white;
   }
-  
+
   .login-container h2 {
     text-align: center;
     margin-bottom: 30px;
     font-size: 2em;
     color: #ffd700; /* Gold color for contrast */
   }
-  
+
   /* Input Groups */
   .input-group {
     position: relative;
     margin-bottom: 20px;
   }
-  
+
   .input-group .icon {
     position: absolute;
     left: 15px;
@@ -105,7 +105,7 @@
     color: #aaa;
     font-size: 1.2em;
   }
-  
+
   .input-group input {
     width: 100%;
     padding: 10px 10px 10px 45px; /* Padding left for the icon */
@@ -115,16 +115,16 @@
     color: white;
     font-size: 1em;
   }
-  
+
   .input-group input::placeholder {
     color: #ddd;
   }
-  
+
   .input-group input:focus {
     outline: none;
     background-color: rgba(255,255,255,0.3);
   }
-  
+
   /* Error Messages */
   .error {
     color: #ff4d4d; /* Light red */
@@ -132,7 +132,7 @@
     margin-top: -15px;
     margin-bottom: 10px;
   }
-  
+
   /* Options: Remember Me and Forgot Password */
   .options {
     display: flex;
@@ -140,25 +140,25 @@
     align-items: center;
     margin-bottom: 20px;
   }
-  
+
   .options .remember-me {
     font-size: 0.9em;
   }
-  
+
   .options .remember-me input {
     margin-right: 5px;
   }
-  
+
   .options .forgot-password {
     font-size: 0.9em;
     color: #ffc0cb; /* Light pink */
     text-decoration: none;
   }
-  
+
   .options .forgot-password:hover {
     text-decoration: underline;
   }
-  
+
   /* Signup Button */
   .login-button { /* Reused class name for consistency */
     width: 100%;
@@ -171,115 +171,168 @@
     cursor: pointer;
     transition: background-color 0.3s, color 0.3s;
   }
-  
+
   .login-button:hover {
     background-color: #1e3a8a; /* Dark Blue */
     color: white;
   }
-  
+
   /* Footer Text */
   .footer {
     text-align: center;
     margin-top: 20px;
     font-size: 0.9em;
   }
-  
+
   .footer .register-link {
     color: #ffc0cb; /* Light pink */
     text-decoration: none;
   }
-  
+
   .footer .register-link:hover {
     text-decoration: underline;
   }
-  
+
   /* Responsive Adjustments for Mobile */
   @media (max-width: 767px) {
     .login-container {
       padding: 30px;
     }
-  
+
     .conversation-header {
       padding: 10px;
     }
-  
+
     .chat-name {
       font-size: 1.2em;
     }
-  
+
     .message-content {
       font-size: 1em;
       padding: 10px;
     }
-  
+
     .message-timestamp {
       font-size: 0.7em;
     }
-  
+
     .message-input input {
       font-size: 1em;
       padding: 10px 15px;
     }
-  
+
     .login-button {
       padding: 10px 0;
     }
-  
+
     /* Silhouettes in Mobile may need adjustment */
     .silhouettes {
       height: 150px; /* Adjust based on your silhouette image */
       background-size: contain; /* Ensure image doesn't stretch */
     }
-  
+
     /* Adjustments to prevent input bar from being pushed down */
     .messages {
       padding-bottom: 0; /* Removed padding-bottom to prevent interference */
       /* min-height:75vh; */ /* Removed */
     }
-  
+
     .message-input {
       /* Removed margin-bottom:60px; */
       margin-bottom: 0;
     }
-  
+
     .contact-item {
       padding: 15px; /* Increased padding */
     }
-  
+
     .contact-name {
       font-size: 1.1em; /* Increased font size */
     }
-  
+
     .contact-preview {
       font-size: 0.95em; /* Increased font size */
     }
-  
+
     /* Larger Avatars for Mobile */
     .message-avatar p-avatar,
     .contact-item p-avatar {
       width: 50px;
       height: 50px;
     }
-  
+
     /* Ensure the input bar stays at the bottom */
     .login-container {
       display: flex;
       flex-direction: column;
       height: auto;
     }
-  
+
     form {
       flex: 1;
       display: flex;
       flex-direction: column;
     }
-  
+
     .options, .footer {
       margin-top: 10px;
     }
   }
-  
+
   /* Optional: Smooth transitions for better UX */
   input, button, a {
     transition: all 0.3s ease;
   }
+
+
+  /* Google Sign-In Button */
+.google-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 10px 0;
+  background-color: white;
+  border: 1px solid #dadce0;
+  border-radius: 25px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: background-color 0.3s, box-shadow 0.3s;
+  margin-top: 15px; /* Adds spacing from the login button */
+}
+
+.google-button:hover {
+  background-color: #f7f7f7;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* Google Logo */
+.google-logo {
+  width: 20px;
+  height: 20px;
+  margin-right: 10px;
+}
+
+/* Google Button Text */
+.google-text {
+  font-family: 'Roboto', sans-serif;
+  font-size: 14px;
+  color: #757575;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 767px) {
+  .google-button {
+    padding: 8px 0;
+  }
+
+  .google-logo {
+    width: 18px;
+    height: 18px;
+    margin-right: 8px;
+  }
+
+  .google-text {
+    font-size: 13px;
+  }
+}
