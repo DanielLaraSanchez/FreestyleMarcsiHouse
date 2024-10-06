@@ -1,29 +1,25 @@
 <div class="battle-page-container">
-  <!-- Main Video with SVG Progress Bar -->
+  <!-- Main Video -->
   <div class="main-video-container">
-    <div class="video-wrapper">
-      <!-- SVG Progress Bar -->
-      <svg
-        class="progress-svg"
-        viewBox="0 0 100 100"
-        preserveAspectRatio="none"
-      >
-        <!-- Background Path -->
-        <path
-          class="progress-back"
-          d="M0,0 H100 V100 H0 Z"
-        />
-        <!-- Animated Progress Path -->
-        <path
-          #progressPath
-          class="progress"
-          d="M0,0 H100 V100 H0 Z"
-          [attr.stroke-dashoffset]="(progressPercent / 100) * pathLength"
-          [attr.stroke-dasharray]="pathLength"
-        />
-      </svg>
-      <!-- Main Video -->
-      <video #videoElement1 autoplay playsinline></video>
+    <video #videoElement1 autoplay playsinline [muted]="!isPlaying"></video>
+
+    <!-- Overlays -->
+    <!-- Random Word Display -->
+    <div class="overlay random-word">
+      {{ currentWord }}
+    </div>
+
+    <!-- Buttons -->
+    <div class="button-container">
+      <button class="control-button" (click)="togglePlayPause()">
+        <i class="pi" [ngClass]="isPlaying ? 'pi-pause' : 'pi-play'"></i>
+      </button>
+      <button class="control-button" (click)="replayVideo()">
+        <i class="pi pi-replay"></i>
+      </button>
+      <button class="control-button" (click)="vote()">
+        <i class="pi pi-thumbs-up"></i>
+      </button>
     </div>
   </div>
 

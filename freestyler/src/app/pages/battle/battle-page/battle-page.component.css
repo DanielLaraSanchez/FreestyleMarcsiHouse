@@ -3,30 +3,14 @@
   position: relative;
   width: 100%;
   height: 100vh;
-  background-color: #000;
+  margin: 0;
+  padding: 0;
   overflow: hidden;
+  background-color: #000;
 }
 
 /* Main Video Styles */
 .main-video-container {
-  position: relative;
-  width: 100%;
-  height: 100%;
-}
-
-.video-wrapper {
-  position: relative;
-  width: 100%;
-  height: 100%;
-}
-
-.video-wrapper video {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.progress-svg {
   position: absolute;
   top: 0;
   left: 0;
@@ -34,20 +18,65 @@
   height: 100%;
 }
 
-.progress-back,
-.progress {
-  fill: none;
-  stroke-width: 1.5; /* Reduced thickness */
-  stroke-linecap: square;
+.main-video-container video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 10px; /* Rounded corners */
 }
 
-.progress-back {
-  stroke: rgba(255, 255, 255, 0.2);
+/* Overlay Styles */
+.overlay {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 10px 20px;
+  border-radius: 10px;
+  color: #fff;
+  font-size: 24px;
+  font-weight: bold;
+  z-index: 2;
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
 }
 
-.progress {
-  stroke: #00bfa5; /* An elegant, subtle color */
-  transition: stroke-dashoffset 1s linear;
+/* Random Word Display */
+.random-word {
+  top: 20px;
+  text-align: center;
+  background-color: rgba(0, 0, 0, 0.5); /* Updated to match buttons */
+  backdrop-filter: blur(5px);
+  color: #fff;
+}
+
+/* Button Container */
+.button-container {
+  position: absolute;
+  display: flex;
+  z-index: 2;
+}
+
+/* Control Buttons */
+.control-button {
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+  border: none;
+  padding: 12px;
+  color: #fff;
+  font-size: 24px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  border-radius: 8px; /* Rounded corners */
+  margin: 5px; /* Space between buttons */
+}
+
+.control-button:hover {
+  background-color: rgba(255, 255, 255, 0.1); /* Slight change on hover */
+  color: #fff;
+}
+
+/* Icon Styling */
+.control-button .pi {
+  font-size: 32px;
 }
 
 /* Small Video Styles */
@@ -55,36 +84,74 @@
   position: absolute;
   bottom: 20px;
   right: 20px;
+  width: 200px;
+  height: 200px;
+  border-radius: 10px;
+  overflow: hidden;
+  z-index: 2;
+  border: 2px solid #fff;
 }
 
 .small-video-container video {
-  width: 200px;
-  height: 200px;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
-  border: 2px solid #fff;
-  border-radius: 8px;
 }
 
+/* Responsive Design */
 @media (max-width: 767px) {
-  .small-video-container {
-    bottom: 80px;
+  /* Adjust buttons to be vertical on the right side */
+  .button-container {
+    flex-direction: column;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    align-items: center;
   }
 
-  .small-video-container video {
-    width: 100px;
-    height: 100px;
+  .control-button {
+    padding: 10px;
+    font-size: 20px;
+    margin-bottom: 15px;
+  }
+
+  .small-video-container {
+    width: 120px;
+    height: 120px;
+    bottom: 80px;
+    right: 10px;
+  }
+
+  .overlay {
+    font-size: 20px;
+    padding: 8px 16px;
+    top: 20px;
   }
 }
 
 @media (min-width: 768px) {
+  /* Reduce main video size by 20% on desktop */
   .main-video-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    width: 80%;
+    height: 80%;
+    top: 10%;
+    left: 10%;
   }
 
-  .video-wrapper {
-    width: 63%;
-    height: auto;
+  /* Buttons remain horizontal at the bottom center */
+  .button-container {
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    flex-direction: row;
+    gap: 15px;
+  }
+
+  .control-button {
+    font-size: 24px;
+  }
+
+  .overlay {
+    font-size: 24px;
   }
 }
