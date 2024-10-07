@@ -1,4 +1,5 @@
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
+import { interval, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-battle-page',
@@ -10,14 +11,21 @@ export class BattlePageComponent implements OnInit, OnDestroy {
   @ViewChild('videoElement2') videoElement2!: ElementRef<HTMLVideoElement>;
   stream!: MediaStream;
 
+  // Timer Properties
+  totalTime: number = 60; // Total time in seconds
+  timeLeft: number = this.totalTime;
+  timerSubscription!: Subscription;
+
   constructor() { }
 
   ngOnInit(): void {
     this.startCamera();
+    this.startTimer();
   }
 
   ngOnDestroy(): void {
     this.stopCamera();
+    this.stopTimer();
   }
 
   startCamera(): void {
@@ -40,5 +48,47 @@ export class BattlePageComponent implements OnInit, OnDestroy {
     if (this.stream) {
       this.stream.getTracks().forEach(track => track.stop());
     }
+  }
+
+  // Timer Methods
+  startTimer(): void {
+    // Initialize the timer
+    this.timeLeft = this.totalTime;
+    this.updateTimerProgress();
+
+    // Create an observable that emits every second
+    const timer = interval(1000);
+
+    // Subscribe to the observable to decrement the timer
+    this.timerSubscription = timer.subscribe(() => {
+      if (this.timeLeft > 0) {
+        this.timeLeft--;
+        this.updateTimerProgress();
+      } else {
+        this.stopTimer();
+        // Action when time is up
+        alert('Time is up!');
+      }
+    });
+  }
+
+  stopTimer(): void {
+    if (this.timerSubscription) {
+      this.timerSubscription.unsubscribe();
+    }
+  }
+
+  // Timer Progress Calculation
+  updateTimerProgress(): void {
+    // The knob's [(ngModel)] is bound to timeLeft,
+    // and [max] is 60, so it will correctly display the remaining time.
+    // No additional calculations are needed.
+  }
+
+  // Optional: Display formatted time (not used in knob but can be used elsewhere)
+  get formattedTime(): string {
+    const minutes = Math.floor(this.timeLeft / 60);
+    const seconds = this.timeLeft % 60;
+    return `${minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
   }
 }
