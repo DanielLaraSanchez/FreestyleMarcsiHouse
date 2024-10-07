@@ -1,38 +1,7 @@
 <div class="battle-page-container">
   <!-- Main Video -->
   <div class="main-video-container">
-    <video #videoElement1 autoplay playsinline [muted]="!isPlaying"></video>
-
-    <!-- Overlays -->
-    <!-- Random Word Display -->
-    <div class="overlay random-word">
-      {{ currentWord }}
-    </div>
-
-    <!-- Buttons -->
-    <div class="button-container">
-      <button class="control-button" (click)="togglePlayPause()">
-        <i class="pi" [ngClass]="isPlaying ? 'pi-pause' : 'pi-play'"></i>
-      </button>
-      <button class="control-button" (click)="replayVideo()">
-        <i class="pi pi-replay"></i>
-      </button>
-      <button class="control-button" (click)="vote()">
-        <i class="pi pi-thumbs-up"></i>
-      </button>
-      <!-- Knob Stopwatch -->
-      <p-knob
-        [(ngModel)]="knobValue"
-        [readonly]="true"
-        [valueColor]="'#e91e63'"
-        [rangeColor]="'#EEEEEE'"
-        [textColor]="'#ffffff'"
-        [size]="80"
-        [strokeWidth]="10"
-        [showValue]="false"
-        styleClass="timer-knob"
-      ></p-knob>
-    </div>
+    <video #videoElement1 autoplay playsinline></video>
   </div>
 
   <!-- Small Video -->
