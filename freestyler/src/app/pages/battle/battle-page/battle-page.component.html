@@ -1,24 +1,34 @@
+<!-- battle-page.component.html -->
 <div class="battle-page-container">
   <!-- Main Video -->
   <div class="main-video-container">
     <video #videoElement1 autoplay playsinline></video>
 
-    <!-- Timer Overlay Positioned at Top-Right Corner -->
-    <div class="timer-overlay">
-      <p-knob
-        [(ngModel)]="timeLeft"
-        valueColor="#e91e63"
-        rangeColor="SlateGray"
-        [size]="100"
-        [strokeWidth]="5"
-        [readonly]="true"
-        [min]="60"
-        [max]="0">
-      </p-knob>
+    <!-- Top Controls Overlay Positioned at Top -->
+    <div class="top-controls">
+      <!-- Timer -->
+      <div class="timer-container">
+        <p-knob
+          [(ngModel)]="timeLeft"
+          valueColor="#e91e63"
+          rangeColor="SlateGray"
+          [size]="80"
+          [strokeWidth]="5"
+          [readonly]="true"
+          textColor="white"
+          [min]="0"
+          [max]="60">
+        </p-knob>
+      </div>
       
-      <!-- Thumbs-Up Voting Button -->
-      <button class="vote-button" (click)="vote()" aria-label="Vote">
-        <i class="pi pi-thumbs-up"></i>
+      <!-- Current Word -->
+      <div class="current-word">
+        <p>{{ word }}</p>
+      </div>
+      
+      <!-- Voting Button -->
+      <button class="vote-button" (click)="vote()">
+        <i class="pi pi-thumbs-up-fill"></i>
       </button>
     </div>
   </div>

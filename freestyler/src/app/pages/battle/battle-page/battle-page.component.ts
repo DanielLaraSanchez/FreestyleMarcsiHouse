@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
-import { interval, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
+import { BattleOrchestratorService } from '../../../services/battle-orchestrator.service';
 
 @Component({
   selector: 'app-battle-page',
@@ -12,28 +13,45 @@ export class BattlePageComponent implements OnInit, OnDestroy {
   stream!: MediaStream;
 
   // Timer Properties
-  totalTime: number = 60; // Total time in seconds
-  timeLeft: number = this.totalTime;
+  timeLeft: number = 60;
   timerSubscription!: Subscription;
+
+  // Current Turn and Word
+  currentTurn: string = 'Player 1';
+  word: string = '';
 
   // Voting State
   hasVoted: boolean = false;
 
-  constructor() { }
+  constructor(private battleService: BattleOrchestratorService) { }
 
   ngOnInit(): void {
     this.startCamera();
-    this.startTimer();
+    this.battleService.startBattle();
+
+    this.timerSubscription = this.battleService.timeLeft$.subscribe(time => {
+      this.timeLeft = time;
+    });
+
+    this.battleService.currentTurn$.subscribe(turn => {
+      this.currentTurn = turn;
+    });
+
+    this.battleService.currentWord$.subscribe(word => {
+      this.word = word;
+    });
   }
 
   ngOnDestroy(): void {
     this.stopCamera();
-    this.stopTimer();
+    if (this.timerSubscription) {
+      this.timerSubscription.unsubscribe();
+    }
+    this.battleService.ngOnDestroy();
   }
 
   startCamera(): void {
-    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-      navigator.mediaDevices.getUserMedia({ video: true })
+      navigator.mediaDevices.getUserMedia({ video: true, audio: true })
         .then(stream => {
           this.stream = stream;
           this.videoElement1.nativeElement.srcObject = stream;
@@ -42,50 +60,12 @@ export class BattlePageComponent implements OnInit, OnDestroy {
         .catch(error => {
           console.error('Error accessing media devices.', error);
         });
-    } else {
-      console.error('Media devices API not supported.');
-    }
   }
 
   stopCamera(): void {
     if (this.stream) {
       this.stream.getTracks().forEach(track => track.stop());
     }
-  }
-
-  // Timer Methods
-  startTimer(): void {
-    // Initialize the timer
-    this.timeLeft = this.totalTime;
-    this.updateTimerProgress();
-
-    // Create an observable that emits every second
-    const timer = interval(1000);
-
-    // Subscribe to the observable to decrement the timer
-    this.timerSubscription = timer.subscribe(() => {
-      if (this.timeLeft > 0) {
-        this.timeLeft--;
-        this.updateTimerProgress();
-      } else {
-        this.stopTimer();
-        // Action when time is up
-        alert('Time is up!');
-      }
-    });
-  }
-
-  stopTimer(): void {
-    if (this.timerSubscription) {
-      this.timerSubscription.unsubscribe();
-    }
-  }
-
-  // Timer Progress Calculation
-  updateTimerProgress(): void {
-    // Since the knob's [(ngModel)] is bound to timeLeft,
-    // and [min] is 0, [max] is 60, it will correctly display the remaining time.
-    // No additional calculations are needed.
   }
 
   // Voting Method
@@ -102,7 +82,7 @@ export class BattlePageComponent implements OnInit, OnDestroy {
     this.hasVoted = true;
   }
 
-  // Optional: Display formatted time (not used in knob but can be used elsewhere)
+  // Optional: Display formatted time
   get formattedTime(): string {
     const minutes = Math.floor(this.timeLeft / 60);
     const seconds = this.timeLeft % 60;
