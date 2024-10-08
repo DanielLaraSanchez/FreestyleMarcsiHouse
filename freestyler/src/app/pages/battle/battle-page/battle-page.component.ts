@@ -16,6 +16,9 @@ export class BattlePageComponent implements OnInit, OnDestroy {
   timeLeft: number = this.totalTime;
   timerSubscription!: Subscription;
 
+  // Voting State
+  hasVoted: boolean = false;
+
   constructor() { }
 
   ngOnInit(): void {
@@ -80,9 +83,23 @@ export class BattlePageComponent implements OnInit, OnDestroy {
 
   // Timer Progress Calculation
   updateTimerProgress(): void {
-    // The knob's [(ngModel)] is bound to timeLeft,
-    // and [max] is 60, so it will correctly display the remaining time.
+    // Since the knob's [(ngModel)] is bound to timeLeft,
+    // and [min] is 0, [max] is 60, it will correctly display the remaining time.
     // No additional calculations are needed.
+  }
+
+  // Voting Method
+  vote(): void {
+    if (this.hasVoted) {
+      alert('You have already voted!');
+      return;
+    }
+
+    // Implement actual voting logic here (e.g., send vote to backend)
+    alert('Thank you for voting!');
+
+    // Update voting state
+    this.hasVoted = true;
   }
 
   // Optional: Display formatted time (not used in knob but can be used elsewhere)

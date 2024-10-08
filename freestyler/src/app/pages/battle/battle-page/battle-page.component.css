@@ -1,3 +1,4 @@
+
 /* General Styles */
 .battle-page-container {
   position: relative;
@@ -30,14 +31,36 @@
   position: absolute;
   top: 10px;
   right: 10px;
-  width: 100px; /* Matches p-knob size */
-  height: 100px;
+  width: 120px; /* Accommodates knob and button */
+  height: 140px; /* Increased height to accommodate larger button */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   z-index: 3; /* Ensures it stays above the main video */
   pointer-events: none; /* Prevents the knob from capturing mouse events */
 }
 
 .timer-overlay p-knob {
   pointer-events: none; /* Ensures knob is non-interactive */
+  margin-bottom: 10px; /* Space between knob and button */
+}
+
+/* Thumbs-Up Voting Button Styles */
+.vote-button {
+  background: transparent; /* Transparent background */
+  border: none; /* No border */
+  color: #fff; /* White color for the icon */
+  font-size: 42px; /* 30% increase from 32px to 42px */
+  cursor: pointer; /* Pointer cursor on hover */
+  transition: color 0.3s ease, transform 0.2s ease;
+}
+
+.vote-button:hover {
+  color: #e0e0e0; /* Light gray on hover */
+}
+
+.vote-button:active {
+  transform: scale(1.1); /* Slight enlarge on click */
 }
 
 /* Small Video Styles */
@@ -86,15 +109,23 @@
 
   /* Timer Overlay for Mobile */
   .timer-overlay {
-    width: 80px; /* Smaller size for mobile */
-    height: 80px;
+    width: 100px; /* Adjusted size for mobile */
+    height: 130px; /* Adjusted height to accommodate larger button */
     top: 5px;
     right: 5px;
+    flex-direction: column;
+    align-items: center;
   }
 
   .timer-overlay p-knob {
-    width: 80px;
-    height: 80px;
+    width: 100px;
+    height: 100px;
+    margin-bottom: 10px; /* Space between knob and button */
+  }
+
+  /* Thumbs-Up Voting Button for Mobile */
+  .vote-button {
+    font-size: 54px; /* 30% increase from 42px to 54px */
   }
 }
 
@@ -107,14 +138,22 @@
 
   /* Timer Overlay for Desktop */
   .timer-overlay {
-    width: 100px;
-    height: 100px;
+    width: 120px;
+    height: 140px;
     top: 10px;
     right: 10px;
+    flex-direction: column;
+    align-items: center;
   }
 
   .timer-overlay p-knob {
     width: 100px;
     height: 100px;
+    margin-bottom: 10px; /* Space between knob and button */
+  }
+
+  /* Thumbs-Up Voting Button for Desktop */
+  .vote-button {
+    font-size: 42px; /* 30% bigger than previous 32px */
   }
 }

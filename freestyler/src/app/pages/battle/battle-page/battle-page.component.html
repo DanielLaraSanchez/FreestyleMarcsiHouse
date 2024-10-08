@@ -3,18 +3,24 @@
   <div class="main-video-container">
     <video #videoElement1 autoplay playsinline></video>
     
-    <!-- Timer Overlay Positioned at Top-Right Corner -->
+    <!-- Timer and Vote Overlay -->
     <div class="timer-overlay">
+      <!-- Countdown Timer -->
       <p-knob 
         [(ngModel)]="timeLeft"
         valueColor="#e91e63" 
-        rangeColor="SlateGray" 
+        rangeColor="#b0b0b0" 
         [size]="100" 
         [strokeWidth]="5" 
         [readonly]="true" 
         [min]="0" 
         [max]="60">
       </p-knob>
+      
+      <!-- Thumbs-Up Voting Button -->
+      <button class="vote-button" (click)="vote()" aria-label="Vote">
+        <i class="pi pi-thumbs-up"></i>
+      </button>
     </div>
   </div>
 
