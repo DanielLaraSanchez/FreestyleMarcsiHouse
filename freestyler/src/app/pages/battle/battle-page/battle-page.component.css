@@ -12,16 +12,16 @@
 /* Main Video Styles */
 .main-video-container {
   position: absolute;
-  top: 75px;
-  left: 40px;
-  width: 85%;
-  height: 75%;
+  top: 40px;
+  left: 80px;
+  width: 80%;
+  height: 90%;
 }
 
 .main-video-container video {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   border-radius: 10px; /* Rounded corners */
 }
 
@@ -89,7 +89,7 @@
     width: 80px; /* Smaller size for mobile */
     height: 80px;
     top: 5px;
-    right: 5px;
+    right: 27px;
   }
 
   .timer-overlay p-knob {
@@ -110,7 +110,7 @@
     width: 100px;
     height: 100px;
     top: 10px;
-    right: 10px;
+    right: 135px;
   }
 
   .timer-overlay p-knob {

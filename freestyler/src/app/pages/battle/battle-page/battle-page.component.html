@@ -2,18 +2,18 @@
   <!-- Main Video -->
   <div class="main-video-container">
     <video #videoElement1 autoplay playsinline></video>
-    
+
     <!-- Timer Overlay Positioned at Top-Right Corner -->
     <div class="timer-overlay">
-      <p-knob 
+      <p-knob
         [(ngModel)]="timeLeft"
-        valueColor="#e91e63" 
-        rangeColor="SlateGray" 
-        [size]="100" 
-        [strokeWidth]="5" 
-        [readonly]="true" 
-        [min]="0" 
-        [max]="60">
+        valueColor="#e91e63"
+        rangeColor="SlateGray"
+        [size]="100"
+        [strokeWidth]="5"
+        [readonly]="true"
+        [min]="60"
+        [max]="0">
       </p-knob>
     </div>
   </div>
