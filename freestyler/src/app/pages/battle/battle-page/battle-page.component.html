@@ -20,12 +20,12 @@
           [max]="60">
         </p-knob>
       </div>
-      
+
       <!-- Current Word -->
       <div class="current-word">
         <p>{{ word }}</p>
       </div>
-      
+
       <!-- Voting Button -->
       <button class="vote-button" (click)="vote()">
         <i class="pi pi-thumbs-up-fill"></i>
@@ -33,8 +33,34 @@
     </div>
   </div>
 
-  <!-- Small Video -->
-  <div class="small-video-container">
-    <video #videoElement2 autoplay playsinline muted></video>
+  <!-- Small Video Wrapper -->
+  <div class="small-video-wrapper">
+    <!-- Small Controls Positioned Above the Small Video -->
+    <div class="small-controls">
+      <!-- Timer Knob -->
+      <div class="small-timer">
+        <p-knob
+          [(ngModel)]="timeLeft"
+          valueColor="#e91e63"
+          rangeColor="SlateGray"
+          [size]="50"
+          [strokeWidth]="4"
+          [readonly]="true"
+          textColor="white"
+          [min]="0"
+          [max]="60">
+        </p-knob>
+      </div>
+
+      <!-- Current Word -->
+      <div class="small-word">
+        <p>{{ word }}</p>
+      </div>
+    </div>
+
+    <!-- Small Video Element -->
+    <div class="small-video-container">
+      <video #videoElement2 autoplay playsinline muted></video>
+    </div>
   </div>
 </div>

@@ -1,3 +1,5 @@
+/* battle-page.component.css */
+
 /* General Styles */
 .battle-page-container {
   position: relative;
@@ -65,7 +67,7 @@
   background: transparent; /* Transparent background */
   border: none; /* No border */
   color: #fff; /* White color for the icon */
-  font-size: 25px; /* Increased size by 20% from 70px to 84px */
+  font-size: 25px; /* Increased size */
   cursor: pointer; /* Pointer cursor on hover */
   transition: transform 0.2s ease;
   pointer-events: auto; /* Allow button to capture mouse events */
@@ -73,7 +75,7 @@
 
 .vote-button i {
   pointer-events: none; /* Ensure the icon itself doesn't capture events */
-  font-size:30px;
+  font-size: 30px; /* Adjusted icon size */
 }
 
 .vote-button:hover {
@@ -85,18 +87,58 @@
   /* Removed color change on click */
 }
 
-/* Small Video Styles */
-.small-video-container {
+/* Small Video Wrapper */
+.small-video-wrapper {
   position: absolute;
   bottom: 20px;
   right: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 4; /* Ensure it's above the main video */
+}
+
+/* Small Controls Positioned Above the Small Video */
+.small-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.3); /* Transparent white background */
+  padding: 6px 10px; /* Reduced padding */
+  border-radius: 8px 8px 0 0; /* Rounded top corners only */
+  margin-bottom: 0px; /* Space between controls and video */
+  width: 220px;
+  box-sizing: border-box;
+}
+
+/* Remove Bottom Border Radius */
+.small-controls {
+  border-radius: 8px 8px 0 0; /* Rounded top corners only */
+}
+
+/* Adjustments for the Timer in Small Controls */
+.small-timer {
+  display: flex;
+  align-items: center;
+  pointer-events: none; /* Ensures knob is non-interactive */
+}
+
+/* Adjustments for the Current Word in Small Controls */
+.small-word {
+  color: #fff;
+  font-size: 20px; /* Slightly smaller font size for small video */
+  margin-left: 10px;
+}
+
+/* Small Video Styles */
+.small-video-container {
   width: 220px;
   height: 220px;
-  border-radius: 10px;
+  border-radius: 0px 0 10px 10px; /* Removed top-right border radius */
   overflow: hidden;
-  z-index: 4; /* Ensures it's above the timer */
   border: 2px solid #fff;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  position: relative; /* To position any future elements if needed */
 }
 
 .small-video-container video {
@@ -107,35 +149,30 @@
 
 /* Responsive Design */
 @media (max-width: 767px) {
-  .small-video-container {
-    width: 168px;
-    height: 168px;
-    bottom: 80px;
-    right: 10px;
-  }
-
   /* Main video fills the screen on mobile */
   .main-video-container {
-    width: 100%;
-    height: 100%;
+    position: absolute;
     top: 0;
     left: 0;
+    width: 100%;
+    height: 100%;
   }
 
   .main-video-container video {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    border-radius: 0px; /* Rounded corners */
+    border-radius: 0px; /* Removed rounded corners */
   }
 
   /* Top Controls for Mobile */
   .top-controls {
+    position: absolute; /* Keep controls at the top */
     left: 0px;
     right: 0px;
     top: 0px;
     padding: 4px 8px; /* Further reduced padding */
-    height: 80px; /* Further reduced height */
+    height: 80px; /* Maintained height */
   }
 
   .current-word {
@@ -147,6 +184,36 @@
 
   /* Voting Button for Mobile */
   .vote-button {
-    font-size: 25px; /* Increased size by 20% from 84px to 100px */
+    font-size: 25px; /* Adjusted size for mobile */
+  }
+
+  /* Small Video Wrapper for Mobile */
+  .small-video-wrapper {
+    bottom: 60px; /* Slightly higher position */
+    right: 10px;
+    width: 168px;
+  }
+
+  /* Small Controls for Mobile */
+  .small-controls {
+    width: 168px; /* Adjusted width for mobile */
+    padding: 4px 6px; /* Reduced padding */
+  }
+
+  .small-word {
+    font-size: 18px; /* Smaller font size on mobile */
+    margin-left: 5px;
+  }
+
+  .small-video-container {
+    width: 168px;
+    height: 168px;
+    border-radius: 0px 0 8px 8px; /* Removed top-right border radius */
+  }
+
+  /* Adjust knob size for mobile */
+  .small-controls .small-timer p-knob {
+    width: 40px; /* Adjust as needed */
+    height: 40px; /* Adjust as needed */
   }
 }
