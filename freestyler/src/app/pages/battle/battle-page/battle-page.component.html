@@ -1,20 +1,19 @@
-<!-- src/app/battle-page/battle-page.component.html -->
-
 <div class="battle-page-container">
-  <!-- Main Video -->
   <div class="main-video-container">
     <video #videoElement1 autoplay playsinline></video>
   </div>
 
-  <!-- Small Video -->
   <div class="small-video-container">
     <video #videoElement2 autoplay playsinline muted></video>
   </div>
 
-  <!-- Battle Sidebar -->
   <app-battle-sidebar 
     [timeLeft]="timeLeft" 
     [word]="word" 
-    (hangUp)="hangUp()">
+    [rapperName]="rapperName"
+    [viewerCount]="viewerCount"
+    [voteCount]="voteCount"
+    (hangUp)="hangUp()"
+    (thumbsUp)="thumbsUp()">
   </app-battle-sidebar>
 </div>

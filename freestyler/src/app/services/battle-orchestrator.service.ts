@@ -1,10 +1,10 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { BehaviorSubject, interval, Subscription } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
-export class BattleOrchestratorService {
+export class BattleOrchestratorService implements OnDestroy {
   private totalTime: number = 60; // Total time in seconds
   private timeLeft: number = this.totalTime;
   private timerSubscription!: Subscription;
@@ -17,6 +17,12 @@ export class BattleOrchestratorService {
 
   private currentWordSubject = new BehaviorSubject<string>('');
   currentWord$ = this.currentWordSubject.asObservable();
+
+  private voteCountSubject = new BehaviorSubject<number>(0);
+  voteCount$ = this.voteCountSubject.asObservable();
+
+  private viewerCountSubject = new BehaviorSubject<number>(0);
+  viewerCount$ = this.viewerCountSubject.asObservable();
 
   private words: string[] = [
     'Victory',
@@ -39,6 +45,7 @@ export class BattleOrchestratorService {
     this.currentTurnSubject.next('Player 1');
     this.generateRandomWord();
     this.startTimer();
+    this.voteCountSubject.next(0); // Initialize vote count
   }
 
   private startTimer(): void {
@@ -71,11 +78,18 @@ export class BattleOrchestratorService {
     const current = this.currentTurnSubject.value;
     const nextTurn = current === 'Player 1' ? 'Player 2' : 'Player 1';
     this.currentTurnSubject.next(nextTurn);
+    this.voteCountSubject.next(0); // Reset vote count for new turn
   }
 
   private generateRandomWord(): void {
     const randomIndex = Math.floor(Math.random() * this.words.length);
     this.currentWordSubject.next(this.words[randomIndex]);
+  }
+
+  // Method to increment vote count
+  incrementVote(): void {
+    const currentVotes = this.voteCountSubject.getValue();
+    this.voteCountSubject.next(currentVotes + 1);
   }
 
   getFormattedTime(): string {

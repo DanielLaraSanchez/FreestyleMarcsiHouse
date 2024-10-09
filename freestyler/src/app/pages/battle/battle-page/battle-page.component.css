@@ -1,5 +1,3 @@
-/* battle-page.component.css */
-
 /* General Styles */
 .battle-page-container {
   position: relative;
@@ -14,49 +12,22 @@
 /* Main Video Styles */
 .main-video-container {
   position: absolute;
-  top: 40px;
-  left: 80px;
-  width: 80%;
-  height: calc(100vh - 40px - 120px); /* 40px top + 120px Sidebar height */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
 }
 
 .main-video-container video {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: 10px; /* Rounded corners */
-}
-
-/* Voting Button Styles */
-.vote-button {
-  background: transparent; /* Transparent background */
-  border: none; /* No border */
-  color: #fff; /* White color for the icon */
-  font-size: 30px; /* Increased size */
-  cursor: pointer; /* Pointer cursor on hover */
-  transition: transform 0.2s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.vote-button i {
-  pointer-events: none; /* Ensure the icon itself doesn't capture events */
-  font-size: 30px; /* Adjusted icon size */
-}
-
-.vote-button:hover {
-  color: #ff4081; /* Light pink on hover */
-}
-
-.vote-button:active {
-  transform: scale(1.1); /* Slight enlarge on click */
 }
 
 /* Small Video Styles */
 .small-video-container {
   position: absolute;
-  bottom: 120px; /* Leave space for Sidebar */
+  bottom: 250px; /* Height of the sidebar */
   right: 20px;
   width: 220px;
   height: 220px;
@@ -73,126 +44,13 @@
   object-fit: cover;
 }
 
-/* Sidebar Styles */
-.custom-sidebar {
-  background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent white background */
-  padding: 10px;
-  height: 120px; /* Fixed height to accommodate content */
-  box-sizing: border-box;
-}
-
-/* Sidebar Content */
-.sidebar-content {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-/* Timer Styles */
-.small-timer {
-  display: flex;
-  align-items: center;
-  pointer-events: none; /* Ensures knob is non-interactive */
-}
-
-.small-timer p-knob {
-  /* Additional styles can be added here if needed */
-}
-
-/* Current Word Styles */
-.small-word {
-  color: #000;
-  font-size: 24px;
-  margin-left: 10px;
-}
-
-/* Hang Up Button Styles */
-.hang-up-button {
-  background-color: #e91e63; /* Primary color */
-  border: none;
-  color: #fff; /* White text */
-  padding: 8px 16px;
-  border-radius: 50px; /* Rounded pill shape */
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  font-size: 16px;
-  margin-left: auto; /* Pushes the button to the right */
-}
-
-.hang-up-button i {
-  margin-right: 8px; /* Space between icon and text */
-}
-
-.hang-up-button:hover {
-  background-color: #c2185b; /* Darker shade on hover */
-}
-
 /* Responsive Design */
 @media (max-width: 767px) {
-  /* Main Video Adjustments */
-  .main-video-container {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: calc(100vh - 120px); /* 120px Sidebar height */
-  }
-
-  .main-video-container video {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 0px; /* Removed rounded corners */
-  }
-
-  /* Small Video Adjustments */
   .small-video-container {
     width: 168px;
     height: 168px;
-    bottom: 120px; /* Slightly higher position to accommodate Sidebar */
+    bottom: 200px; /* Height of the mobile sidebar */
     right: 10px;
-    border-radius: 10px 0 8px 8px; /* Removed top-right border radius */
-  }
-
-  .small-word {
-    font-size: 18px; /* Smaller font size on mobile */
-    margin-left: 5px;
-  }
-
-  /* Sidebar Adjustments for Mobile */
-  .custom-sidebar {
-    height: 120px; /* Maintain consistent height */
-    padding: 8px;
-  }
-
-  .sidebar-content {
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  .small-timer p-knob {
-    width: 40px; /* Adjusted knob size for mobile */
-    height: 40px;
-  }
-
-  .hang-up-button {
-    padding: 6px 12px;
-    font-size: 14px;
-  }
-
-  .hang-up-button i {
-    margin-right: 4px;
-  }
-
-  /* Adjust main-video-container height if necessary */
-  .main-video-container {
-    height: calc(100vh - 120px); /* Sidebar height */
-  }
-
-  /* Ensure Sidebar does not overlap on mobile */
-  .battle-page-container {
-    padding-bottom: 120px; /* Optional: additional padding if needed */
+    border-radius: 10px 0 8px 8px; /* Adjusted border radius */
   }
 }

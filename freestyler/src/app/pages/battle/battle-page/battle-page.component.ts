@@ -1,7 +1,6 @@
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { BattleOrchestratorService } from '../../../services/battle-orchestrator.service';
-import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-battle-page',
@@ -13,9 +12,6 @@ export class BattlePageComponent implements OnInit, OnDestroy {
   @ViewChild('videoElement2') videoElement2!: ElementRef<HTMLVideoElement>;
   stream!: MediaStream;
 
-  // Sidebar Visibility
-  sidebarVisible: boolean = true; // Always visible
-
   // Timer Properties
   timeLeft: number = 60;
   timerSubscription!: Subscription;
@@ -24,10 +20,15 @@ export class BattlePageComponent implements OnInit, OnDestroy {
   currentTurn: string = 'Player 1';
   word: string = '';
 
+  // Additional Properties
+  rapperName: string = 'Player 1';
+  viewerCount: number = 100;
+  voteCount: number = 0;
+
   // Voting State
   hasVoted: boolean = false;
 
-  constructor(private battleService: BattleOrchestratorService, private router: Router) { }
+  constructor(private battleService: BattleOrchestratorService) { }
 
   ngOnInit(): void {
     this.startCamera();
@@ -39,10 +40,19 @@ export class BattlePageComponent implements OnInit, OnDestroy {
 
     this.battleService.currentTurn$.subscribe(turn => {
       this.currentTurn = turn;
+      this.updateRapperData(turn);
     });
 
     this.battleService.currentWord$.subscribe(word => {
       this.word = word;
+    });
+
+    this.battleService.viewerCount$.subscribe(count => {
+      this.viewerCount = count;
+    });
+
+    this.battleService.voteCount$.subscribe(count => {
+      this.voteCount = count;
     });
   }
 
@@ -72,27 +82,37 @@ export class BattlePageComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Voting Method
-  vote(): void {
+  // Method to handle Hang Up event from BattleSidebarComponent
+  hangUp(): void {
+    this.stopCamera();
+    alert('You have ended the battle.');
+    // Optionally, navigate to another page or reset state
+    // Example: this.router.navigate(['/home']);
+  }
+
+  // Method to handle Thumbs Up event from BattleSidebarComponent
+  thumbsUp(): void {
     if (this.hasVoted) {
       alert('You have already voted!');
       return;
     }
 
-    // Implement actual voting logic here (e.g., send vote to backend)
+    this.battleService.incrementVote(); // Update vote count via service
     alert('Thank you for voting!');
 
     // Update voting state
     this.hasVoted = true;
   }
 
-  // Hang Up Method
-  hangUp(): void {
-    // Implement hang-up logic here, e.g., stop camera, navigate away
-    this.stopCamera();
-    this.router.navigate(['/battlefield'])
-    // Optionally, navigate to another page or reset state
-    // Example: this.router.navigate(['/home']);
+  // Method to update rapper data based on the current turn
+  updateRapperData(turn: string): void {
+    // Placeholder logic. Replace with actual data retrieval.
+    if (turn === 'Player 1') {
+      this.rapperName = 'Player 1';
+    } else if (turn === 'Player 2') {
+      this.rapperName = 'Player 2';
+    }
+    // Add more conditions if there are more players
   }
 
   // Optional: Display formatted time

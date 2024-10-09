@@ -1,89 +1,199 @@
 /* Sidebar Styles */
 .custom-sidebar {
-    background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent white background */
-    padding: 10px;
-    height: 120px; /* Fixed height to accommodate content */
+    background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent dark background */
+    padding: 10px 20px;
+    height: 220px; /* Adjusted height to fit all elements */
     box-sizing: border-box;
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    
+    /* Hide Scrollbar */
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+  
+  .custom-sidebar::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, and Opera */
   }
   
   /* Sidebar Content */
   .sidebar-content {
     display: flex;
+    flex-direction: row;
+    align-items: center;
     justify-content: space-between;
-    align-items: center;
+    width: 100%;
+    height: 100%;
   }
   
-  /* Timer Styles */
-  .small-timer {
+  /* Left Section: Battle Timer */
+  .left-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+  }
+  
+  .left-section p-knob {
+    width: 60px; /* Adjusted size for better fit */
+    height: 60px;
+  }
+  
+  .timer-label {
+    margin-top: 5px;
+    color: #fff;
+    font-size: 14px;
+    font-weight: bold;
+  }
+  
+  /* Center Section: Rapper's Name and Counts */
+  .center-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 2;
+  }
+  
+  .rapper-name p {
+    font-size: 20px;
+    font-weight: bold;
+    margin: 8px 0;
+    color: #fff;
+  }
+  
+  .viewer-vote {
+    display: flex;
+    flex-direction: row;
+    gap: 15px;
+    margin-top: 5px;
+  }
+  
+  .viewer-count, .vote-count {
     display: flex;
     align-items: center;
-    pointer-events: none; /* Ensures knob is non-interactive */
-  }
-  
-  .small-timer p-knob {
-    /* Additional styles can be added here if needed */
-  }
-  
-  /* Current Word Styles */
-  .small-word {
-    color: #000;
-    font-size: 24px;
-    margin-left: 10px;
-  }
-  
-  /* Hang Up Button Styles */
-  .hang-up-button {
-    background-color: #e91e63; /* Primary color */
-    border: none;
-    color: #fff; /* White text */
-    padding: 8px 16px;
-    border-radius: 50px; /* Rounded pill shape */
-    cursor: pointer;
-    display: flex;
-    align-items: center;
+    gap: 5px;
     font-size: 16px;
-    margin-left: auto; /* Pushes the button to the right */
+    color: #ffeb3b; /* Yellow color for icons and text */
+  }
+  
+  /* Pulse Animation */
+  @keyframes pulse {
+    0% {
+      transform: scale(1);
+      color: #fdd835; /* Bright yellow */
+    }
+    50% {
+      transform: scale(1.2);
+      color: #fff176; /* Lighter yellow */
+    }
+    100% {
+      transform: scale(1);
+      color: #fdd835;
+    }
+  }
+  
+  .vote-count {
+    animation: pulse 0.6s ease-in-out;
+  }
+  
+  /* Right Section: Buttons */
+  .right-section {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+  }
+  
+  .hang-up-button, .thumbs-up-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 30px; /* Rounded pill shape */
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+  
+  .hang-up-button {
+    /* background-color: #f44336;  */
+    color: #fff;
+    width: 40px;
+    height: 40px;
   }
   
   .hang-up-button i {
-    margin-right: 8px; /* Space between icon and text */
+    font-size: 20px;
   }
   
   .hang-up-button:hover {
-    background-color: #c2185b; /* Darker shade on hover */
+    background-color: #d32f2f; /* Darker red on hover */
+    transform: scale(1.05);
+  }
+  
+  .hang-up-button:active {
+    transform: scale(0.95);
+  }
+  
+  .thumbs-up-button {
+    background-color: #4caf50; /* Green color */
+    color: #fff;
+    padding: 8px 12px;
+  }
+  
+  .thumbs-up-button i {
+    font-size: 20px;
+    margin-right: 6px;
+  }
+  
+  .thumbs-up-button span {
+    font-size: 16px;
+  }
+  
+  .thumbs-up-button:hover {
+    background-color: #388e3c; /* Darker green on hover */
+    transform: scale(1.05);
+  }
+  
+  .thumbs-up-button:active {
+    transform: scale(0.95);
   }
   
   /* Responsive Design */
   @media (max-width: 767px) {
     .custom-sidebar {
-      height: 120px; /* Maintain consistent height */
-      padding: 8px;
+      height: 180px; /* Adjusted height for smaller screens */
+      padding: 10px 15px;
     }
   
-    .sidebar-content {
-      flex-direction: row;
-      justify-content: space-between;
-      align-items: center;
+    .left-section p-knob {
+      width: 50px; /* Smaller knob on mobile */
+      height: 50px;
     }
   
-    .small-timer p-knob {
-      width: 40px; /* Adjusted knob size for mobile */
-      height: 40px;
+    .timer-label {
+      font-size: 12px;
     }
   
-    .hang-up-button {
-      padding: 6px 12px;
+    .rapper-name p {
+      font-size: 18px;
+    }
+  
+    .viewer-vote {
+      gap: 10px;
+      margin-top: 3px;
+    }
+  
+    .viewer-count, .vote-count {
       font-size: 14px;
     }
   
-    .hang-up-button i {
-      margin-right: 4px;
-    }
-  
-    .small-word {
-      font-size: 18px; /* Smaller font size on mobile */
-      margin-left: 5px;
+    .thumbs-up-button, .hang-up-button {
+      padding: 8px 14px;
+      font-size: 14px;
     }
   }
