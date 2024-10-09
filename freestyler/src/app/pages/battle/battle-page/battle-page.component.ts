@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { BattleOrchestratorService } from '../../../services/battle-orchestrator.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-battle-page',
@@ -26,7 +27,7 @@ export class BattlePageComponent implements OnInit, OnDestroy {
   // Voting State
   hasVoted: boolean = false;
 
-  constructor(private battleService: BattleOrchestratorService) { }
+  constructor(private battleService: BattleOrchestratorService, private router: Router) { }
 
   ngOnInit(): void {
     this.startCamera();
@@ -89,7 +90,7 @@ export class BattlePageComponent implements OnInit, OnDestroy {
   hangUp(): void {
     // Implement hang-up logic here, e.g., stop camera, navigate away
     this.stopCamera();
-    alert('You have ended the battle.');
+    this.router.navigate(['/battlefield'])
     // Optionally, navigate to another page or reset state
     // Example: this.router.navigate(['/home']);
   }

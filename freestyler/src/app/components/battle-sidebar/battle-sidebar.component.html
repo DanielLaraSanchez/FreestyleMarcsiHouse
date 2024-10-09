@@ -1,0 +1,47 @@
+<!-- src/app/battle-sidebar/battle-sidebar.component.html -->
+
+<p-sidebar
+  [visible]="true" 
+  position="bottom"
+  [dismissible]="false"
+  [closeOnEscape]="false"
+  styleClass="custom-sidebar"
+  [baseZIndex]="10000" 
+>
+  <!-- Sidebar Header: Hang Up Button -->
+  <ng-template pTemplate="header">
+    <button class="hang-up-button" (click)="onHangUp()" aria-label="Hang Up">
+      <i class="pi pi-phone-slash" aria-hidden="true"></i>
+      <span>Hang Up</span>
+    </button>
+  </ng-template>
+
+  <!-- Sidebar Content: Timer and Current Word -->
+  <ng-template pTemplate="content">
+    <div class="sidebar-content">
+      <!-- Timer Knob -->
+      <div class="small-timer">
+        <p-knob
+          [(ngModel)]="timeLeft"
+          valueColor="#e91e63"
+          rangeColor="SlateGray"
+          [size]="50"
+          [strokeWidth]="4"
+          [readonly]="true"
+          textColor="white"
+          [min]="0"
+          [max]="60"
+        >
+        </p-knob>
+      </div>
+
+      <!-- Current Word -->
+      <div class="small-word">
+        <p>{{ word }}</p>
+      </div>
+
+      <!-- Optional: Additional Controls or Information -->
+      <!-- You can add more elements here if needed -->
+    </div>
+  </ng-template>
+</p-sidebar>

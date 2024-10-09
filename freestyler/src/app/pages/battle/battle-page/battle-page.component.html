@@ -1,4 +1,5 @@
-<!-- battle-page.component.html -->
+<!-- src/app/battle-page/battle-page.component.html -->
+
 <div class="battle-page-container">
   <!-- Main Video -->
   <div class="main-video-container">
@@ -10,49 +11,10 @@
     <video #videoElement2 autoplay playsinline muted></video>
   </div>
 
-  <!-- Sidebar Controls -->
-  <p-sidebar
-    [(visible)]="sidebarVisible"
-    position="bottom"
-    [dismissible]="false"
-    [closeOnEscape]="false"
-    styleClass="custom-sidebar"
-  >
-    <!-- Sidebar Header: Hang Up Button -->
-    <ng-template pTemplate="header">
-      <button class="hang-up-button" (click)="hangUp()">
-        <i class="pi pi-phone-slash"></i>
-        <span>Hang Up</span>
-      </button>
-    </ng-template>
-
-    <!-- Sidebar Content: Timer and Current Word -->
-    <ng-template pTemplate="content">
-      <div class="sidebar-content">
-        <!-- Timer Knob -->
-        <div class="small-timer">
-          <p-knob
-            [(ngModel)]="timeLeft"
-            valueColor="#e91e63"
-            rangeColor="SlateGray"
-            [size]="50"
-            [strokeWidth]="4"
-            [readonly]="true"
-            textColor="white"
-            [min]="0"
-            [max]="60"
-          >
-          </p-knob>
-        </div>
-
-        <!-- Current Word -->
-        <div class="small-word">
-          <p>{{ word }}</p>
-        </div>
-
-        <!-- Optional: Additional Controls or Information -->
-        <!-- You can add more elements here if needed -->
-      </div>
-    </ng-template>
-  </p-sidebar>
+  <!-- Battle Sidebar -->
+  <app-battle-sidebar 
+    [timeLeft]="timeLeft" 
+    [word]="word" 
+    (hangUp)="hangUp()">
+  </app-battle-sidebar>
 </div>

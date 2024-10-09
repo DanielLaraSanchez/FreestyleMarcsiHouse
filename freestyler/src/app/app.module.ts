@@ -41,6 +41,7 @@ import { DynamicDialogModule } from 'primeng/dynamicdialog';
 import { BattlePairComponent } from './components/battle-pair/battle-pair.component';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { AuthCallbackComponent } from './components/auth-callback/auth-callback.component';
+import { BattleSidebarComponent } from './components/battle-sidebar/battle-sidebar.component';
 
 @NgModule({
   declarations: [
@@ -52,7 +53,8 @@ import { AuthCallbackComponent } from './components/auth-callback/auth-callback.
     ChatPageComponent,
     UserActionsDialogComponent,
     BattlePairComponent,
-    AuthCallbackComponent
+    AuthCallbackComponent,
+    BattleSidebarComponent
   ],
   imports: [
     HttpClientModule,

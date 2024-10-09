@@ -1,0 +1,89 @@
+/* Sidebar Styles */
+.custom-sidebar {
+    background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent white background */
+    padding: 10px;
+    height: 120px; /* Fixed height to accommodate content */
+    box-sizing: border-box;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+  }
+  
+  /* Sidebar Content */
+  .sidebar-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  /* Timer Styles */
+  .small-timer {
+    display: flex;
+    align-items: center;
+    pointer-events: none; /* Ensures knob is non-interactive */
+  }
+  
+  .small-timer p-knob {
+    /* Additional styles can be added here if needed */
+  }
+  
+  /* Current Word Styles */
+  .small-word {
+    color: #000;
+    font-size: 24px;
+    margin-left: 10px;
+  }
+  
+  /* Hang Up Button Styles */
+  .hang-up-button {
+    background-color: #e91e63; /* Primary color */
+    border: none;
+    color: #fff; /* White text */
+    padding: 8px 16px;
+    border-radius: 50px; /* Rounded pill shape */
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+    margin-left: auto; /* Pushes the button to the right */
+  }
+  
+  .hang-up-button i {
+    margin-right: 8px; /* Space between icon and text */
+  }
+  
+  .hang-up-button:hover {
+    background-color: #c2185b; /* Darker shade on hover */
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 767px) {
+    .custom-sidebar {
+      height: 120px; /* Maintain consistent height */
+      padding: 8px;
+    }
+  
+    .sidebar-content {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+    }
+  
+    .small-timer p-knob {
+      width: 40px; /* Adjusted knob size for mobile */
+      height: 40px;
+    }
+  
+    .hang-up-button {
+      padding: 6px 12px;
+      font-size: 14px;
+    }
+  
+    .hang-up-button i {
+      margin-right: 4px;
+    }
+  
+    .small-word {
+      font-size: 18px; /* Smaller font size on mobile */
+      margin-left: 5px;
+    }
+  }
