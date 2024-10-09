@@ -1,8 +1,8 @@
 /* Sidebar Styles */
 .custom-sidebar {
-    background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent dark background */
-    padding: 10px 20px;
-    height: 220px; /* Adjusted height to fit all elements */
+    background-color: #282c34;
+    padding: 15px;
+    height: 200px;
     box-sizing: border-box;
     border-top-left-radius: 15px;
     border-top-right-radius: 15px;
@@ -10,14 +10,13 @@
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    
-    /* Hide Scrollbar */
-    -ms-overflow-style: none; /* IE and Edge */
-    scrollbar-width: none; /* Firefox */
+    color: #ffffff;
+    width: 90%; /* Adjusted width for less gap */
+    margin: 0 auto;
   }
   
   .custom-sidebar::-webkit-scrollbar {
-    display: none; /* Chrome, Safari, and Opera */
+    display: none;
   }
   
   /* Sidebar Content */
@@ -38,37 +37,89 @@
     flex: 1;
   }
   
-  .left-section p-knob {
-    width: 60px; /* Adjusted size for better fit */
-    height: 60px;
-  }
-  
   .timer-label {
     margin-top: 5px;
     font-size: 14px;
     font-weight: bold;
   }
   
-  /* Center Section: Rapper's Name and Counts */
+  /* Center Section: Rapper's Name and Word */
   .center-section {
     display: flex;
     flex-direction: column;
     align-items: center;
+    gap: 10px;
     flex: 2;
   }
   
-  .rapper-name p {
-    font-size: 20px;
-    font-weight: bold;
-    margin: 8px 0;
-    /* color: #fff; */
+  .rapper-name {
+    display: flex;
+    align-items: center;
+    gap: 10px;
   }
   
-  .viewer-vote {
+  .rapper-name p {
+    font-size: 22px;
+    font-weight: bold;
+    margin: 0;
+  }
+  
+  .rap-word {
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 20px;
+  }
+  
+  /* Right Section: Button */
+  .right-section {
     display: flex;
-    flex-direction: row;
+    align-items: center;
+    flex: 1;
+  }
+  
+  /* Button Styles */
+  .hang-up-button, .thumbs-up-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    width: 40px;
+    height: 40px;
+  }
+  
+  .hang-up-button {
+    background-color: #f44336;
+    color: #ffffff;
+  }
+  
+  .hang-up-button:hover {
+    background-color: #d32f2f;
+    transform: scale(1.05);
+  }
+  
+  .thumbs-up-button {
+    background-color: #4caf50;
+    color: #ffffff;
+  }
+  
+  .thumbs-up-button:hover {
+    background-color: #388e3c;
+    transform: scale(1.05);
+  }
+  
+  /* Top Left Corner Info */
+  .top-left-info {
+    position: absolute;
+    bottom: 130px;
+    left: 10px;
+    display: flex;
     gap: 15px;
-    margin-top: 5px;
+    color: black;
+    z-index: 40000;
   }
   
   .viewer-count, .vote-count {
@@ -78,120 +129,28 @@
     font-size: 16px;
   }
   
-  /* Pulse Animation */
-  @keyframes pulse {
-    0% {
-      transform: scale(1);
-      color: #fdd835; /* Bright yellow */
-    }
-    50% {
-      transform: scale(1.2);
-      color: #fff176; /* Lighter yellow */
-    }
-    100% {
-      transform: scale(1);
-      color: #fdd835;
-    }
-  }
-  
-  .vote-count {
-    animation: pulse 0.6s ease-in-out;
-  }
-  
-  /* Right Section: Buttons */
-  .right-section {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 10px;
-    flex: 1;
-  }
-  
-  .hang-up-button, .thumbs-up-button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: none;
-    border-radius: 30px; /* Rounded pill shape */
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-  }
-  
-  .hang-up-button {
-    /* background-color: #f44336;  */
-    color: #fff;
-    width: 40px;
-    height: 40px;
-  }
-  
-  .hang-up-button i {
-    font-size: 20px;
-  }
-  
-  .hang-up-button:hover {
-    background-color: #d32f2f; /* Darker red on hover */
-    transform: scale(1.05);
-  }
-  
-  .hang-up-button:active {
-    transform: scale(0.95);
-  }
-  
-  .thumbs-up-button {
-    background-color: #4caf50; /* Green color */
-    color: #fff;
-    padding: 8px 12px;
-  }
-  
-  .thumbs-up-button i {
-    font-size: 20px;
-    margin-right: 6px;
-  }
-  
-  .thumbs-up-button span {
-    font-size: 16px;
-  }
-  
-  .thumbs-up-button:hover {
-    background-color: #388e3c; /* Darker green on hover */
-    transform: scale(1.05);
-  }
-  
-  .thumbs-up-button:active {
-    transform: scale(0.95);
+  .viewer-count i, .vote-count i {
+    font-size: 18px;
   }
   
   /* Responsive Design */
   @media (max-width: 767px) {
     .custom-sidebar {
-      height: 180px; /* Adjusted height for smaller screens */
-      padding: 10px 15px;
+      height: 180px;
+      padding: 10px;
     }
   
     .left-section p-knob {
-      width: 50px; /* Smaller knob on mobile */
-      height: 50px;
-    }
-  
-    .timer-label {
-      font-size: 12px;
+      width: 60px;
+      height: 60px;
     }
   
     .rapper-name p {
       font-size: 18px;
     }
-  
-    .viewer-vote {
-      gap: 10px;
-      margin-top: 3px;
-    }
-  
-    .viewer-count, .vote-count {
-      font-size: 14px;
-    }
-  
-    .thumbs-up-button, .hang-up-button {
-      padding: 8px 14px;
-      font-size: 14px;
-    }
   }
+
+  .p-sidebar .p-sidebar-header {
+    display:none !important;
+  }
+

@@ -15,37 +15,36 @@
       <p-knob
         [(ngModel)]="timeLeft"
         [valueColor]="'#e91e63'"
-        [rangeColor]="'SlateGray'"
-        [size]="100"
-        [strokeWidth]="3"
+        [rangeColor]="'#8A8A8A'"
+        [size]="70"
+        [strokeWidth]="5"
         [readonly]="true"
         [textColor]="'black'"
         [min]="0"
         [max]="60"
+        showValue="true"
         aria-label="Battle Timer"
-      >
-      </p-knob>
+      ></p-knob>
       <div class="timer-label">Time Left</div>
     </div>
 
-    <!-- Center Section: Rapper's Name, Viewer & Vote Count -->
+    <!-- Center Section: Rapper's Name -->
     <div class="center-section">
       <div class="rapper-name">
         <p>{{ rapperName }}</p>
-      </div>
-      <div class="viewer-vote">
-        <div class="viewer-count" aria-label="Number of Viewers">
-          <i class="pi pi-eye" aria-hidden="true"></i>
-          <span>{{ viewerCount }}</span>
-        </div>
-        <div class="vote-count" aria-label="Number of Votes">
+        <button
+          class="thumbs-up-button"
+          (click)="onThumbsUp()"
+          aria-label="Thumbs Up Vote"
+          pTooltip="Thumbs Up"
+          tooltipPosition="bottom"
+        >
           <i class="pi pi-thumbs-up" aria-hidden="true"></i>
-          <span>{{ voteCount }}</span>
-        </div>
+        </button>
       </div>
     </div>
 
-    <!-- Right Section: Buttons -->
+    <!-- Right Section: Hang Up Button -->
     <div class="right-section">
       <button
         class="hang-up-button"
@@ -54,17 +53,20 @@
         pTooltip="Hang Up"
         tooltipPosition="bottom"
       >
-        <i class="pi pi-phone" aria-hidden="true"></i>
-      </button>
-      <button
-        class="thumbs-up-button"
-        (click)="onThumbsUp()"
-        aria-label="Thumbs Up Vote"
-        pTooltip="Thumbs Up"
-        tooltipPosition="bottom"
-      >
-        <i class="pi pi-thumbs-up" aria-hidden="true"></i>
+        <i class="pi pi-phone"></i>
       </button>
     </div>
   </div>
 </p-sidebar>
+
+<!-- Top Left Corner: Viewer and Vote Counts -->
+<div class="top-left-info">
+  <div class="viewer-count" aria-label="Number of Viewers">
+    <i class="pi pi-eye" aria-hidden="true"></i>
+    <span>{{ viewerCount }}</span>
+  </div>
+  <div class="vote-count" aria-label="Number of Votes">
+    <i class="pi pi-thumbs-up" aria-hidden="true"></i>
+    <span>{{ voteCount }}</span>
+  </div>
+</div>
