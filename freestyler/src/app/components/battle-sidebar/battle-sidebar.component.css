@@ -45,7 +45,6 @@
   
   .timer-label {
     margin-top: 5px;
-    color: #fff;
     font-size: 14px;
     font-weight: bold;
   }
@@ -62,7 +61,7 @@
     font-size: 20px;
     font-weight: bold;
     margin: 8px 0;
-    color: #fff;
+    /* color: #fff; */
   }
   
   .viewer-vote {
@@ -77,7 +76,6 @@
     align-items: center;
     gap: 5px;
     font-size: 16px;
-    color: #ffeb3b; /* Yellow color for icons and text */
   }
   
   /* Pulse Animation */

@@ -7,6 +7,7 @@
   [baseZIndex]="10000"
   aria-labelledby="battle-sidebar"
   showCloseIcon="false"
+  modal="false"
 >
   <div class="sidebar-content">
     <!-- Left Section: Battle Timer -->
@@ -15,7 +16,7 @@
         [(ngModel)]="timeLeft"
         [valueColor]="'#e91e63'"
         [rangeColor]="'SlateGray'"
-        [size]="60"
+        [size]="100"
         [strokeWidth]="3"
         [readonly]="true"
         [textColor]="'black'"
@@ -53,7 +54,7 @@
         pTooltip="Hang Up"
         tooltipPosition="bottom"
       >
-        <i class="pi pi-phone-slash" aria-hidden="true"></i>
+        <i class="pi pi-phone" aria-hidden="true"></i>
       </button>
       <button
         class="thumbs-up-button"
@@ -63,7 +64,6 @@
         tooltipPosition="bottom"
       >
         <i class="pi pi-thumbs-up" aria-hidden="true"></i>
-        <span>👍</span>
       </button>
     </div>
   </div>
