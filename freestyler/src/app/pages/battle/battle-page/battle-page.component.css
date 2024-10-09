@@ -1,3 +1,5 @@
+/* battle-page.component.css */
+
 /* General Styles */
 .battle-page-container {
   position: relative;
@@ -15,7 +17,7 @@
   top: 40px;
   left: 80px;
   width: 80%;
-  height: 90%;
+  height: calc(100vh - 40px - 120px); /* 40px top + 120px Sidebar height */
 }
 
 .main-video-container video {
@@ -25,55 +27,22 @@
   border-radius: 10px; /* Rounded corners */
 }
 
-/* Top Controls Styles */
-.top-controls {
-  position: absolute;
-  top: 0px;
-  left: 0px;
-  right: 0px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent background */
-  padding: 6px 12px; /* Further reduced padding */
-  border-radius: 8px;
-  z-index: 3; /* Ensures it stays above the main video */
-  height: 80px; /* Reduced height to make it less tall */
-  box-sizing: border-box;
-}
-
-/* Timer Container */
-.timer-container {
-  pointer-events: none; /* Ensures knob is non-interactive */
-}
-
-/* Current Word Styles */
-.current-word {
-  pointer-events: none; /* Ensures word is non-interactive */
-  color: #fff;
-  font-size: 28px; /* Increased font size */
-  text-align: center;
-  padding: 10px 20px;
-  border-radius: 5px;
-  flex: 1;
-  margin: 0 20px;
-  background-color: rgba(0, 0, 0, 0); /* Removed background */
-}
-
 /* Voting Button Styles */
 .vote-button {
   background: transparent; /* Transparent background */
   border: none; /* No border */
   color: #fff; /* White color for the icon */
-  font-size: 25px; /* Increased size by 20% from 70px to 84px */
+  font-size: 30px; /* Increased size */
   cursor: pointer; /* Pointer cursor on hover */
   transition: transform 0.2s ease;
-  pointer-events: auto; /* Allow button to capture mouse events */
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .vote-button i {
   pointer-events: none; /* Ensure the icon itself doesn't capture events */
-  font-size:30px;
+  font-size: 30px; /* Adjusted icon size */
 }
 
 .vote-button:hover {
@@ -82,19 +51,18 @@
 
 .vote-button:active {
   transform: scale(1.1); /* Slight enlarge on click */
-  /* Removed color change on click */
 }
 
 /* Small Video Styles */
 .small-video-container {
   position: absolute;
-  bottom: 20px;
+  bottom: 120px; /* Leave space for Sidebar */
   right: 20px;
   width: 220px;
   height: 220px;
-  border-radius: 10px;
+  border-radius: 10px 0 10px 10px; /* Removed top-right border radius */
   overflow: hidden;
-  z-index: 4; /* Ensures it's above the timer */
+  z-index: 4; /* Ensure it's above the Sidebar */
   border: 2px solid #fff;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
@@ -105,48 +73,126 @@
   object-fit: cover;
 }
 
+/* Sidebar Styles */
+.custom-sidebar {
+  background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent white background */
+  padding: 10px;
+  height: 120px; /* Fixed height to accommodate content */
+  box-sizing: border-box;
+}
+
+/* Sidebar Content */
+.sidebar-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Timer Styles */
+.small-timer {
+  display: flex;
+  align-items: center;
+  pointer-events: none; /* Ensures knob is non-interactive */
+}
+
+.small-timer p-knob {
+  /* Additional styles can be added here if needed */
+}
+
+/* Current Word Styles */
+.small-word {
+  color: #000;
+  font-size: 24px;
+  margin-left: 10px;
+}
+
+/* Hang Up Button Styles */
+.hang-up-button {
+  background-color: #e91e63; /* Primary color */
+  border: none;
+  color: #fff; /* White text */
+  padding: 8px 16px;
+  border-radius: 50px; /* Rounded pill shape */
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+  margin-left: auto; /* Pushes the button to the right */
+}
+
+.hang-up-button i {
+  margin-right: 8px; /* Space between icon and text */
+}
+
+.hang-up-button:hover {
+  background-color: #c2185b; /* Darker shade on hover */
+}
+
 /* Responsive Design */
 @media (max-width: 767px) {
-  .small-video-container {
-    width: 168px;
-    height: 168px;
-    bottom: 80px;
-    right: 10px;
-  }
-
-  /* Main video fills the screen on mobile */
+  /* Main Video Adjustments */
   .main-video-container {
-    width: 100%;
-    height: 100%;
+    position: absolute;
     top: 0;
     left: 0;
+    width: 100%;
+    height: calc(100vh - 120px); /* 120px Sidebar height */
   }
 
   .main-video-container video {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    border-radius: 0px; /* Rounded corners */
+    border-radius: 0px; /* Removed rounded corners */
   }
 
-  /* Top Controls for Mobile */
-  .top-controls {
-    left: 0px;
-    right: 0px;
-    top: 0px;
-    padding: 4px 8px; /* Further reduced padding */
-    height: 80px; /* Further reduced height */
+  /* Small Video Adjustments */
+  .small-video-container {
+    width: 168px;
+    height: 168px;
+    bottom: 120px; /* Slightly higher position to accommodate Sidebar */
+    right: 10px;
+    border-radius: 10px 0 8px 8px; /* Removed top-right border radius */
   }
 
-  .current-word {
-    font-size: 24px; /* Increased font size */
-    padding: 8px 16px;
-    margin: 0 10px;
-    background-color: rgba(0, 0, 0, 0); /* Removed background */
+  .small-word {
+    font-size: 18px; /* Smaller font size on mobile */
+    margin-left: 5px;
   }
 
-  /* Voting Button for Mobile */
-  .vote-button {
-    font-size: 25px; /* Increased size by 20% from 84px to 100px */
+  /* Sidebar Adjustments for Mobile */
+  .custom-sidebar {
+    height: 120px; /* Maintain consistent height */
+    padding: 8px;
+  }
+
+  .sidebar-content {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .small-timer p-knob {
+    width: 40px; /* Adjusted knob size for mobile */
+    height: 40px;
+  }
+
+  .hang-up-button {
+    padding: 6px 12px;
+    font-size: 14px;
+  }
+
+  .hang-up-button i {
+    margin-right: 4px;
+  }
+
+  /* Adjust main-video-container height if necessary */
+  .main-video-container {
+    height: calc(100vh - 120px); /* Sidebar height */
+  }
+
+  /* Ensure Sidebar does not overlap on mobile */
+  .battle-page-container {
+    padding-bottom: 120px; /* Optional: additional padding if needed */
   }
 }

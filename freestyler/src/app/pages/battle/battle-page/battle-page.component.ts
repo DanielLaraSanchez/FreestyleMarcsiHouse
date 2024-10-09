@@ -12,6 +12,9 @@ export class BattlePageComponent implements OnInit, OnDestroy {
   @ViewChild('videoElement2') videoElement2!: ElementRef<HTMLVideoElement>;
   stream!: MediaStream;
 
+  // Sidebar Visibility
+  sidebarVisible: boolean = true; // Always visible
+
   // Timer Properties
   timeLeft: number = 60;
   timerSubscription!: Subscription;
@@ -51,15 +54,15 @@ export class BattlePageComponent implements OnInit, OnDestroy {
   }
 
   startCamera(): void {
-      navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-        .then(stream => {
-          this.stream = stream;
-          this.videoElement1.nativeElement.srcObject = stream;
-          this.videoElement2.nativeElement.srcObject = stream;
-        })
-        .catch(error => {
-          console.error('Error accessing media devices.', error);
-        });
+    navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+      .then(stream => {
+        this.stream = stream;
+        this.videoElement1.nativeElement.srcObject = stream;
+        this.videoElement2.nativeElement.srcObject = stream;
+      })
+      .catch(error => {
+        console.error('Error accessing media devices.', error);
+      });
   }
 
   stopCamera(): void {
@@ -80,6 +83,15 @@ export class BattlePageComponent implements OnInit, OnDestroy {
 
     // Update voting state
     this.hasVoted = true;
+  }
+
+  // Hang Up Method
+  hangUp(): void {
+    // Implement hang-up logic here, e.g., stop camera, navigate away
+    this.stopCamera();
+    alert('You have ended the battle.');
+    // Optionally, navigate to another page or reset state
+    // Example: this.router.navigate(['/home']);
   }
 
   // Optional: Display formatted time
