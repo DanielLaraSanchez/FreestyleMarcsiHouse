@@ -12,7 +12,7 @@
   <div class="sidebar-content">
     <!-- Left Section: Battle Timer -->
     <div class="left-section">
-      <p-knob
+      <!-- <p-knob
         [(ngModel)]="timeLeft"
         [valueColor]="'#e91e63'"
         [rangeColor]="'#8A8A8A'"
@@ -25,12 +25,11 @@
         showValue="true"
         aria-label="Battle Timer"
       ></p-knob>
-      <div class="timer-label">Time Left</div>
-    </div>
+      <div class="timer-label">Time Left</div> -->
 
-    <!-- Center Section: Rapper's Name -->
-    <div class="center-section">
-      <div class="rapper-name">
+      
+    </div>
+    <!-- <div class="rapper-name">
         <p>{{ rapperName }}</p>
         <button
           class="thumbs-up-button"
@@ -41,12 +40,11 @@
         >
           <i class="pi pi-thumbs-up" aria-hidden="true"></i>
         </button>
-      </div>
-    </div>
+      </div> -->
 
-    <!-- Right Section: Hang Up Button -->
-    <div class="right-section">
-      <button
+    <!-- Center Section: Rapper's Name -->
+    <div class="center-section">
+        <button
         class="hang-up-button"
         (click)="onHangUp()"
         aria-label="Hang Up Call"
@@ -55,6 +53,12 @@
       >
         <i class="pi pi-phone"></i>
       </button>
+
+    </div>
+
+    <!-- Right Section: Hang Up Button -->
+    <div class="right-section">
+
     </div>
   </div>
 </p-sidebar>
@@ -70,3 +74,17 @@
     <span>{{ voteCount }}</span>
   </div>
 </div>
+
+
+<!-- Top Left Corner: Viewer and Vote Counts -->
+<div class="top-right-info">
+    <!-- <button
+    class="hang-up-button"
+    (click)="onHangUp()"
+    aria-label="Hang Up Call"
+    pTooltip="Hang Up"
+    tooltipPosition="bottom"
+  >
+    <i class="pi pi-phone"></i>
+  </button> -->
+  </div>
