@@ -8,50 +8,47 @@
   color: #ffffff;
   width: 100%;
   margin: 0 auto;
-}
-
-.sidebar-content {
   display: flex;
-  justify-content: space-around;
+  flex-direction: column;
   align-items: center;
-  width: 100%;
-  height: 100%;
+  justify-content: center;
 }
 
 .word-display {
-  font-size: 1.5rem;
+  font-size: 1.8rem;
+  color: #f0f0f0;
   text-align: center;
+  margin-bottom: 15px;
 }
 
 .controls {
   display: flex;
-  gap: 10px;
+  gap: 20px;
 }
 
-.hangup-btn,
-.thumbsup-btn {
+.hangup-btn {
   background-color: #f44336;
+  border: none;
+  color: #fff;
+  padding: 15px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.thumbsup-btn {
+  background-color: #6a1b9a;
   border: none;
   color: #fff;
   padding: 10px 15px;
   border-radius: 5px;
   cursor: pointer;
+  font-size: 1rem;
 }
 
-.thumbsup-btn {
-  background-color: #4caf50;
-}
-
-:host ::ng-deep .battle-sidebar .p-sidebar-header {
+:host ::ng-deep .p-sidebar-header {
   display: none;
-}
-
-.header-content {
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-}
-
-.spacer {
-  flex: 1;
 }

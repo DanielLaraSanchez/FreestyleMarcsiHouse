@@ -5,16 +5,18 @@
   [closeOnEscape]="false"
   styleClass="custom-sidebar battle-sidebar"
   [baseZIndex]="10000"
-  aria-labelledby="battle-sidebar"
   showCloseIcon="false"
   modal="false"
 >
-
-
   <div class="sidebar-content">
     <div class="word-display">
-      <span>{{ word }}</span>
+      <span>{{ word || 'Your Word Here' }}</span>
     </div>
-
+    <div class="controls">
+      <button (click)="onHangUp()" class="hangup-btn">
+        <i class="pi pi-phone"></i>
+      </button>
+      <button (click)="onThumbsUp()" class="thumbsup-btn">👍</button>
+    </div>
   </div>
 </p-sidebar>
