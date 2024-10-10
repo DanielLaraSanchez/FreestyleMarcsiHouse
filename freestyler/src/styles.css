@@ -10,3 +10,17 @@ body {
     padding: 0;
     box-sizing: border-box;
 }
+
+/* .custom-sidebar .p-sidebar-header {
+    background-color: #333 !important;
+    padding: 5px !important;
+    color: #fff !important;
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .header-content {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+  } */

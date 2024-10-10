@@ -2,166 +2,55 @@
 .custom-sidebar {
     background-color: #282c34;
     padding: 15px;
-    height: 200px;
+    height: 100px;
     box-sizing: border-box;
     border-top-left-radius: 15px;
     border-top-right-radius: 15px;
     display: flex;
     align-items: center;
-    justify-content: center;
-    overflow: hidden;
+    justify-content: space-between;
     color: #ffffff;
-    width: 90%; /* Adjusted width for less gap */
+    width: 100%;
     margin: 0 auto;
-  }
-  
-  .custom-sidebar::-webkit-scrollbar {
-    display: none;
   }
   
   /* Sidebar Content */
   .sidebar-content {
     display: flex;
-    flex-direction: row;
-    align-items: center;
     justify-content: space-between;
     width: 100%;
     height: 100%;
   }
   
-  /* Left Section: Battle Timer */
-  .left-section {
+  /* Sections */
+  .left-section, .right-section {
+    flex: 1;
+    text-align: center;
+    border: 1px solid black;
+    height: 100%;
+  }
+
+
+
+  .header-content {
     display: flex;
-    flex-direction: column;
-    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+  }
+  
+  .spacer {
     flex: 1;
   }
-  
-  .timer-label {
-    margin-top: 5px;
-    font-size: 14px;
-    font-weight: bold;
-  }
-  
-  /* Center Section: Rapper's Name and Word */
-  .center-section {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-    flex: 2;
-  }
-  
-  .rapper-name {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  
-  .rapper-name p {
-    font-size: 22px;
-    font-weight: bold;
-    margin: 0;
-  }
-  
-  .rap-word {
-    background-color: rgba(0, 0, 0, 0.5);
-    padding: 5px 10px;
-    border-radius: 5px;
-    font-size: 20px;
-  }
-  
-  /* Right Section: Button */
-  .right-section {
-    display: flex;
-    align-items: center;
-    flex: 1;
-  }
-  
-  /* Button Styles */
-  .hang-up-button, .thumbs-up-button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: none;
-    border-radius: 50%;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-    width: 40px;
-    height: 40px;
-  }
-  
-  .hang-up-button {
-    background-color: #f44336;
-    color: #ffffff;
-  }
-  
-  .hang-up-button:hover {
-    background-color: #d32f2f;
-    transform: scale(1.05);
-  }
-  
-  .thumbs-up-button {
-    background-color: #4caf50;
-    color: #ffffff;
-  }
-  
-  .thumbs-up-button:hover {
-    background-color: #388e3c;
-    transform: scale(1.05);
-  }
-  
-  /* Top Left Corner Info */
-  .top-left-info {
-    position: absolute;
-    bottom: 120px;
-    left: 10px;
-    display: flex;
-    gap: 15px;
-    color: black;
-    z-index: 40000;
+
+
+  :host ::ng-deep .battle-sidebar .p-sidebar-header {
+    background-color: #333;
+    padding: 5px;
+    color: #fff;
   }
 
-  .top-right-info {
-    position: absolute;
-    bottom: 130px;
-    right: 10px;
+  .header-content {
     display: flex;
-    gap: 15px;
-    color: black;
-    z-index: 40000;
-
+    justify-content: space-between;
+    width: 100%;
   }
-  
-  .viewer-count, .vote-count {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 16px;
-  }
-  
-  .viewer-count i, .vote-count i {
-    font-size: 18px;
-  }
-  
-  /* Responsive Design */
-  @media (max-width: 767px) {
-    .custom-sidebar {
-      height: 180px;
-      padding: 10px;
-    }
-  
-    .left-section p-knob {
-      width: 60px;
-      height: 60px;
-    }
-  
-    .rapper-name p {
-      font-size: 18px;
-    }
-  }
-
-  .p-sidebar .p-sidebar-header {
-    display:none !important;
-  }
-

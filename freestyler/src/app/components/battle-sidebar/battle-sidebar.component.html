@@ -1,90 +1,23 @@
 <p-sidebar
-  [visible]="true"
-  position="bottom"
-  [dismissible]="false"
-  [closeOnEscape]="false"
-  styleClass="custom-sidebar"
-  [baseZIndex]="10000"
-  aria-labelledby="battle-sidebar"
-  showCloseIcon="false"
-  modal="false"
->
-  <div class="sidebar-content">
-    <!-- Left Section: Battle Timer -->
-    <div class="left-section">
-      <!-- <p-knob
-        [(ngModel)]="timeLeft"
-        [valueColor]="'#e91e63'"
-        [rangeColor]="'#8A8A8A'"
-        [size]="70"
-        [strokeWidth]="5"
-        [readonly]="true"
-        [textColor]="'black'"
-        [min]="0"
-        [max]="60"
-        showValue="true"
-        aria-label="Battle Timer"
-      ></p-knob>
-      <div class="timer-label">Time Left</div> -->
+     [visible]="true"
+     position="bottom"
+     [dismissible]="false"
+     [closeOnEscape]="false"
+     styleClass="custom-sidebar battle-sidebar"
+     [baseZIndex]="10000"
+     aria-labelledby="battle-sidebar"
+     showCloseIcon="false"
+     modal="false"
+   >
+     <ng-template pTemplate="header">
+       <div class="header-content">
+         <span class="font-semibold text-xl">Player1</span>
+         <span class="spacer"></span>
+         <span class="font-semibold text-xl">Player2</span>
+       </div>
+     </ng-template>
 
-      
-    </div>
-    <!-- <div class="rapper-name">
-        <p>{{ rapperName }}</p>
-        <button
-          class="thumbs-up-button"
-          (click)="onThumbsUp()"
-          aria-label="Thumbs Up Vote"
-          pTooltip="Thumbs Up"
-          tooltipPosition="bottom"
-        >
-          <i class="pi pi-thumbs-up" aria-hidden="true"></i>
-        </button>
-      </div> -->
-
-    <!-- Center Section: Rapper's Name -->
-    <div class="center-section">
-        <button
-        class="hang-up-button"
-        (click)="onHangUp()"
-        aria-label="Hang Up Call"
-        pTooltip="Hang Up"
-        tooltipPosition="bottom"
-      >
-        <i class="pi pi-phone"></i>
-      </button>
-
-    </div>
-
-    <!-- Right Section: Hang Up Button -->
-    <div class="right-section">
-
-    </div>
-  </div>
-</p-sidebar>
-
-<!-- Top Left Corner: Viewer and Vote Counts -->
-<div class="top-left-info">
-  <div class="viewer-count" aria-label="Number of Viewers">
-    <i class="pi pi-eye" aria-hidden="true"></i>
-    <span>{{ viewerCount }}</span>
-  </div>
-  <div class="vote-count" aria-label="Number of Votes">
-    <i class="pi pi-thumbs-up" aria-hidden="true"></i>
-    <span>{{ voteCount }}</span>
-  </div>
-</div>
-
-
-<!-- Top Left Corner: Viewer and Vote Counts -->
-<div class="top-right-info">
-    <!-- <button
-    class="hang-up-button"
-    (click)="onHangUp()"
-    aria-label="Hang Up Call"
-    pTooltip="Hang Up"
-    tooltipPosition="bottom"
-  >
-    <i class="pi pi-phone"></i>
-  </button> -->
-  </div>
+     <div class="sidebar-content">
+       <!-- Sidebar content -->
+     </div>
+   </p-sidebar>
