@@ -50,11 +50,18 @@
 }
 
 .vote-button {
-  background: transparent;
-  border: none;
-  color: #fff;
-  font-size: 25px;
-  pointer-events: auto;
+  background: transparent; /* Transparent background */
+  border: none; /* No border */
+  color: #fff; /* White color for the icon */
+  font-size: 25px; /* Increased size by 20% from 70px to 84px */
+  cursor: pointer; /* Pointer cursor on hover */
+  transition: transform 0.2s ease;
+  pointer-events: auto; /* Allow button to capture mouse events */
+}
+
+.vote-button i {
+  pointer-events: none; /* Ensure the icon itself doesn't capture events */
+  font-size:30px;
 }
 
 .vote-button:hover {
@@ -104,6 +111,8 @@
   .small-video-container {
     width: 168px;
     height: 168px;
+    bottom: 100px;
+    right: 10px;
   }
 
   .current-word {
