@@ -22,6 +22,37 @@
   object-fit: cover;
 }
 
+.opponent-name {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  font-size: 18px;
+  padding: 5px 10px;
+  border-radius: 5px;
+  max-width: 15%;
+  overflow: hidden;
+  text-overflow: ellipsis " [..]";
+  white-space: nowrap;
+  display: block; /* Ensure block-level element for ellipsis */
+}
+
+.long-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: block; /* Ensure block-level element for ellipsis */
+}
+
+@media (max-width: 767px) {
+  .opponent-name {
+    font-size: 16px;
+    max-width: 70%;
+  }
+}
+
+
 .top-controls {
   position: absolute;
   top: 0;
