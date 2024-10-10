@@ -19,11 +19,18 @@
         </p-knob>
       </div>
 
-      <div class="current-word">
+      <div class="current-word" *ngIf="battleStarted">
         <p>{{ word }}</p>
       </div>
 
-      <button class="vote-button" (click)="thumbsUp()">
+      <button *ngIf="!battleStarted"
+              class="start-button"
+              (click)="startBattle()"
+              [@zoomOutDown]="triggerZoomOut">
+        Start
+      </button>
+
+      <button class="vote-button" [class.invisible]="!battleStarted" (click)="thumbsUp()">
         <i class="pi pi-thumbs-up-fill"></i>
       </button>
     </div>

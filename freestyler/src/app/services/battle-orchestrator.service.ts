@@ -1,13 +1,14 @@
 import { Injectable, OnDestroy } from '@angular/core';
-import { BehaviorSubject, interval, Subscription } from 'rxjs';
+import { BehaviorSubject, interval, Subscription, timer } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class BattleOrchestratorService implements OnDestroy {
   private totalTime: number = 60; // Total time in seconds
   private timeLeft: number = this.totalTime;
   private timerSubscription!: Subscription;
+  private wordChangeSubscription!: Subscription;
 
   private currentTurnSubject = new BehaviorSubject<string>('Player 1');
   currentTurn$ = this.currentTurnSubject.asObservable();
@@ -34,18 +35,19 @@ export class BattleOrchestratorService implements OnDestroy {
     'Mic',
     'Beats',
     'Freestyle',
-    'Legend'
+    'Legend',
   ];
 
-  constructor() { }
+  private stream!: MediaStream;
+
+  constructor() {}
 
   startBattle(): void {
     this.timeLeft = this.totalTime;
-    this.timeLeftSubject.next(this.timeLeft);
     this.currentTurnSubject.next('Player 1');
-    this.generateRandomWord();
+    this.voteCountSubject.next(0);
     this.startTimer();
-    this.voteCountSubject.next(0); // Initialize vote count
+    this.startWordChange();
   }
 
   private startTimer(): void {
@@ -56,22 +58,19 @@ export class BattleOrchestratorService implements OnDestroy {
       } else {
         this.stopTimer();
         this.switchTurn();
-        this.resetTimer();
       }
     });
   }
 
-  private stopTimer(): void {
-    if (this.timerSubscription) {
-      this.timerSubscription.unsubscribe();
-    }
+  private startWordChange(): void {
+    this.wordChangeSubscription = interval(5000).subscribe(() => {
+      this.generateRandomWord();
+    });
+    this.generateRandomWord(); // Generate initial word
   }
 
-  private resetTimer(): void {
-    this.timeLeft = this.totalTime;
-    this.timeLeftSubject.next(this.timeLeft);
-    this.generateRandomWord();
-    this.startTimer();
+  private stopTimer(): void {
+    this.timerSubscription?.unsubscribe();
   }
 
   private switchTurn(): void {
@@ -79,6 +78,8 @@ export class BattleOrchestratorService implements OnDestroy {
     const nextTurn = current === 'Player 1' ? 'Player 2' : 'Player 1';
     this.currentTurnSubject.next(nextTurn);
     this.voteCountSubject.next(0); // Reset vote count for new turn
+    this.timeLeft = this.totalTime;
+    this.timeLeftSubject.next(this.timeLeft);
   }
 
   private generateRandomWord(): void {
@@ -86,19 +87,30 @@ export class BattleOrchestratorService implements OnDestroy {
     this.currentWordSubject.next(this.words[randomIndex]);
   }
 
-  // Method to increment vote count
   incrementVote(): void {
     const currentVotes = this.voteCountSubject.getValue();
     this.voteCountSubject.next(currentVotes + 1);
   }
 
-  getFormattedTime(): string {
-    const minutes = Math.floor(this.timeLeft / 60);
-    const seconds = this.timeLeft % 60;
-    return `${minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
+  startCamera(): void {
+    navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+      .then(stream => {
+        this.stream = stream;
+        // Setup video streams in the component
+      })
+      .catch(error => {
+        console.error('Error accessing media devices.', error);
+      });
+  }
+
+  stopCamera(): void {
+    if (this.stream) {
+      this.stream.getTracks().forEach(track => track.stop());
+    }
   }
 
   ngOnDestroy(): void {
     this.stopTimer();
+    this.wordChangeSubscription?.unsubscribe();
   }
 }

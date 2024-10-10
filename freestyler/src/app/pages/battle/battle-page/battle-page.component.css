@@ -197,6 +197,65 @@
   object-fit: cover;
 }
 
+.vote-button {
+  background-color: transparent;
+  border: none;
+  color: #fff;
+  font-size: 25px;
+  cursor: pointer;
+  outline: none;
+  transition: box-shadow 0.5s;
+  border-radius: 60px;
+  height: 50px;
+  width: 50px;
+  visibility: visible; /* Default is visible */
+  opacity: 1;
+}
+
+.vote-button.invisible {
+  visibility: hidden;
+  opacity: 0;
+}
+
+.start-button {
+  background-color: #28a745;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  font-size: 18px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, box-shadow 0.5s;
+}
+
+.start-button:hover {
+  background-color: #218838;
+}
+
+.start-button.glow-name {
+  box-shadow: 0 0 20px #28a745, 0 0 30px #28a745, 0 0 40px #28a745;
+  animation: fadeOutGlow 4s forwards;
+}
+.start-button {
+  background-color: #28a745;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  font-size: 18px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, box-shadow 0.5s;
+}
+
+.start-button:hover {
+  background-color: #218838;
+}
+
+.start-button.glow-name {
+  box-shadow: 0 0 20px #28a745, 0 0 30px #28a745, 0 0 40px #28a745;
+  animation: fadeOutGlow 4s forwards;
+}
+
 @media (max-width: 767px) {
   .small-video-container {
     width: 168px;

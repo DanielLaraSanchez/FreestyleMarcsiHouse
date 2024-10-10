@@ -1,12 +1,17 @@
 import {
-  Component, OnInit, OnDestroy, ViewChild, ElementRef
+  Component,
+  OnInit,
+  OnDestroy,
+  ViewChild,
+  ElementRef,
 } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { BattleOrchestratorService } from '../../../services/battle-orchestrator.service';
 import {
   heartBeatAnimation,
   rubberBandAnimation,
-  tadaAnimation
+  tadaAnimation,
+  zoomOutDownAnimation,
 } from 'angular-animations';
 
 @Component({
@@ -16,17 +21,17 @@ import {
   animations: [
     heartBeatAnimation(),
     rubberBandAnimation(),
-    tadaAnimation({ duration: 1000, delay: 0 })  // Customize `tadaAnimation`
-  ]
+    tadaAnimation({ duration: 1000, delay: 0 }),
+    zoomOutDownAnimation(),
+  ],
 })
 export class BattlePageComponent implements OnInit, OnDestroy {
   @ViewChild('videoElement1') videoElement1!: ElementRef<HTMLVideoElement>;
   @ViewChild('videoElement2') videoElement2!: ElementRef<HTMLVideoElement>;
-  stream!: MediaStream;
 
+  stream!: MediaStream;
   timeLeft: number = 60;
   timerSubscription!: Subscription;
-
   currentTurn: string = 'Player 1';
   word: string = '';
 
@@ -37,58 +42,57 @@ export class BattlePageComponent implements OnInit, OnDestroy {
   hasVoted: boolean = false;
   triggerTada: boolean = false;
   applyGlow: boolean = false;
+  battleStarted: boolean = false;
+  triggerZoomOut: boolean = false;
 
   constructor(private battleService: BattleOrchestratorService) {}
 
   ngOnInit(): void {
     this.startCamera();
-    this.battleService.startBattle();
 
-    this.timerSubscription = this.battleService.timeLeft$.subscribe(time => {
+    this.battleService.timeLeft$.subscribe((time) => {
       this.timeLeft = time;
     });
 
-    this.battleService.currentTurn$.subscribe(turn => {
+    this.battleService.currentTurn$.subscribe((turn) => {
       this.currentTurn = turn;
       this.updateRapperData(turn);
     });
 
-    this.battleService.currentWord$.subscribe(word => {
+    this.battleService.currentWord$.subscribe((word) => {
       this.word = word;
     });
 
-    this.battleService.viewerCount$.subscribe(count => {
+    this.battleService.viewerCount$.subscribe((count) => {
       this.viewerCount = count;
     });
 
-    this.battleService.voteCount$.subscribe(count => {
+    this.battleService.voteCount$.subscribe((count) => {
       this.voteCount = count;
     });
   }
 
   ngOnDestroy(): void {
     this.stopCamera();
-    if (this.timerSubscription) {
-      this.timerSubscription.unsubscribe();
-    }
     this.battleService.ngOnDestroy();
   }
 
   startCamera(): void {
-    navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-      .then(stream => {
+    navigator.mediaDevices
+      .getUserMedia({ video: true, audio: true })
+      .then((stream) => {
         this.stream = stream;
         this.videoElement1.nativeElement.srcObject = stream;
         this.videoElement2.nativeElement.srcObject = stream;
       })
-      .catch(error => {
+      .catch((error) => {
         console.error('Error accessing media devices.', error);
       });
   }
 
   stopCamera(): void {
     if (this.stream) {
-      this.stream.getTracks().forEach(track => track.stop());
+      this.stream.getTracks().forEach((track) => track.stop());
     }
   }
 
@@ -97,24 +101,37 @@ export class BattlePageComponent implements OnInit, OnDestroy {
     alert('You have ended the battle.');
   }
 
+  startBattle(): void {
+    setTimeout(() => {
+      this.triggerZoomOut = true;
+
+      setTimeout(() => {
+        this.battleStarted = true;
+
+        this.battleService.startBattle();
+
+      }, 900);
+    }, 1000);
+  }
+
   thumbsUp(): void {
-    // if (this.hasVoted) {
-    //   alert('You have already voted!');
-    //   return;
-    // }
+    if (this.hasVoted) {
+      alert('You have already voted!');
+      return;
+    }
 
     this.battleService.incrementVote();
 
-    this.triggerTada = !this.triggerTada;
+    this.triggerTada = true;
 
     setTimeout(() => {
       this.applyGlow = true;
       setTimeout(() => {
         this.applyGlow = false;
-      }, 2000);  // Ensure it matches your desired glow duration
+      }, 2000);
     }, 0);
 
-    this.hasVoted = true; // State updated here
+    this.hasVoted = true;
   }
 
   updateRapperData(turn: string): void {
