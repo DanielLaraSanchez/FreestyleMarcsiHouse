@@ -1,4 +1,3 @@
-/* General Styles */
 .battle-page-container {
   position: relative;
   width: 100%;
@@ -9,15 +8,12 @@
   background-color: #000;
 }
 
-/* Main Video Styles */
 .main-video-container {
   position: absolute;
   top: 0;
   left: 0;
-  width: 50%;
-  height: 90%;
-  border: 2px solid #fff;
-
+  width: 100%;
+  height: 100%;
 }
 
 .main-video-container video {
@@ -26,15 +22,74 @@
   object-fit: cover;
 }
 
-/* Small Video Styles */
+.top-controls {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 3;
+}
+
+.timer-container,
+.current-word,
+.vote-button {
+  pointer-events: none;
+}
+
+.current-word {
+  color: #fff;
+  font-size: 24px;
+  text-align: center;
+  margin: 0 auto;
+  flex: 1;
+}
+
+.vote-button {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 25px;
+  pointer-events: auto;
+}
+
+.vote-button:hover {
+  color: #ff4081;
+}
+
+.bottom-controls {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.hangup-btn {
+  background-color: #f44336;
+  border: none;
+  color: #fff;
+  padding: 15px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 20px;
+}
+
 .small-video-container {
   position: absolute;
-  top: 0px; 
-  right: 0px;
-  width: 50%;
-  height: 90%;
+  bottom: 20px;
+  right: 20px;
+  width: 220px;
+  height: 220px;
+  border-radius: 10px;
   overflow: hidden;
-  z-index: 4; 
+  z-index: 4;
   border: 2px solid #fff;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
@@ -45,24 +100,22 @@
   object-fit: cover;
 }
 
-/* Responsive Design */
 @media (max-width: 767px) {
   .small-video-container {
-    position:absolute;
     width: 168px;
     height: 168px;
-    top: 586px; /* Height of the mobile sidebar */
-    right: 2px;
-    border-radius: 10px 0 0px 0px; /* Adjusted border radius */
   }
 
-  .main-video-container {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 85%;
+  .current-word {
+    font-size: 18px;
   }
 
+  .vote-button {
+    font-size: 20px;
+  }
 
+  .hangup-btn {
+    padding: 10px;
+    font-size: 15px;
+  }
 }

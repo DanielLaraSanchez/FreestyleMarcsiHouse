@@ -1,19 +1,39 @@
 <div class="battle-page-container">
   <div class="main-video-container">
     <video #videoElement1 autoplay playsinline></video>
+
+    <div class="top-controls">
+      <div class="timer-container">
+        <p-knob
+          [(ngModel)]="timeLeft"
+          valueColor="#e91e63"
+          rangeColor="SlateGray"
+          [size]="80"
+          [strokeWidth]="5"
+          [readonly]="true"
+          textColor="white"
+          [min]="0"
+          [max]="60">
+        </p-knob>
+      </div>
+
+      <div class="current-word">
+        <p>{{ word }}</p>
+      </div>
+
+      <button class="vote-button">
+        <i class="pi pi-thumbs-up"></i>
+      </button>
+    </div>
   </div>
 
   <div class="small-video-container">
     <video #videoElement2 autoplay playsinline muted></video>
   </div>
 
-  <app-battle-sidebar 
-    [timeLeft]="timeLeft" 
-    [word]="word" 
-    [rapperName]="rapperName"
-    [viewerCount]="viewerCount"
-    [voteCount]="voteCount"
-    (hangUp)="hangUp()"
-    (thumbsUp)="thumbsUp()">
-  </app-battle-sidebar>
+  <div class="bottom-controls">
+    <button class="hangup-btn">
+      <i class="pi pi-phone"></i>
+    </button>
+  </div>
 </div>
