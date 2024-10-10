@@ -1,5 +1,5 @@
 <div class="battle-page-container">
-  <div class="main-video-container">
+  <div class="main-video-container" [@tada]="triggerHeartBeat">
     <video #videoElement1 autoplay playsinline></video>
     <div class="opponent-name">
       <p class="long-text">MC HAMMER</p>
@@ -23,7 +23,7 @@
         <p>{{ word }}</p>
       </div>
 
-      <button class="vote-button">
+      <button class="vote-button" (click)="thumbsUp()">
         <i class="pi pi-thumbs-up-fill"></i>
       </button>
     </div>
@@ -34,7 +34,7 @@
   </div>
 
   <div class="bottom-controls">
-    <button class="hangup-btn">
+    <button class="hangup-btn" (click)="hangUp()">
       <i class="pi pi-phone"></i>
     </button>
   </div>

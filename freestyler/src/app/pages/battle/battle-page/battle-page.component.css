@@ -159,3 +159,21 @@
     font-size: 15px;
   }
 }
+
+
+.vote-button {
+  background-color: transparent;
+  border: none;
+  color: #fff;
+  font-size: 25px;
+  cursor: pointer;
+  outline: none;
+  transition: box-shadow 0.5s;
+  border-radius: 60px;
+  height:50px;
+  width:50px;
+}
+
+.vote-button:hover {
+  box-shadow: 0 0 20px #ff4081, 0 0 30px #ff4081, 0 0 40px #ff4081;
+}

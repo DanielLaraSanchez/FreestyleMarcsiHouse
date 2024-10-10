@@ -1,11 +1,19 @@
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
+import {
+  Component, OnInit, OnDestroy, ViewChild, ElementRef
+} from '@angular/core';
 import { Subscription } from 'rxjs';
 import { BattleOrchestratorService } from '../../../services/battle-orchestrator.service';
+import {
+  heartBeatAnimation,
+  rubberBandAnimation,
+  tadaAnimation
+} from 'angular-animations';
 
 @Component({
   selector: 'app-battle-page',
   templateUrl: './battle-page.component.html',
-  styleUrls: ['./battle-page.component.css']
+  styleUrls: ['./battle-page.component.css'],
+  animations: [heartBeatAnimation(), rubberBandAnimation(), tadaAnimation()] // Use only heartBeatAnimation
 })
 export class BattlePageComponent implements OnInit, OnDestroy {
   @ViewChild('videoElement1') videoElement1!: ElementRef<HTMLVideoElement>;
@@ -27,8 +35,9 @@ export class BattlePageComponent implements OnInit, OnDestroy {
 
   // Voting State
   hasVoted: boolean = false;
+  triggerHeartBeat: boolean = false; // Animation trigger
 
-  constructor(private battleService: BattleOrchestratorService) { }
+  constructor(private battleService: BattleOrchestratorService) {}
 
   ngOnInit(): void {
     this.startCamera();
@@ -82,40 +91,29 @@ export class BattlePageComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Method to handle Hang Up event from BattleSidebarComponent
   hangUp(): void {
     this.stopCamera();
     alert('You have ended the battle.');
-    // Optionally, navigate to another page or reset state
-    // Example: this.router.navigate(['/home']);
   }
 
-  // Method to handle Thumbs Up event from BattleSidebarComponent
   thumbsUp(): void {
-    if (this.hasVoted) {
-      alert('You have already voted!');
-      return;
-    }
+    // if (this.hasVoted) {
+    //   alert('You have already voted!');
+    //   return;
+    // }
 
-    this.battleService.incrementVote(); // Update vote count via service
-    alert('Thank you for voting!');
+    this.battleService.incrementVote();
 
-    // Update voting state
+    // Trigger heartBeat animation
+    this.triggerHeartBeat = !this.triggerHeartBeat;
+
     this.hasVoted = true;
   }
 
-  // Method to update rapper data based on the current turn
   updateRapperData(turn: string): void {
-    // Placeholder logic. Replace with actual data retrieval.
-    if (turn === 'Player 1') {
-      this.rapperName = 'Player 1';
-    } else if (turn === 'Player 2') {
-      this.rapperName = 'Player 2';
-    }
-    // Add more conditions if there are more players
+    this.rapperName = turn;
   }
 
-  // Optional: Display formatted time
   get formattedTime(): string {
     const minutes = Math.floor(this.timeLeft / 60);
     const seconds = this.timeLeft % 60;
