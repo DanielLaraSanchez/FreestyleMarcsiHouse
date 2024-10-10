@@ -22,7 +22,7 @@
   object-fit: cover;
 }
 
-.opponent-name {
+/* .opponent-name {
   position: absolute;
   bottom: 10px;
   left: 10px;
@@ -35,14 +35,14 @@
   overflow: hidden;
   text-overflow: ellipsis " [..]";
   white-space: nowrap;
-  display: block; /* Ensure block-level element for ellipsis */
+  display: block;
 }
 
 .long-text {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  display: block; /* Ensure block-level element for ellipsis */
+  display: block;
 }
 
 @media (max-width: 767px) {
@@ -50,7 +50,66 @@
     font-size: 16px;
     max-width: 70%;
   }
+} */
+
+
+
+.opponent-name {
+  position: absolute;
+  top: 18px;
+  left: 112px;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  font-size: 18px;
+  padding: 5px 10px;
+  border-radius: 25px;
+  max-width: 15%;
+  overflow: hidden;
+  text-overflow: ellipsis " [..]";
+  white-space: nowrap;
+  display: block;
+  z-index: 4;
 }
+
+.long-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: block;
+}
+
+@media (max-width: 767px) {
+  .opponent-name {
+    position: absolute;
+    top: 104px;
+    left: -1px;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: #fff;
+    font-size: 18px;
+    padding: 5px 10px;
+    /* border-radius: 25px; */
+    max-width: 15%;
+    overflow: hidden;
+    text-overflow: ellipsis " [..]";
+    white-space: nowrap;
+    display: block;
+    z-index: 4;
+    border-top-left-radius: 0;
+    border-top-right-radius: 50px;
+    border-bottom-right-radius: 50px;
+    border-bottom-left-radius: 0;
+    font-size: 16px;
+    max-width: 70%;
+  }
+
+  .long-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: block;
+  }
+}
+
 
 
 .top-controls {
@@ -176,4 +235,34 @@
 
 .vote-button:hover {
   box-shadow: 0 0 20px #ff4081, 0 0 30px #ff4081, 0 0 40px #ff4081;
+}
+
+.glow-name {
+  box-shadow: 0 0 20px #ff4081, 0 0 30px #ff4081, 0 0 40px #ff4081;
+  transition: box-shadow 4.5s;
+}
+
+.opponent-name {
+  /* Other existing styles */
+  transition: box-shadow 4.5s;
+}
+
+
+@keyframes fadeOutGlow {
+  0% {
+    box-shadow: 0 0 20px #ff4081, 0 0 30px #ff4081, 0 0 40px #ff4081;
+  }
+  100% {
+    box-shadow: 0 0 0px #ff4081;
+  }
+}
+
+.glow-name {
+  box-shadow: 0 0 40px #ff4081, 0 0 30px #ff4081, 0 0 40px #ff4081;
+  animation: fadeOutGlow 4s forwards;
+  transition: box-shadow 4.5s;
+}
+
+.opponent-name {
+  transition: box-shadow 4.5s;
 }

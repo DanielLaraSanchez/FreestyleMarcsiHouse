@@ -13,29 +13,30 @@ import {
   selector: 'app-battle-page',
   templateUrl: './battle-page.component.html',
   styleUrls: ['./battle-page.component.css'],
-  animations: [heartBeatAnimation(), rubberBandAnimation(), tadaAnimation()] // Use only heartBeatAnimation
+  animations: [
+    heartBeatAnimation(),
+    rubberBandAnimation(),
+    tadaAnimation({ duration: 1000, delay: 0 })  // Customize `tadaAnimation`
+  ]
 })
 export class BattlePageComponent implements OnInit, OnDestroy {
   @ViewChild('videoElement1') videoElement1!: ElementRef<HTMLVideoElement>;
   @ViewChild('videoElement2') videoElement2!: ElementRef<HTMLVideoElement>;
   stream!: MediaStream;
 
-  // Timer Properties
   timeLeft: number = 60;
   timerSubscription!: Subscription;
 
-  // Current Turn and Word
   currentTurn: string = 'Player 1';
   word: string = '';
 
-  // Additional Properties
   rapperName: string = 'Player 1';
   viewerCount: number = 100;
   voteCount: number = 0;
 
-  // Voting State
   hasVoted: boolean = false;
-  triggerHeartBeat: boolean = false; // Animation trigger
+  triggerTada: boolean = false;
+  applyGlow: boolean = false;
 
   constructor(private battleService: BattleOrchestratorService) {}
 
@@ -104,10 +105,16 @@ export class BattlePageComponent implements OnInit, OnDestroy {
 
     this.battleService.incrementVote();
 
-    // Trigger heartBeat animation
-    this.triggerHeartBeat = !this.triggerHeartBeat;
+    this.triggerTada = !this.triggerTada;
 
-    this.hasVoted = true;
+    setTimeout(() => {
+      this.applyGlow = true;
+      setTimeout(() => {
+        this.applyGlow = false;
+      }, 2000);  // Ensure it matches your desired glow duration
+    }, 0);
+
+    this.hasVoted = true; // State updated here
   }
 
   updateRapperData(turn: string): void {
