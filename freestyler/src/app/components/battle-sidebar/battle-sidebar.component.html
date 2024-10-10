@@ -1,23 +1,20 @@
 <p-sidebar
-     [visible]="true"
-     position="bottom"
-     [dismissible]="false"
-     [closeOnEscape]="false"
-     styleClass="custom-sidebar battle-sidebar"
-     [baseZIndex]="10000"
-     aria-labelledby="battle-sidebar"
-     showCloseIcon="false"
-     modal="false"
-   >
-     <ng-template pTemplate="header">
-       <div class="header-content">
-         <span class="font-semibold text-xl">Player1</span>
-         <span class="spacer"></span>
-         <span class="font-semibold text-xl">Player2</span>
-       </div>
-     </ng-template>
+  [visible]="true"
+  position="bottom"
+  [dismissible]="false"
+  [closeOnEscape]="false"
+  styleClass="custom-sidebar battle-sidebar"
+  [baseZIndex]="10000"
+  aria-labelledby="battle-sidebar"
+  showCloseIcon="false"
+  modal="false"
+>
 
-     <div class="sidebar-content">
-       <!-- Sidebar content -->
-     </div>
-   </p-sidebar>
+
+  <div class="sidebar-content">
+    <div class="word-display">
+      <span>{{ word }}</span>
+    </div>
+
+  </div>
+</p-sidebar>
