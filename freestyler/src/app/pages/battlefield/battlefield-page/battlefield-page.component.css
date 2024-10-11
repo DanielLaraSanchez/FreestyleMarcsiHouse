@@ -17,6 +17,18 @@
   .battlefield-content {
     flex-direction: row;
   }
+  /* Online Users now occupy 60% of the width */
+  .online-users {
+    flex: 0 0 60%;
+    max-width: 60%;
+    overflow-y: auto;
+  }
+  /* Ongoing Battles now occupy 40% of the width */
+  .ongoing-battles {
+    flex: 0 0 40%;
+    max-width: 40%;
+    overflow-y: auto;
+  }
 }
 
 /* Online Users */
@@ -27,28 +39,15 @@
   width: 100%;
 }
 
-@media (min-width: 768px) {
-  .online-users {
-    width: 300px;
-    max-width: 300px;
-    min-width: 240px;
-    overflow-y: auto;
-  }
-}
-
 /* Users Grid */
 .users-grid {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
-  gap: 60px;
-  padding: 38px;
-}
-
-@media (min-width: 768px) {
-  .users-grid {
-    justify-content: flex-start;
-  }
+  gap: 6px;
+  padding-top: 40px;
+  padding-right: 40px;
+  padding-bottom: 40px;
+  padding-left: 40px;
 }
 
 .user-card {
@@ -95,7 +94,6 @@
 /* Ongoing Battles */
 .ongoing-battles {
   padding: 20px;
-  flex: 1;
   overflow: auto;
 }
 
@@ -143,7 +141,7 @@ app-battle-pair {
     overflow-x: auto;
     padding: 32px;
     background-color: rgba(73, 14, 59, 0.075);
-    gap:16px;
+    gap: 16px;
   }
 
   .users-grid::-webkit-scrollbar {

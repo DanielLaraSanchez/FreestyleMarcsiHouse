@@ -1,13 +1,15 @@
 /* Battle Card */
 .battle-card {
     background-color: #fff;
-    border-radius: 75px;
+    border-radius: 50px;
     position: relative;
     overflow: hidden;
     cursor: pointer;
     border: 1px solid #e0e0e0;
     transition: box-shadow 0.3s ease;
     padding: 20px;
+    width:70%;
+    height:150px;
   }
 
   .battle-card:hover {
@@ -40,7 +42,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-left: 60px; /* Adjusted for the time indicator width */
+    margin-left: 0px; /* Adjusted for the time indicator width */
   }
 
   /* Battle Avatar Container */
@@ -76,12 +78,13 @@
     font-size: 1.5em;
     margin: 0 20px;
     align-self: center;
+    margin-top:-35px;
   }
 
   /* Adjusted space between users on desktop */
   @media (min-width: 768px) {
     .battle-content {
-      margin-left: 60px; /* Adjusted for the time indicator width */
+      margin-left: 0px; /* Adjusted for the time indicator width */
     }
 
     .battle-avatar-container {
@@ -100,6 +103,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+
   }
 
   /* Remove Blurriness */
@@ -107,4 +111,27 @@
   .battle-card * {
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
+    /* width: 98%;
+    margin-left: 6px;
+    border-radius:30px; */
+}
+
+@media (max-width: 768px) {
+  .battle-content {
+    margin-left: 0px; /* Adjusted for the time indicator width */
   }
+
+  .battle-avatar-container {
+  }
+
+  .battle-card,
+  .battle-card  {
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    width: 98%;
+    margin-left: 6px;
+    border-radius:30px;
+}
+}
+
+
