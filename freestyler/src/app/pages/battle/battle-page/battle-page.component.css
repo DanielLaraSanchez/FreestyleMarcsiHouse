@@ -7,6 +7,19 @@
   overflow: hidden;
   background-color: #000;
 }
+.top-controls {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background-color: rgba(0, 0, 0, 0.2);
+  z-index: 3;
+}
+
 
 .main-video-container {
   position: absolute;
@@ -81,7 +94,7 @@
 @media (max-width: 767px) {
   .opponent-name {
     position: absolute;
-    top: 104px;
+    top: 83px;
     left: -1px;
     background-color: rgba(0, 0, 0, 0.5);
     color: #fff;
@@ -108,8 +121,6 @@
     white-space: nowrap;
     display: block;
   }
-}
-
 
 
 .top-controls {
@@ -120,9 +131,17 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px;
-  background-color: rgba(0, 0, 0, 0.6);
+  padding: 0px;
+  background-color: rgba(0, 0, 0, 0.2);
   z-index: 3;
+}
+
+}
+
+
+.timer-container.invisible {
+  visibility: hidden;
+  opacity: 0
 }
 
 .timer-container,
@@ -133,10 +152,11 @@
 
 .current-word {
   color: #fff;
-  font-size: 24px;
+  font-size: 30px;
   text-align: center;
   margin: 0 auto;
   flex: 1;
+  font-weight: bold;
 }
 
 .vote-button {
@@ -169,7 +189,7 @@
 }
 
 .hangup-btn {
-  background-color: #f44336;
+  background-color: #f44336; /* Keep as red to indicate exit */
   border: none;
   color: #fff;
   padding: 15px;
@@ -217,43 +237,44 @@
   opacity: 0;
 }
 
+
+
+@keyframes clickFeedback {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(0.95);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
 .start-button {
-  background-color: #28a745;
+  background-color: rgb(0, 0, 0);
   color: #fff;
   border: none;
-  padding: 10px 20px;
-  font-size: 18px;
-  border-radius: 10px;
+  height: 60px;
+  width: 60px;
+  font-size: 17px;
+  border-radius: 50%;
+  font-weight: bold;
   cursor: pointer;
   transition: background-color 0.3s ease, box-shadow 0.5s;
+  box-shadow: 0 0 20px rgba(255, 64, 129, 0), 0 0 30px rgba(255, 64, 129, 0), 0 0 40px rgba(255, 64, 129, 0);
 }
 
 .start-button:hover {
-  background-color: #218838;
+  box-shadow: 0 0 20px rgba(255, 64, 129, 0.7), 0 0 30px rgba(255, 64, 129, 0.7), 0 0 40px rgba(255, 64, 129, 0.7);
+  background-color: #242224;
 }
 
-.start-button.glow-name {
-  box-shadow: 0 0 20px #28a745, 0 0 30px #28a745, 0 0 40px #28a745;
-  animation: fadeOutGlow 4s forwards;
-}
-.start-button {
-  background-color: #28a745;
-  color: #fff;
-  border: none;
-  padding: 10px 20px;
-  font-size: 18px;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: background-color 0.3s ease, box-shadow 0.5s;
-}
-
-.start-button:hover {
-  background-color: #218838;
-}
-
-.start-button.glow-name {
-  box-shadow: 0 0 20px #28a745, 0 0 30px #28a745, 0 0 40px #28a745;
-  animation: fadeOutGlow 4s forwards;
+.start-button:active {
+  animation: clickFeedback 0.3s forwards;
 }
 
 @media (max-width: 767px) {
@@ -265,7 +286,7 @@
   }
 
   .current-word {
-    font-size: 18px;
+    font-size: 25px;
   }
 
   .vote-button {

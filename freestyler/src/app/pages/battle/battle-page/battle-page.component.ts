@@ -8,11 +8,15 @@ import {
 import { Subscription } from 'rxjs';
 import { BattleOrchestratorService } from '../../../services/battle-orchestrator.service';
 import {
+  bounceInAnimation,
+  bounceOutRightAnimation,
+  flipAnimation,
   heartBeatAnimation,
   rubberBandAnimation,
   tadaAnimation,
   zoomOutDownAnimation,
 } from 'angular-animations';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-battle-page',
@@ -23,6 +27,11 @@ import {
     rubberBandAnimation(),
     tadaAnimation({ duration: 1000, delay: 0 }),
     zoomOutDownAnimation(),
+    flipAnimation({ duration: 1500, delay: 0 }),
+    bounceOutRightAnimation({ duration: 1500, delay: 0 },
+    ),
+    bounceInAnimation()
+
   ],
 })
 export class BattlePageComponent implements OnInit, OnDestroy {
@@ -44,8 +53,11 @@ export class BattlePageComponent implements OnInit, OnDestroy {
   applyGlow: boolean = false;
   battleStarted: boolean = false;
   triggerZoomOut: boolean = false;
+  triggerFlipAnimation: boolean = false;
+  triggerBounceIn: boolean = false;
+  showStartButton: boolean = false;
 
-  constructor(private battleService: BattleOrchestratorService) {}
+  constructor(private battleService: BattleOrchestratorService, private router: Router) {}
 
   ngOnInit(): void {
     this.startCamera();
@@ -73,7 +85,7 @@ export class BattlePageComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.stopCamera();
+    // this.stopCamera();
     this.battleService.ngOnDestroy();
   }
 
@@ -94,6 +106,8 @@ export class BattlePageComponent implements OnInit, OnDestroy {
     if (this.stream) {
       this.stream.getTracks().forEach((track) => track.stop());
     }
+    // this.router.navigate(['/battlefield'])
+
   }
 
   hangUp(): void {
@@ -102,28 +116,37 @@ export class BattlePageComponent implements OnInit, OnDestroy {
   }
 
   startBattle(): void {
+    this.triggerFlipAnimation = true;
+
+    // Trigger flip animation after 1 second
     setTimeout(() => {
       this.triggerZoomOut = true;
 
-      setTimeout(() => {
-        this.battleStarted = true;
+    }, 300);
 
-        this.battleService.startBattle();
+    // Trigger zoom out after 2 seconds
+    setTimeout(() => {
+      this.showStartButton = !this.showStartButton;
 
-      }, 900);
-    }, 1000);
+    }, 1500);
+
+    // Start the battle after 3 seconds
+    setTimeout(() => {
+      this.battleStarted = true;
+      this.battleService.startBattle();
+      this.triggerBounceIn = !this.triggerBounceIn;
+    }, 1500);
   }
 
   thumbsUp(): void {
-    if (this.hasVoted) {
-      alert('You have already voted!');
-      return;
-    }
+    // if (this.hasVoted) {
+    //   alert('You have already voted!');
+    //   return;
+    // }
 
     this.battleService.incrementVote();
 
-    this.triggerTada = true;
-
+    this.triggerTada = !this.triggerTada;
     setTimeout(() => {
       this.applyGlow = true;
       setTimeout(() => {
@@ -131,7 +154,7 @@ export class BattlePageComponent implements OnInit, OnDestroy {
       }, 2000);
     }, 0);
 
-    this.hasVoted = true;
+    // this.hasVoted = true;
   }
 
   updateRapperData(turn: string): void {

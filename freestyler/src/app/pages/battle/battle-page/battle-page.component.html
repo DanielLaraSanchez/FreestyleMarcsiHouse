@@ -1,11 +1,19 @@
 <div class="battle-page-container">
   <div class="main-video-container">
     <video #videoElement1 autoplay playsinline></video>
-    <div class="opponent-name" [ngClass]="{'glow-name': applyGlow}" [@tada]="triggerTada">
+    <div
+      class="opponent-name"
+      [ngClass]="{ 'glow-name': applyGlow }"
+      [@tada]="triggerTada"
+    >
       <p class="long-text">MC HAMMER</p>
     </div>
     <div class="top-controls">
-      <div class="timer-container">
+      <div
+        class="timer-container"
+        [class.invisible]="!battleStarted"
+        [@bounceIn]="triggerBounceIn"
+      >
         <p-knob
           [(ngModel)]="timeLeft"
           valueColor="#e91e63"
@@ -15,28 +23,36 @@
           [readonly]="true"
           textColor="white"
           [min]="0"
-          [max]="60">
+          [max]="60"
+        >
         </p-knob>
       </div>
 
       <div class="current-word" *ngIf="battleStarted">
-        <p>{{ word }}</p>
+        <p [@bounceIn]="triggerBounceIn">{{ word }}</p>
       </div>
 
-      <button *ngIf="!battleStarted"
-              class="start-button"
-              (click)="startBattle()"
-              [@zoomOutDown]="triggerZoomOut">
+      <button
+        *ngIf="!showStartButton"
+        class="start-button"
+        (click)="startBattle()"
+        [@bounceOutRight]="triggerZoomOut"
+      >
         Start
       </button>
 
-      <button class="vote-button" [class.invisible]="!battleStarted" (click)="thumbsUp()">
+      <button
+      [@bounceIn]="triggerBounceIn"
+        class="vote-button"
+        [class.invisible]="!battleStarted"
+        (click)="thumbsUp()"
+      >
         <i class="pi pi-thumbs-up-fill"></i>
       </button>
     </div>
   </div>
 
-  <div class="small-video-container">
+  <div class="small-video-container" [@flip]="triggerFlipAnimation">
     <video #videoElement2 autoplay playsinline muted></video>
   </div>
 
