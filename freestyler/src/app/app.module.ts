@@ -33,6 +33,7 @@ import { ChatPageComponent } from './pages/chat/chat-page/chat-page.component';
 import { CarouselModule } from 'primeng/carousel';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { DividerModule } from 'primeng/divider';
 
 import { TooltipModule } from 'primeng/tooltip';
 import { TabViewModule } from 'primeng/tabview';
@@ -78,6 +79,7 @@ import { BattleSidebarComponent } from './components/battle-sidebar/battle-sideb
     TabMenuModule,
     TieredMenuModule,
     OverlayPanelModule,
+    DividerModule,
     ProgressBarModule,
     TooltipModule,
     CardModule,

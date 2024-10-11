@@ -11,6 +11,7 @@ import { Subscription } from 'rxjs';
   selector: 'app-battlefield-page',
   templateUrl: './battlefield-page.component.html',
   styleUrls: ['./battlefield-page.component.css'],
+
 })
 export class BattlefieldPageComponent implements OnInit, OnDestroy {
   isMobile: boolean = false;
@@ -45,7 +46,7 @@ export class BattlefieldPageComponent implements OnInit, OnDestroy {
   }
 
   watchBattle(battle: Pair) {
-    this.router.navigate(['/battle', battle.id]);
+    // this.router.navigate(['/battle', battle.id]);
   }
 
   sendBattleRequest(user: User) {
@@ -55,7 +56,7 @@ export class BattlefieldPageComponent implements OnInit, OnDestroy {
 
   startRandomBattle() {
     console.log('Starting random battle');
-    this.router.navigate(['/battle']);
+    // this.router.navigate(['/battle']);
   }
 
   ngOnDestroy() {

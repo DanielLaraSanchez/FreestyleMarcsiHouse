@@ -1,7 +1,7 @@
 /* Battle Card */
 .battle-card {
     background-color: #fff;
-    border-radius: 12px;
+    border-radius: 75px;
     position: relative;
     overflow: hidden;
     cursor: pointer;
@@ -9,11 +9,11 @@
     transition: box-shadow 0.3s ease;
     padding: 20px;
   }
-  
+
   .battle-card:hover {
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
   }
-  
+
   /* Time Indicator Bar */
   .time-indicator {
     position: absolute;
@@ -26,7 +26,7 @@
     align-items: center;
     justify-content: center;
   }
-  
+
   .time-text {
     transform: rotate(-90deg);
     font-size: 1em;
@@ -34,7 +34,7 @@
     font-weight: bold;
     white-space: nowrap;
   }
-  
+
   /* Battle Content */
   .battle-content {
     display: flex;
@@ -42,7 +42,7 @@
     justify-content: center;
     margin-left: 60px; /* Adjusted for the time indicator width */
   }
-  
+
   /* Battle Avatar Container */
   .battle-avatar-container {
     display: flex;
@@ -52,11 +52,11 @@
     height: 140px; /* Set fixed height */
     box-sizing: border-box;
   }
-  
+
   .battle-avatar-container p-avatar {
     /* No border or background for a clean look */
   }
-  
+
   .user-name {
     margin-top: 10px;
     font-weight: bold;
@@ -68,7 +68,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  
+
   /* VS Text */
   .vs-text {
     font-weight: bold;
@@ -77,23 +77,23 @@
     margin: 0 20px;
     align-self: center;
   }
-  
+
   /* Adjusted space between users on desktop */
   @media (min-width: 768px) {
     .battle-content {
       margin-left: 60px; /* Adjusted for the time indicator width */
     }
-  
+
     .battle-avatar-container {
       margin: 0 30px; /* Adjusted spacing */
     }
   }
-  
+
   /* Center VS Text Vertically */
   .vs-text {
     align-self: center;
   }
-  
+
   /* Ensure Battle Content is Centered */
   .battle-content {
     flex: 1;
@@ -101,7 +101,7 @@
     align-items: center;
     justify-content: center;
   }
-  
+
   /* Remove Blurriness */
   .battle-card,
   .battle-card * {

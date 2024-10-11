@@ -106,6 +106,10 @@
     font-size: 1.2em;
   }
 
+  .confirm-password-container {
+    margin-bottom:45px !important;
+  }
+
   .input-group input {
     width: 100%;
     padding: 10px 10px 10px 45px; /* Padding left for the icon */
@@ -223,6 +227,7 @@
 
     .login-button {
       padding: 10px 0;
+      margin-bottom: 25px;
     }
 
     /* Silhouettes in Mobile may need adjustment */
