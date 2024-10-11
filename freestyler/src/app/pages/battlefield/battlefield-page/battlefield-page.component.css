@@ -28,7 +28,6 @@
   }
   /* Ongoing Battles now occupy 40% of the width */
   .ongoing-battles {
-    margin-left: 80px;
     flex: 0 0 40%;
     max-width: 40%;
     overflow-y: auto;
@@ -63,6 +62,7 @@
   position: relative; /* For pseudo-element positioning if needed */
   /* Simplified box-shadow to prevent blur */
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  will-change: transform, box-shadow; /* Optimize rendering */
 }
 
 /* Glow Effect on User Card Hover */
@@ -106,6 +106,7 @@
 /* Ongoing Battles */
 .ongoing-battles {
   overflow: auto;
+  margin-left:50px;
 }
 
 /* Battles Grid */
