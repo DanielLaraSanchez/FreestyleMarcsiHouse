@@ -18,6 +18,8 @@
   padding: 10px;
   background-color: rgba(0, 0, 0, 0.2);
   z-index: 3;
+  min-height:116px;
+  min-height:116px;
 }
 
 
@@ -134,6 +136,8 @@
   padding: 0px;
   background-color: rgba(0, 0, 0, 0.2);
   z-index: 3;
+  max-height:85px;
+  min-height:85px;
 }
 
 }

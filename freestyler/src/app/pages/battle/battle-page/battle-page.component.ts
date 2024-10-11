@@ -112,7 +112,7 @@ export class BattlePageComponent implements OnInit, OnDestroy {
 
   hangUp(): void {
     this.stopCamera();
-    this.router.navigate(['/battlefield'])
+    this.router.navigate(['/field'])
   }
 
   startBattle(): void {

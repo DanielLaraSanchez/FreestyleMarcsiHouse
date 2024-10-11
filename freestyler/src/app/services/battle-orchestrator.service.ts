@@ -92,22 +92,6 @@ export class BattleOrchestratorService implements OnDestroy {
     this.voteCountSubject.next(currentVotes + 1);
   }
 
-  startCamera(): void {
-    navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-      .then(stream => {
-        this.stream = stream;
-        // Setup video streams in the component
-      })
-      .catch(error => {
-        console.error('Error accessing media devices.', error);
-      });
-  }
-
-  stopCamera(): void {
-    if (this.stream) {
-      this.stream.getTracks().forEach(track => track.stop());
-    }
-  }
 
   ngOnDestroy(): void {
     this.stopTimer();
