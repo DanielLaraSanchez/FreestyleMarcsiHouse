@@ -12,10 +12,21 @@ export class AuthService {
   private tokenSubject = new BehaviorSubject<string | null>(this.getToken());
   public token$ = this.tokenSubject.asObservable();
   private currentUserId: string | null = null;
-  constructor(private http: HttpClient) {}
+
+  constructor(private http: HttpClient) {
+    const token = this.getToken();
+    if (token) {
+      const decoded = this.decodeToken(token);
+      this.currentUserId = decoded?.id ?? null;
+      console.log('Authenticated User ID:', this.currentUserId);
+    }
+  }
 
   login(email: string, password: string): Observable<any> {
-    return this.http.post(`http://localhost:3000/auth/login`, { email, password });
+    return this.http.post(`http://localhost:3000/auth/login`, {
+      email,
+      password,
+    });
   }
 
   loginWithGoogle(): void {
@@ -23,7 +34,11 @@ export class AuthService {
   }
 
   signup(name: string, email: string, password: string): Observable<any> {
-    return this.http.post(`http://localhost:3000/auth/signup`, { name, email, password });
+    return this.http.post(`http://localhost:3000/auth/signup`, {
+      name,
+      email,
+      password,
+    });
   }
 
   isAuthenticated(): boolean {
@@ -36,8 +51,7 @@ export class AuthService {
     this.tokenSubject.next(token); // Emit the new token
     const decoded = this.decodeToken(token);
     this.currentUserId = decoded?.id ?? null;
-    console.log("here", this.currentUserId)
-
+    console.log('AuthService: Current User ID set to:', this.currentUserId);
   }
 
   getToken(): string | null {
@@ -65,5 +79,6 @@ export class AuthService {
     localStorage.removeItem(TOKEN_KEY);
     this.tokenSubject.next(null); // Emit null to indicate logout
     this.currentUserId = null;
+    console.log('AuthService: User logged out.');
   }
 }

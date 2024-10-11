@@ -1,16 +1,16 @@
 import { Injectable, OnDestroy } from '@angular/core';
-import { default as io } from 'socket.io-client';
+import { default as io, Socket } from 'socket.io-client';
 import { BehaviorSubject, Subject, Subscription } from 'rxjs';
 import { Message } from '../models/message';
 import { AuthService } from './auth.service';
 
-const SOCKET_URL = 'http://localhost:3000'; // Adjust as needed
+const SOCKET_URL = 'http://localhost:3000'; // Adjust if different
 
 @Injectable({
   providedIn: 'root',
 })
 export class SignalingService implements OnDestroy {
-  private socket!: any;
+  private socket: any;
   private isConnected = false;
 
   // Subjects to emit socket connection status and user status updates
@@ -22,6 +22,19 @@ export class SignalingService implements OnDestroy {
 
   private onMessageSubject = new Subject<{ tabId: string; message: Message }>();
   public onMessage$ = this.onMessageSubject.asObservable();
+
+  // Subjects for WebRTC Battle Events
+  private battleFoundSubject = new Subject<{ roomId: string; partnerId: string }>();
+  public battleFound$ = this.battleFoundSubject.asObservable();
+
+  private webrtcOfferSubject = new Subject<any>();
+  public webrtcOffer$ = this.webrtcOfferSubject.asObservable();
+
+  private webrtcAnswerSubject = new Subject<any>();
+  public webrtcAnswer$ = this.webrtcAnswerSubject.asObservable();
+
+  private webrtcIceCandidateSubject = new Subject<any>();
+  public webrtcIceCandidate$ = this.webrtcIceCandidateSubject.asObservable();
 
   private tokenSubscription!: Subscription;
 
@@ -80,6 +93,24 @@ export class SignalingService implements OnDestroy {
       this.onMessageSubject.next(data);
     });
 
+    // Handle battle found event
+    this.socket.on('battleFound', (data: any) => {
+      this.battleFoundSubject.next(data);
+    });
+
+    // Handle WebRTC signaling events
+    this.socket.on('webrtc_offer', (data: any) => {
+      this.webrtcOfferSubject.next(data);
+    });
+
+    this.socket.on('webrtc_answer', (data: any) => {
+      this.webrtcAnswerSubject.next(data);
+    });
+
+    this.socket.on('webrtc_ice_candidate', (data: any) => {
+      this.webrtcIceCandidateSubject.next(data);
+    });
+
     // Handle socket errors if needed
     this.socket.on('connect_error', (err: any) => {
       console.error('Socket connection error:', err);
@@ -96,9 +127,47 @@ export class SignalingService implements OnDestroy {
     }
   }
 
+  // Existing Chat Methods
   sendMessage(tabId: string, message: Message): void {
     if (this.socket && this.isConnected) {
       this.socket.emit('message', { tabId, message });
+    } else {
+      console.error('Socket is not connected.');
+    }
+  }
+
+  // New Battle and WebRTC Methods
+  startRandomBattle(): void {
+    if (this.socket && this.isConnected) {
+      this.socket.emit('startRandomBattle');
+      console.log('Requested to start a random battle.');
+    } else {
+      console.error('Socket is not connected.');
+    }
+  }
+
+  sendWebRTCOffer(roomId: string, offer: any): void {
+    if (this.socket && this.isConnected) {
+      this.socket.emit('webrtc_offer', { roomId, offer });
+      console.log('Sent WebRTC offer.');
+    } else {
+      console.error('Socket is not connected.');
+    }
+  }
+
+  sendWebRTCAnswer(roomId: string, answer: any): void {
+    if (this.socket && this.isConnected) {
+      this.socket.emit('webrtc_answer', { roomId, answer });
+      console.log('Sent WebRTC answer.');
+    } else {
+      console.error('Socket is not connected.');
+    }
+  }
+
+  sendWebRTCIceCandidate(roomId: string, candidate: any): void {
+    if (this.socket && this.isConnected) {
+      this.socket.emit('webrtc_ice_candidate', { roomId, candidate });
+      console.log('Sent ICE candidate.');
     } else {
       console.error('Socket is not connected.');
     }

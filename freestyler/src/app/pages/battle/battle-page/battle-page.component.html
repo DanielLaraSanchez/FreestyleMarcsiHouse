@@ -1,14 +1,24 @@
 <div class="battle-page-container">
   <div class="main-video-container">
-    <video #videoElement1 autoplay playsinline></video>
+    <!-- Remote Video (Big, Opponent's Stream) -->
+    <video #remoteVideo autoplay playsinline class="big-video"></video>
+
+    <!-- Local Video (Small, User's Own Stream) -->
+    <video #localVideo autoplay playsinline muted class="small-video"></video>
+
+    <!-- Opponent's Name Display -->
     <div
       class="opponent-name"
       [ngClass]="{ 'glow-name': applyGlow }"
       [@tada]="triggerTada"
     >
-      <p class="long-text">MC HAMMER</p>
+      <!-- Optionally, display opponent's name. Placeholder here -->
+      <p class="long-text">{{ rapperName }}</p>
     </div>
+
+    <!-- Top Controls (Timer, Current Word, Buttons) -->
     <div class="top-controls">
+      <!-- Timer Container -->
       <div
         class="timer-container"
         [class.invisible]="!battleStarted"
@@ -28,12 +38,14 @@
         </p-knob>
       </div>
 
+      <!-- Current Word Display -->
       <div class="current-word" *ngIf="battleStarted">
         <p [@bounceIn]="triggerBounceIn">{{ word }}</p>
       </div>
 
+      <!-- Start Battle Button (Visible Once Paired) -->
       <button
-        *ngIf="!showStartButton"
+        *ngIf="showStartButton && !battleStarted"
         class="start-button"
         (click)="startBattle()"
         [@bounceOutRight]="triggerZoomOut"
@@ -41,8 +53,9 @@
         START
       </button>
 
+      <!-- Thumbs Up Button (For Voting) -->
       <button
-      [@bounceIn]="triggerBounceIn"
+        [@bounceIn]="triggerBounceIn"
         class="vote-button"
         [class.invisible]="!battleStarted"
         (click)="thumbsUp()"
@@ -52,10 +65,7 @@
     </div>
   </div>
 
-  <div class="small-video-container" [@flip]="triggerFlipAnimation">
-    <video #videoElement2 autoplay playsinline muted></video>
-  </div>
-
+  <!-- Bottom Controls (Hang Up Button) -->
   <div class="bottom-controls">
     <button class="hangup-btn" (click)="hangUp()">
       <i class="pi pi-phone"></i>

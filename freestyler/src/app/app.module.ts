@@ -43,6 +43,7 @@ import { BattlePairComponent } from './components/battle-pair/battle-pair.compon
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { AuthCallbackComponent } from './components/auth-callback/auth-callback.component';
 import { BattleSidebarComponent } from './components/battle-sidebar/battle-sidebar.component';
+import { Battle2Component } from './battle2/battle2.component';
 
 @NgModule({
   declarations: [
@@ -55,7 +56,8 @@ import { BattleSidebarComponent } from './components/battle-sidebar/battle-sideb
     UserActionsDialogComponent,
     BattlePairComponent,
     AuthCallbackComponent,
-    BattleSidebarComponent
+    BattleSidebarComponent,
+    Battle2Component
   ],
   imports: [
     HttpClientModule,
