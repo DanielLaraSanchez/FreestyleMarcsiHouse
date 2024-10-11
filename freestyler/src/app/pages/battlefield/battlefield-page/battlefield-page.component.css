@@ -1,11 +1,10 @@
-/* battlefield.component.css */
-
 /* General Container Styles */
 .battlefield-container {
   position: relative;
   padding: 0;
-  height: 100vh; /* Adjusted for navbar and FAB height */
-  overflow: hidden;
+  /* Ensure the container can expand based on content */
+  height: 100vh;
+   overflow: hidden;
 }
 
 /* Battlefield Content Layout */
@@ -32,6 +31,7 @@
     max-width: 40%;
     overflow-y: auto;
     padding: 20px; /* Added padding */
+    margin-left: 50px;
   }
 }
 
@@ -39,7 +39,7 @@
 .online-users {
   padding: 0;
   overflow: auto;
-  height: 100%;
+  height: auto; /* Changed from 100% to auto */
   width: 100%;
 }
 
@@ -68,7 +68,8 @@
 /* Glow Effect on User Card Hover */
 .user-card:hover {
   transform: translateY(-5px); /* Reduced transformation to minimize blur */
-  box-shadow: 0 0 10px rgba(255, 64, 129, 0.7), 0 6px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 0 10px rgba(255, 64, 129, 0.7),
+    0 6px 12px rgba(0, 0, 0, 0.2);
   /* Simplified glow effect */
 }
 
@@ -106,7 +107,7 @@
 /* Ongoing Battles */
 .ongoing-battles {
   overflow: auto;
-  margin-left:50px;
+  /* margin-left:50px; */
 }
 
 /* Battles Grid */
@@ -123,6 +124,7 @@
   box-sizing: border-box;
 }
 
+/* Responsive Adjustments */
 @media (max-width: 767px) {
   .battle-card-wrapper {
     flex: 1 1 100%; /* Full width on mobile */
@@ -142,6 +144,12 @@ app-battle-pair {
 @media (max-width: 767px) {
   .battlefield-content {
     flex-direction: column;
+  }
+
+  /* Ongoing Battles */
+  .ongoing-battles {
+    overflow: auto;
+    margin-left: 0px;
   }
 
   .online-users {
@@ -169,6 +177,7 @@ app-battle-pair {
     flex: 1;
     overflow: auto;
     padding: 0px;
+    margin-left: 0px;
   }
 
   .battles-grid {
@@ -221,7 +230,7 @@ body {
 .battle-fab {
   align-self: center;
   margin: 0 20px;
-  background-color: #68217A; /* Visual Studio 2022 icon color */
+  background-color: #68217a; /* Visual Studio 2022 icon color */
   border: none;
   color: #fff;
   transition: background-color 0.3s ease, transform 0.3s ease;

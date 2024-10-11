@@ -279,10 +279,10 @@
 
 @media (max-width: 767px) {
   .small-video-container {
-    width: 168px;
-    height: 168px;
-    bottom: 100px;
-    right: 10px;
+    width: 130px;
+    height: 159px;
+    bottom: 87px;
+    right: 7px;
   }
 
   .current-word {

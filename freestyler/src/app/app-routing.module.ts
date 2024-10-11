@@ -19,7 +19,7 @@ const routes: Routes = [
   { path: 'signup', component: SignupComponent },
   { path: 'auth/google/callback', component: AuthCallbackComponent },
   { path: 'battle', component: BattlePageComponent},
-  { path: 'battlefield', component: BattlefieldPageComponent },
+  { path: 'field', component: BattlefieldPageComponent },
 
 
   // Protected routes
