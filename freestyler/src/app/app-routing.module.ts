@@ -22,11 +22,13 @@ const routes: Routes = [
   { path: 'battle', component: BattlePageComponent},
   { path: 'field', component: BattlefieldPageComponent },
   { path: 'user-profile', component: UserprofilePageComponent },
+  { path: 'chat', component: ChatPageComponent },
+
 
 
 
   // Protected routes
-  { path: 'chat', component: ChatPageComponent, canActivate: [AuthGuard] },
+  // { path: 'chat', component: ChatPageComponent, canActivate: [AuthGuard] },
   // { path: 'battlefield', component: BattlefieldPageComponent, canActivate: [AuthGuard] },
   // { path: 'battle', component: BattlePageComponent, canActivate: [AuthGuard]},
 

@@ -61,15 +61,20 @@ export class AppComponent implements OnInit, OnDestroy {
       {
         label: 'Profile',
         icon: 'pi pi-fw pi-user',
-        routerLink: '/profile',
+        routerLink: '/user-profile',
+      },
+      {
+        label: 'BattleField',
+        icon: 'pi pi-fw pi-slack',
+        routerLink: '/field',
       },
     ];
 
     // Define mobile menu items (icons only)
     this.mobileMenuItems = [
       {
-        icon: 'pi pi-fw pi-home',
-        routerLink: '/home',
+        icon: 'pi pi-fw pi-slack',
+        routerLink: '/field',
       },
       {
         icon: 'pi pi-fw pi-microphone',
