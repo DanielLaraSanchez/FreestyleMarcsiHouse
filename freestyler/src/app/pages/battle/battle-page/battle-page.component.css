@@ -24,10 +24,10 @@
 
 .main-video-container, .small-video-container {
   position: absolute;
-  top: 50%;
+  top: 75%;
   transform: translateY(-50%);
-  width: 45%;
-  height: 70%;
+  width: 34%; /* Reduced width for 25% smaller view */
+  height: 52.5%; /* Reduced height for 25% smaller view */
   border-radius: 50px;
   overflow: hidden;
   z-index: 4;
@@ -36,11 +36,11 @@
 }
 
 .main-video-container {
-  left: 5%;
+  left: 7%;
 }
 
 .small-video-container {
-  right: 5%;
+  right: 7%;
 }
 
 .main-video-container video, .small-video-container video {
@@ -75,13 +75,33 @@
 }
 
 @media (max-width: 667px) {
+  .opponent-name {
+    position: absolute;
+    top: 114px;
+    left: 5px;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: #fff;
+    font-size: 18px;
+    padding: 5px 10px;
+    /* border-radius: 25px; */
+    max-width: 50%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: block;
+    z-index: 4;
+    border-top-left-radius: 0px;
+    border-top-right-radius: 25px;
+    border-bottom-right-radius: 25px;
+    border-bottom-left-radius: 0px;
+  }
   .main-video-container {
-    top: 459px;
+    top: 460px;
     left: 0;
     width: 100%;
     height: 100%;
     z-index: 0;
-    border-radius: 0px;
+    border-radius: 0;
   }
 
   .main-video-container video {
@@ -94,9 +114,9 @@
   .small-video-container {
     bottom: 20px;
     right: 20px;
-    width: 220px;
-    height: 220px;
-    border-radius: 10px;
+    width: 130px;
+    height: 159px;
+    border-radius: 0; /* No border-radius on mobile */
   }
 
   .small-video-container video {
@@ -178,6 +198,7 @@
   color: #fff;
   border: none;
   height: 75px;
+  margin-right:50px;
   width: 75px;
   font-size: 17px;
   border-radius: 50%;
