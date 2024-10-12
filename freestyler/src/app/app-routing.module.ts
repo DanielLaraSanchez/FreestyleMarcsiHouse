@@ -5,6 +5,7 @@ import { SignupComponent } from './pages/signup/signup/signup.component';
 import { LoginComponent } from './pages/login/login/login.component';
 import { BattlePageComponent } from './pages/battle/battle-page/battle-page.component';
 import { ChatPageComponent } from './pages/chat/chat-page/chat-page.component';
+import { UserprofilePageComponent } from './pages/userprofile/userprofile-page/userprofile-page.component';
 import { AuthCallbackComponent } from './components/auth-callback/auth-callback.component';
 import { AuthGuard } from './guards/auth.guard';
 
@@ -20,6 +21,8 @@ const routes: Routes = [
   { path: 'auth/google/callback', component: AuthCallbackComponent },
   { path: 'battle', component: BattlePageComponent},
   { path: 'field', component: BattlefieldPageComponent },
+  { path: 'user-profile', component: UserprofilePageComponent },
+
 
 
   // Protected routes
