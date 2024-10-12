@@ -1,0 +1,83 @@
+<!-- Mobile Layout -->
+<div *ngIf="isMobile" class="profile-container-mobile">
+    <div class="header-background-mobile"></div>
+    <div class="avatar-wrapper">
+      <p-avatar [style]="{ 'width': '100px', height: '100px' }" [image]="user.profilePicture" shape="circle" size="xlarge"></p-avatar>
+      <p-button
+      [style]="{ 'width': '40px', height: '40px' }"
+        icon="pi pi-camera"
+        [rounded]="true" 
+        class="p-button-rounded p-button-primary p-button-text"
+        styleClass="avatar-edit-button"
+      ></p-button>
+    </div>
+    <div class="profile-card">
+      <div class="user-info">
+        <h2>{{ user.name }}</h2>
+      </div>
+      <div class="form-section">
+        <div class="p-fluid">
+          <div class="p-field">
+            <label for="username">Username</label>
+            <input id="username" type="text" pInputText [value]="user.name" />
+          </div>
+          <div class="p-field">
+            <label for="email">Email</label>
+            <input id="email" type="email" pInputText />
+          </div>
+          <div class="p-field">
+            <label for="phone">Phone</label>
+            <input id="phone" type="text" pInputText />
+          </div>
+          <div class="p-field">
+            <label for="address">Address</label>
+            <input id="address" type="text" pInputText />
+          </div>
+        </div>
+      </div>
+      <p-button label="Save Changes" icon="pi pi-save" class="p-button-success"></p-button>
+    </div>
+  </div>
+  
+  <!-- Desktop Layout -->
+  <div *ngIf="isDesktop" class="profile-container-desktop">
+    <div class="header-background-desktop"></div>
+    <div class="avatar-wrapper">
+      <p-avatar [style]="{ 'width': '130px', height: '130px' }" [image]="user.profilePicture" shape="circle" size="xlarge"></p-avatar>
+      <p-button
+        icon="pi pi-camera"
+        class="p-button-rounded p-button-primary p-button-text"
+        [rounded]="true" 
+        [style]="{ 'width': '45px', height: '45px' }"
+        styleClass="avatar-edit-button-desktop"
+      ></p-button>
+    </div>
+    <div class="profile-card-desktop">
+      <div class="user-info-desktop">
+        <h2>{{ user.name }}</h2>
+      </div>
+      <div class="form-section-desktop">
+        <div class="p-fluid">
+          <div class="p-grid p-dir-col p-align-center">
+            <div class="p-field p-col-8">
+              <label for="username">Username</label>
+              <input id="username" type="text" pInputText [value]="user.name" />
+            </div>
+            <div class="p-field p-col-8">
+              <label for="email">Email</label>
+              <input id="email" type="email" pInputText />
+            </div>
+            <div class="p-field p-col-8">
+              <label for="phone">Phone</label>
+              <input id="phone" type="text" pInputText />
+            </div>
+            <div class="p-field p-col-8">
+              <label for="address">Address</label>
+              <input id="address" type="text" pInputText />
+            </div>
+          </div>
+        </div>
+      </div>
+      <p-button label="Save Changes" icon="pi pi-save" class="p-button-success"></p-button>
+    </div>
+  </div>

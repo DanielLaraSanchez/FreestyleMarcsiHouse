@@ -1,0 +1,92 @@
+.header-background-mobile, .header-background-desktop {
+    height: 200px;
+    background-color: #f0f0f0;
+    background-image: url('/userprofile.svg');
+    background-size: cover;
+    background-position: center;
+    border-radius: 10px 10px 0 0;
+  }
+  
+  .avatar-wrapper {
+    position: absolute;
+    top: 211px;
+    left: 57%;
+    transform: translateX(-50%);
+    z-index: 1;
+  }
+  
+  .avatar-edit-button {
+    position: absolute;
+    top: -20px;
+    right: -20px;
+    width: 40px;
+    height: 40px;
+  }
+  
+  .profile-container-mobile, .profile-container-desktop {
+    width: 100%;
+    padding-top: 20px;
+  }
+  
+  .profile-card, .profile-card-desktop {
+    background-color: white;
+    border-radius: 0 0 10px 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-top: 60px;
+  }
+  
+  .user-info, .user-info-desktop {
+    margin-top: 57px;
+    text-align: center;
+  }
+  
+  .form-section, .form-section-desktop {
+    margin-top: 20px;
+  }
+  
+  .p-field {
+    margin-bottom: 1rem;
+  }
+  
+  .p-button-success {
+    width: 100%;
+    margin-top: 2rem;
+    display: block;
+  }
+  
+  .avatar-edit-button-desktop {
+    position: absolute;
+    top: 20px;
+    right: -20px;
+    width: 50px;
+    height: 50px;
+  }
+  
+  .form-section-desktop .p-grid {
+    width: 40%;
+    margin: auto;
+  }
+
+  @media (max-width: 767px) {
+
+    .avatar-wrapper {
+        position: absolute;
+        top: 229px;
+        left: 55%;
+        transform: translateX(-50%);
+        z-index: 1;
+      }
+
+      .user-info, .user-info-desktop {
+        margin-top: 40px;
+      }
+
+      .form-section-desktop .p-grid {
+        width: 60%;
+        margin: auto;
+      }
+
+
+
+  }
