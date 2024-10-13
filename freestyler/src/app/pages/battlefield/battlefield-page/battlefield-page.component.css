@@ -170,6 +170,7 @@ app-battle-pair {
     padding: 32px;
     background-color: rgba(73, 14, 59, 0.075);
     gap: 16px;
+    margin-left:-20px;
   }
 
   .users-grid::-webkit-scrollbar {
