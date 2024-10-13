@@ -84,10 +84,12 @@ export class BattlePageComponent implements OnInit, OnDestroy {
 
     // Subscribe to connection state to handle WebRTC connection updates
     const connectionStateSubscription = this.battleService.connectionState$.subscribe((state) => {
-      console.log('WebRTC Connection State:', state);
-      if (state === 'connected') {
+      console.log('WebRTC Connection State:AKIIIIIIIIIIIIIIIIIIIIIIIIIIII', state);
+      if (state !== 'disconnected') {
         // Once connected, assign the remote stream to the remote video element
         this.remoteStreamSubscription = this.battleService.remoteStream$.subscribe((stream) => {
+          console.log('WebRTC Connection State:AKIIIIIIIIIIIIIIIIIIIIIIIIIIII', stream);
+
           if (stream && this.remoteVideo) {
             // Ensure the video element is available
             setTimeout(() => {
