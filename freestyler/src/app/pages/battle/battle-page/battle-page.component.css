@@ -18,10 +18,12 @@
   justify-content: space-between;
   align-items: center;
   padding: 10px;
-  background-color: rgba(0, 0, 0, 0.2);
+  /* background: linear-gradient(90deg, rgba(153, 50, 204, 0.075),rgba(169, 158, 175, 0.123), rgba(153, 50, 204, 0.062)); */
+  background: linear-gradient(90deg, rgba(153, 50, 204, 0.301),rgba(0, 0, 0, 0.89), rgba(153, 50, 204, 0.37));
+
   z-index: 3;
-  min-height:116px;
-  min-height:116px;
+  min-height: 116px;
+  /* backdrop-filter: blur(8px);  */
 }
 
 
@@ -295,7 +297,9 @@
   justify-content: space-between;
   align-items: center;
   padding: 0px;
-  background-color: rgba(0, 0, 0, 0.2);
+  /* background-color: rgba(0, 0, 0, 0.2); */
+  background: linear-gradient(90deg, rgba(153, 50, 204, 0.301),rgba(0, 0, 0, 0.89), rgba(153, 50, 204, 0.37));
+
   z-index: 3;
   max-height:85px;
   min-height:85px;
@@ -335,6 +339,7 @@
   border-radius: 60px;
   height:50px;
   width:50px;
+  margin-right:7px;
 }
 
 .vote-button:hover {
