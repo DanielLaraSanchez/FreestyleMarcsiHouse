@@ -15,7 +15,7 @@ interface BattleFoundData {
   providedIn: 'root',
 })
 export class SignalingService implements OnDestroy {
-  private socket: any | null = null;
+  private socket: any = null;
   private isConnected = false;
 
   // Expose the client's own socket ID

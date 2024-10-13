@@ -71,12 +71,13 @@ export class BattlePageComponent implements OnInit, OnDestroy {
       console.log('Battle found event received:', data);
       this.showStartButton = this.battleService.isOfferer; // Show "Start Battle" only if offerer
 
-      if (!this.battleService.isOfferer) {
+      if (this.battleService.isOfferer) {
+        // Offerer should see the "Start Battle" button
+        console.log('User is Offerer. Awaiting user action to start battle.');
+      } else {
         // If answerer, automatically set battleStarted to true to render remoteVideo
-        setTimeout(() => {
-          this.battleStarted = true;
-          this.cdr.detectChanges(); // Ensure view updates before assigning stream
-        }, 0);
+        this.battleStarted = true;
+        console.log('User is Answerer. Automatically starting battle.');
       }
     });
     this.subscriptions.add(battleFoundSubscription);
@@ -92,6 +93,7 @@ export class BattlePageComponent implements OnInit, OnDestroy {
             setTimeout(() => {
               this.remoteVideo.nativeElement.srcObject = stream;
               console.log('Remote video stream assigned.');
+              this.cdr.detectChanges(); // Trigger change detection
             }, 0);
           } else {
             console.warn('Remote stream received but remoteVideo is undefined.');
@@ -150,7 +152,7 @@ export class BattlePageComponent implements OnInit, OnDestroy {
       await this.battleService.initializeLocalStream();
       if (this.localVideo && this.battleService.localStream) {
         this.localVideo.nativeElement.srcObject = this.battleService.localStream;
-        console.log('Local video stream assigned to small video element.');
+        console.log('Local video stream assigned to local video element.');
       } else {
         console.warn('Local video element or localStream is undefined.');
       }
@@ -165,26 +167,11 @@ export class BattlePageComponent implements OnInit, OnDestroy {
     this.battleService.startBattle();
   }
 
-  // Start Battle method triggered by the "Start Battle" button
+  // Start Battle method triggered by the "Start Battle" button (now optional)
   startBattle(): void {
-    console.log('Start Battle button clicked.');
-    console.log(`Room ID: ${this.battleService.roomId}`);
-
-    // Only the offerer should initiate the WebRTC connection
-    if (this.battleService.isOfferer) {
-      // User is the offerer; initiate WebRTC connection
-      if (this.battleService.roomId) {
-        this.battleService.initiateWebRTCConnection();
-        console.log('Offerer initiating WebRTC connection.');
-      } else {
-        console.error('No roomId available to initiate WebRTC connection.');
-        return;
-      }
-      this.battleStarted = true;
-    }
-
-    // Hide the "Start Battle" button after initiating
-    this.showStartButton = false;
+    console.log('Start Battle method called.');
+    // The battle initiation is now handled automatically for the Offerer
+    // This method can be left empty or used for additional controls if needed
   }
 
   // Thumbs Up method for voting

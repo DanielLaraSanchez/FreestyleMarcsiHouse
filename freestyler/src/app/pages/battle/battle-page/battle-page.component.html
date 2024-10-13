@@ -5,6 +5,7 @@
   </div>
 
   <div class="controls">
+    <!-- "Start Battle" button is removed as Battle initiation is automatic for Offerer -->
     <button *ngIf="showStartButton && !battleStarted" (click)="startBattle()">Start Battle</button>
     <button *ngIf="battleStarted" (click)="hangUp()">Hang Up</button>
     <button (click)="thumbsUp()" [class.glow]="applyGlow">Thumbs Up</button>
