@@ -1,74 +1,21 @@
-<div class="battle-page-container">
-  <div class="main-video-container">
-    <!-- Remote Video (Big, Opponent's Stream) -->
-    <video #remoteVideo autoplay playsinline class="big-video"></video>
-
-    <!-- Local Video (Small, User's Own Stream) -->
-    <video #localVideo autoplay playsinline muted class="small-video"></video>
-
-    <!-- Opponent's Name Display -->
-    <div
-      class="opponent-name"
-      [ngClass]="{ 'glow-name': applyGlow }"
-      [@tada]="triggerTada"
-    >
-      <!-- Optionally, display opponent's name. Placeholder here -->
-      <p class="long-text">{{ rapperName }}</p>
-    </div>
-
-    <!-- Top Controls (Timer, Current Word, Buttons) -->
-    <div class="top-controls">
-      <!-- Timer Container -->
-      <div
-        class="timer-container"
-        [class.invisible]="!battleStarted"
-        [@bounceIn]="triggerBounceIn"
-      >
-        <p-knob
-          [(ngModel)]="timeLeft"
-          valueColor="#e91e63"
-          rangeColor="SlateGray"
-          [size]="80"
-          [strokeWidth]="5"
-          [readonly]="true"
-          textColor="white"
-          [min]="0"
-          [max]="60"
-        >
-        </p-knob>
-      </div>
-
-      <!-- Current Word Display -->
-      <div class="current-word" *ngIf="battleStarted">
-        <p [@bounceIn]="triggerBounceIn">{{ word }}</p>
-      </div>
-
-      <!-- Start Battle Button (Visible Once Paired) -->
-      <button
-        *ngIf="showStartButton && !battleStarted"
-        class="start-button"
-        (click)="startBattle()"
-        [@bounceOutRight]="triggerZoomOut"
-      >
-        START
-      </button>
-
-      <!-- Thumbs Up Button (For Voting) -->
-      <button
-        [@bounceIn]="triggerBounceIn"
-        class="vote-button"
-        [class.invisible]="!battleStarted"
-        (click)="thumbsUp()"
-      >
-        <i class="pi pi-thumbs-up-fill"></i>
-      </button>
-    </div>
+<div class="battle-container">
+  <div class="video-section">
+    <video #localVideo autoplay muted playsinline class="local-video"></video>
+    <video #remoteVideo autoplay playsinline class="remote-video"></video>
   </div>
 
-  <!-- Bottom Controls (Hang Up Button) -->
-  <div class="bottom-controls">
-    <button class="hangup-btn" (click)="hangUp()">
-      <i class="pi pi-phone"></i>
-    </button>
+  <div class="controls">
+    <button *ngIf="showStartButton && !battleStarted" (click)="startBattle()">Start Battle</button>
+    <button *ngIf="battleStarted" (click)="hangUp()">Hang Up</button>
+    <button (click)="thumbsUp()" [class.glow]="applyGlow">Thumbs Up</button>
+  </div>
+
+  <div class="battle-info">
+    <p>Time Left: {{ timeLeft }}</p>
+    <p>Current Turn: {{ currentTurn }}</p>
+    <p>Word: {{ word }}</p>
+    <p>Rapper: {{ rapperName }}</p>
+    <p>Viewer Count: {{ viewerCount }}</p>
+    <p>Vote Count: {{ voteCount }}</p>
   </div>
 </div>

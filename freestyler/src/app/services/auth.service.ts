@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
-import { jwtDecode } from 'jwt-decode'; // Correct import statement
+import {jwtDecode} from 'jwt-decode'; // Correct import statement
 
 const TOKEN_KEY = 'auth-token';
 
@@ -23,10 +23,7 @@ export class AuthService {
   }
 
   login(email: string, password: string): Observable<any> {
-    return this.http.post(`http://localhost:3000/auth/login`, {
-      email,
-      password,
-    });
+    return this.http.post(`http://localhost:3000/auth/login`, { email, password });
   }
 
   loginWithGoogle(): void {
@@ -34,11 +31,7 @@ export class AuthService {
   }
 
   signup(name: string, email: string, password: string): Observable<any> {
-    return this.http.post(`http://localhost:3000/auth/signup`, {
-      name,
-      email,
-      password,
-    });
+    return this.http.post(`http://localhost:3000/auth/signup`, { name, email, password });
   }
 
   isAuthenticated(): boolean {

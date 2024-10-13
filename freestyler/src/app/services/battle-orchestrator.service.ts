@@ -3,11 +3,16 @@ import { BehaviorSubject, Subject, Subscription } from 'rxjs';
 import { SignalingService } from './signaling.service';
 import { AuthService } from './auth.service';
 
+interface BattleFoundData {
+  roomId: string;
+  partnerSocketId: string;
+}
+
 @Injectable({
   providedIn: 'root',
 })
 export class BattleOrchestratorService implements OnDestroy {
-  // Existing Battle Subjects
+  // Battle Mechanics Subjects
   private currentTurnSubject = new BehaviorSubject<string>('Player 1');
   currentTurn$ = this.currentTurnSubject.asObservable();
 
@@ -24,21 +29,20 @@ export class BattleOrchestratorService implements OnDestroy {
   viewerCount$ = this.viewerCountSubject.asObservable();
 
   // WebRTC Related
-  peerConnection!: RTCPeerConnection;
-  remoteStream!: MediaStream | null;
-  roomId!: string;
-  partnerId!: string;
+  public peerConnection: RTCPeerConnection | null = null;
+  public remoteStream: MediaStream | null = null;
+  public roomId: string = '';
+  public partnerSocketId: string = '';
 
   // Subjects to emit WebRTC connection status and remote stream
   private connectionStateSubject = new BehaviorSubject<string>('disconnected');
   public connectionState$ = this.connectionStateSubject.asObservable();
 
-  private remoteStreamSubject = new BehaviorSubject<MediaStream | null>(null);
+  private remoteStreamSubject = new Subject<MediaStream | null>();
   public remoteStream$ = this.remoteStreamSubject.asObservable();
 
-  private battleFoundSubject = new Subject<{ roomId: string; partnerId: string }>();
+  private battleFoundSubject = new Subject<BattleFoundData>();
   public battleFound$ = this.battleFoundSubject.asObservable();
-
 
   // ICE Configuration (add TURN servers as needed)
   private iceConfig: RTCConfiguration = {
@@ -53,61 +57,85 @@ export class BattleOrchestratorService implements OnDestroy {
     ],
   };
 
-  // Battle Found Subscription
-  private battleFoundSubscription!: Subscription;
-
-  // Incoming WebRTC Events Subscriptions
-  private incomingOfferSubscription!: Subscription;
-  private incomingAnswerSubscription!: Subscription;
-  private incomingIceCandidateSubscription!: Subscription;
-
-  private subscriptionBag: Subscription = new Subscription();
+  // Matchmaking and WebRTC Subscriptions
+  private subscriptions = new Subscription();
 
   // Local Stream
-  localStream!: MediaStream;
+  public localStream: MediaStream | null = null;
+
+  // Store own socket ID
+  private ownSocketId: string = '';
+
+  // Role Determination
+  public isOfferer: boolean = false;
 
   constructor(
     private signalingService: SignalingService,
     private authService: AuthService
   ) {
-    // Subscribe to battle found events
-    this.battleFoundSubscription = this.signalingService.battleFound$.subscribe((data) => {
-      this.roomId = data.roomId;
-      this.partnerId = data.partnerId;
-      console.log(`Battle found! Room ID: ${this.roomId}, Partner ID: ${this.partnerId}`);
-      // Do not automatically initiate WebRTC connection; wait for user to click "Start Battle"
-    });
-    this.subscriptionBag.add(this.battleFoundSubscription);
+    // Subscribe to own socket ID
+    const ownSocketIdSubscription = this.signalingService.ownSocketId$.subscribe(
+      (id) => {
+        this.ownSocketId = id;
+        console.log('Own Socket ID:', this.ownSocketId);
+      }
+    );
+    this.subscriptions.add(ownSocketIdSubscription);
+
+    // Subscribe to battle found event
+    const battleFoundSubscription = this.signalingService.battleFound$.subscribe(
+      (data) => {
+        this.roomId = data.roomId;
+        this.partnerSocketId = data.partnerSocketId;
+        console.log(
+          `Battle found! Room ID: ${this.roomId}, Partner Socket ID: ${this.partnerSocketId}`
+        );
+        // Notify subscribers about battle found
+        this.battleFoundSubject.next(data);
+        // Determine role based on socket IDs
+        this.determineRoleAndInitiate();
+      }
+    );
+    this.subscriptions.add(battleFoundSubscription);
 
     // Subscribe to incoming WebRTC offers
-    this.incomingOfferSubscription = this.signalingService.webrtcOffer$.subscribe((data) => {
-      console.log('Received WebRTC offer:', data);
-      this.handleOffer(data.offer);
-    });
-    this.subscriptionBag.add(this.incomingOfferSubscription);
+    const incomingOfferSubscription = this.signalingService.webrtcOffer$.subscribe(
+      (offer) => {
+        console.log('Received WebRTC offer:', offer);
+        this.handleOffer(offer);
+      }
+    );
+    this.subscriptions.add(incomingOfferSubscription);
 
     // Subscribe to incoming WebRTC answers
-    this.incomingAnswerSubscription = this.signalingService.webrtcAnswer$.subscribe((data) => {
-      console.log('Received WebRTC answer:', data);
-      this.handleAnswer(data.answer);
-    });
-    this.subscriptionBag.add(this.incomingAnswerSubscription);
+    const incomingAnswerSubscription = this.signalingService.webrtcAnswer$.subscribe(
+      (answer) => {
+        console.log('Received WebRTC answer:', answer);
+        this.handleAnswer(answer);
+      }
+    );
+    this.subscriptions.add(incomingAnswerSubscription);
 
     // Subscribe to incoming ICE candidates
-    this.incomingIceCandidateSubscription = this.signalingService.webrtcIceCandidate$.subscribe((data) => {
-      console.log('Received ICE candidate:', data);
-      this.handleIceCandidate(data.candidate);
-    });
-    this.subscriptionBag.add(this.incomingIceCandidateSubscription);
+    const incomingIceCandidateSubscription = this.signalingService.webrtcIceCandidate$.subscribe(
+      (candidate) => {
+        console.log('Received ICE candidate:', candidate);
+        this.handleIceCandidate(candidate);
+      }
+    );
+    this.subscriptions.add(incomingIceCandidateSubscription);
   }
 
   // Initialize local stream
-  async initializeLocalStream() {
+  async initializeLocalStream(): Promise<void> {
     try {
-      this.localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      this.localStream = await navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: true,
+      });
       console.log('Local stream initialized.');
     } catch (error) {
-      console.error('Error accessing media devices.', error);
+      console.error('Error accessing media devices:', error);
     }
   }
 
@@ -120,33 +148,56 @@ export class BattleOrchestratorService implements OnDestroy {
     this.viewerCountSubject.next(0);
     this.currentWordSubject.next('');
 
-    // Initialize local stream and start matchmaking
-    await this.initializeLocalStream();
+    // Initialize local stream if not already
+    if (!this.localStream) {
+      await this.initializeLocalStream();
+    }
+
+    // Start matchmaking
     this.signalingService.startRandomBattle();
     console.log('Matchmaking initiated.');
   }
 
-  // Initiate WebRTC Connection
+  // Determine role based on socket IDs and initiate WebRTC if offerer
+  private determineRoleAndInitiate() {
+    if (!this.ownSocketId || !this.partnerSocketId) {
+      console.error('Socket IDs not available for role determination.');
+      return;
+    }
+
+    // Simple lexical comparison to determine who is the offerer
+    if (this.ownSocketId < this.partnerSocketId) {
+      console.log('Role determined: Offerer');
+      this.isOfferer = true;
+      // Automatically initiate WebRTC connection as the offerer
+      this.initiateWebRTCConnection();
+    } else {
+      console.log('Role determined: Answerer');
+      this.isOfferer = false;
+      // The answerer will wait for the offer to be received
+    }
+  }
+
+  // Initiate WebRTC Connection (Offerer)
   async initiateWebRTCConnection() {
+    if (!this.roomId) {
+      console.error('Cannot initiate WebRTC connection without roomId.');
+      return;
+    }
+
     this.connectionStateSubject.next('connecting');
     this.peerConnection = new RTCPeerConnection(this.iceConfig);
-
-    // Add local stream tracks to the peer connection
-    if (this.localStream) {
-      console.log('Adding local stream tracks to peer connection.');
-      this.localStream.getTracks().forEach((track) => {
-        this.peerConnection.addTrack(track, this.localStream);
-      });
-    }
+    console.log('RTCPeerConnection created.');
 
     // Handle remote stream
     this.peerConnection.ontrack = (event) => {
       if (!this.remoteStream) {
         this.remoteStream = new MediaStream();
         this.remoteStreamSubject.next(this.remoteStream);
-        console.log('Remote stream received.');
+        console.log('Remote stream initialized.');
       }
       this.remoteStream.addTrack(event.track);
+      console.log('Added remote track to remoteStream.');
     };
 
     // Handle ICE candidates
@@ -156,6 +207,27 @@ export class BattleOrchestratorService implements OnDestroy {
         console.log('Sent ICE candidate.');
       }
     };
+
+    // Handle connection state changes
+    this.peerConnection.onconnectionstatechange = () => {
+      const state = this.peerConnection?.connectionState;
+      console.log(`RTCPeerConnection state: ${state}`);
+      if (state === 'connected') {
+        this.connectionStateSubject.next('connected');
+      } else if (state === 'disconnected' || state === 'failed') {
+        this.connectionStateSubject.next('disconnected');
+      }
+    };
+
+    // Add local stream tracks to the peer connection
+    if (this.localStream) {
+      console.log('Adding local stream tracks to peer connection.');
+      this.localStream.getTracks().forEach((track) => {
+        this.peerConnection?.addTrack(track, this.localStream!);
+      });
+    } else {
+      console.warn('Local stream not initialized.');
+    }
 
     // Create an offer
     try {
@@ -168,27 +240,23 @@ export class BattleOrchestratorService implements OnDestroy {
     }
   }
 
-  // Handle WebRTC Offer
+  // Handle WebRTC Offer (Answerer)
   async handleOffer(offer: RTCSessionDescriptionInit) {
     console.log('Handling received offer.');
-    this.connectionStateSubject.next('connecting');
-    this.peerConnection = new RTCPeerConnection(this.iceConfig);
+    this.connectionStateSubject.next('answering');
 
-    // Add local stream tracks to the peer connection
-    if (this.localStream) {
-      this.localStream.getTracks().forEach((track) => {
-        this.peerConnection.addTrack(track, this.localStream);
-      });
-    }
+    this.peerConnection = new RTCPeerConnection(this.iceConfig);
+    console.log('RTCPeerConnection created for answering.');
 
     // Handle remote stream
     this.peerConnection.ontrack = (event) => {
       if (!this.remoteStream) {
         this.remoteStream = new MediaStream();
         this.remoteStreamSubject.next(this.remoteStream);
-        console.log('Remote stream received.');
+        console.log('Remote stream initialized.');
       }
       this.remoteStream.addTrack(event.track);
+      console.log('Added remote track to remoteStream.');
     };
 
     // Handle ICE candidates
@@ -199,8 +267,31 @@ export class BattleOrchestratorService implements OnDestroy {
       }
     };
 
+    // Handle connection state changes
+    this.peerConnection.onconnectionstatechange = () => {
+      const state = this.peerConnection?.connectionState;
+      console.log(`RTCPeerConnection state: ${state}`);
+      if (state === 'connected') {
+        this.connectionStateSubject.next('connected');
+      } else if (state === 'disconnected' || state === 'failed') {
+        this.connectionStateSubject.next('disconnected');
+      }
+    };
+
+    // Add local stream tracks to the peer connection
+    if (this.localStream) {
+      console.log('Adding local stream tracks to peer connection.');
+      this.localStream.getTracks().forEach((track) => {
+        this.peerConnection?.addTrack(track, this.localStream!);
+      });
+    } else {
+      console.warn('Local stream not initialized.');
+    }
+
     try {
       await this.peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
+      console.log('Set remote description with offer.');
+
       const answer = await this.peerConnection.createAnswer();
       await this.peerConnection.setLocalDescription(answer);
       this.signalingService.sendWebRTCAnswer(this.roomId, answer);
@@ -210,15 +301,15 @@ export class BattleOrchestratorService implements OnDestroy {
     }
   }
 
-  // Handle WebRTC Answer
+  // Handle WebRTC Answer (Offerer)
   async handleAnswer(answer: RTCSessionDescriptionInit) {
     console.log('Handling received answer.');
     try {
-      await this.peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
+      await this.peerConnection?.setRemoteDescription(new RTCSessionDescription(answer));
       this.connectionStateSubject.next('connected');
-      console.log('WebRTC connection established.');
+      console.log('Set remote description with answer. WebRTC connection established.');
     } catch (error) {
-      console.error('Error setting remote description:', error);
+      console.error('Error setting remote description with answer:', error);
     }
   }
 
@@ -226,7 +317,7 @@ export class BattleOrchestratorService implements OnDestroy {
   async handleIceCandidate(candidate: RTCIceCandidateInit) {
     console.log('Adding received ICE candidate.');
     try {
-      await this.peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+      await this.peerConnection?.addIceCandidate(new RTCIceCandidate(candidate));
       console.log('Added ICE candidate.');
     } catch (error) {
       console.error('Error adding received ICE candidate:', error);
@@ -237,24 +328,31 @@ export class BattleOrchestratorService implements OnDestroy {
   incrementVote(): void {
     const currentVotes = this.voteCountSubject.getValue();
     this.voteCountSubject.next(currentVotes + 1);
+    console.log('Vote incremented:', currentVotes + 1);
   }
 
   ngOnDestroy(): void {
     // Cleanup subscriptions
-    this.subscriptionBag.unsubscribe();
+    this.subscriptions.unsubscribe();
 
     // Close WebRTC connection if it exists
     if (this.peerConnection) {
       this.peerConnection.close();
       console.log('Peer connection closed.');
+      this.peerConnection = null;
     }
 
     // Stop all media tracks
     if (this.localStream) {
       this.localStream.getTracks().forEach((track) => track.stop());
       console.log('Local media tracks stopped.');
+      this.localStream = null;
     }
 
-    // Existing battle cleanup handled by the component
+    if (this.remoteStream) {
+      this.remoteStream.getTracks().forEach((track) => track.stop());
+      console.log('Remote media tracks stopped.');
+      this.remoteStream = null;
+    }
   }
 }
