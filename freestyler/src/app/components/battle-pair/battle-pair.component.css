@@ -56,10 +56,6 @@
     box-sizing: border-box;
   }
 
-  .battle-avatar-container p-avatar {
-    /* No border or background for a clean look */
-  }
-
   .user-name {
     margin-top: 10px;
     font-weight: bold;

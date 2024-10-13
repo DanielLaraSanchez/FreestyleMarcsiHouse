@@ -44,7 +44,7 @@
     <!-- Mobile Menu Items -->
     <div class="menu-items">
       <a *ngFor="let item of mobileMenuItems" [routerLink]="item.routerLink" class="menu-item">
-        <button pButton type="button" [icon]="item.icon" class="p-button p-button-text"></button>
+        <button pButton type="button" [style]="{ 'font-size': '31px'}" [icon]="item.icon" class="p-button p-button-text"></button>
       </a>
     </div>
   </div>
