@@ -30,7 +30,7 @@
     </div>
 
     <div class="current-word" *ngIf="battleStarted">
-      <p [@bounceIn]="triggerBounceIn">{{ word }}</p>
+      <p style class="current-word-p" [@bounceIn]="triggerBounceIn">{{ word }}</p>
     </div>
 
     <button *ngIf="!showStartButton"
@@ -54,3 +54,6 @@
     </button>
   </div>
 </div>
+
+
+
