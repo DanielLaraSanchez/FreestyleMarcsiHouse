@@ -51,6 +51,7 @@ export class BattlePageComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+        this.battleService.startBattle();
     // Get current user ID from AuthService
     this.currentUserId = this.authService.getCurrentUserId();
     console.log('Current User ID:', this.currentUserId);
@@ -176,7 +177,7 @@ export class BattlePageComponent implements OnInit, OnDestroy {
         this.hangUp(false);
 
         // Redirect to /chat
-        this.router.navigate(['/chat']);
+        this.router.navigate(['/battle']);
       });
     this.subscriptions.add(partnerDisconnectedSubscription);
   }

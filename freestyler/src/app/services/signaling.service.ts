@@ -64,7 +64,8 @@ export class SignalingService implements OnDestroy {
 
   private connectSocket(token: string) {
     if (this.isConnected && this.socket) {
-      return; // Already connected
+      console.log("Existing socket detected. Disconnecting for a fresh connection.");
+      this.disconnectSocket(); // Force disconnect existing socket for fresh connection
     }
 
     if (!token) {
@@ -76,6 +77,10 @@ export class SignalingService implements OnDestroy {
       query: {
         token: token,
       },
+      reconnectionAttempts: 5, // Optional: Limit reconnection attempts
+      reconnectionDelay: 1000, // Optional: Initial delay in ms
+      reconnectionDelayMax: 5000, // Optional: Maximum delay in ms
+      transports: ['websocket'], // Optional: Force WebSocket transport
     });
 
     // Handle socket connection
@@ -89,10 +94,10 @@ export class SignalingService implements OnDestroy {
     });
 
     // Handle socket disconnection
-    this.socket.on('disconnect', () => {
+    this.socket.on('disconnect', (reason: string) => {
       this.isConnected = false;
       this.socketConnectedSubject.next(false);
-      console.log('Socket disconnected');
+      console.log('Socket disconnected:', reason);
       this.ownSocketIdSubject.next(''); // Reset own socket ID
     });
 
@@ -159,13 +164,17 @@ export class SignalingService implements OnDestroy {
 
     // Handle 'partnerDisconnected' event
     this.socket.on('partnerDisconnected', () => {
-      console.log('Received partnerDisconnected event from server.');
+      console.log('Partner disconnected. Notifying BattleOrchestratorService.');
       this.partnerDisconnectedSubject.next();
     });
 
-    // Handle socket errors if needed
+    // Handle socket errors
     this.socket.on('connect_error', (err: any) => {
       console.error('Socket connection error:', err);
+    });
+
+    this.socket.on('error', (err: any) => {
+      console.error('Socket error:', err);
     });
   }
 
@@ -174,8 +183,9 @@ export class SignalingService implements OnDestroy {
       this.socket.disconnect();
       this.isConnected = false;
       this.socketConnectedSubject.next(false);
+      this.ownSocketIdSubject.next('');
+      console.log('Socket disconnected and state reset.');
       this.socket = null;
-      console.log('Socket disconnected');
     }
   }
 
@@ -217,10 +227,7 @@ export class SignalingService implements OnDestroy {
     }
   }
 
-  sendWebRTCIceCandidate(
-    roomId: string,
-    candidate: RTCIceCandidateInit
-  ): void {
+  sendWebRTCIceCandidate(roomId: string, candidate: RTCIceCandidateInit): void {
     if (this.socket && this.isConnected) {
       this.socket.emit('webrtc_ice_candidate', { roomId, candidate });
       console.log('Sent ICE candidate.');
