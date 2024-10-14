@@ -45,6 +45,9 @@ export class SignalingService implements OnDestroy {
   private webrtcIceCandidateSubject = new Subject<RTCIceCandidateInit>();
   public webrtcIceCandidate$ = this.webrtcIceCandidateSubject.asObservable();
 
+  private partnerDisconnectedSubject = new Subject<void>();
+  public partnerDisconnected$ = this.partnerDisconnectedSubject.asObservable();
+
   private subscriptions = new Subscription();
 
   constructor(private authService: AuthService) {
@@ -75,6 +78,7 @@ export class SignalingService implements OnDestroy {
       },
     });
 
+    // Handle socket connection
     this.socket.on('connect', () => {
       this.isConnected = true;
       this.socketConnectedSubject.next(true);
@@ -84,6 +88,7 @@ export class SignalingService implements OnDestroy {
       }
     });
 
+    // Handle socket disconnection
     this.socket.on('disconnect', () => {
       this.isConnected = false;
       this.socketConnectedSubject.next(false);
@@ -91,13 +96,14 @@ export class SignalingService implements OnDestroy {
       this.ownSocketIdSubject.next(''); // Reset own socket ID
     });
 
-    // Handle user online/offline status updates
+    // Handle user online status updates
     this.socket.on('userOnline', (data: { userId: string }) => {
       const { userId } = data;
       this.userStatusSubject.next({ status: 'online', userId });
       console.log(`User Online: ${userId}`);
     });
 
+    // Handle user offline status updates
     this.socket.on('userOffline', (data: { userId: string }) => {
       const { userId } = data;
       this.userStatusSubject.next({ status: 'offline', userId });
@@ -117,25 +123,44 @@ export class SignalingService implements OnDestroy {
     });
 
     // Handle WebRTC signaling events
-    this.socket.on('webrtc_offer', (data: { offer: RTCSessionDescriptionInit }) => {
-      if (data.offer) {
-        this.webrtcOfferSubject.next(data.offer);
-        console.log('Received WebRTC offer:', data.offer);
-      }
-    });
 
-    this.socket.on('webrtc_answer', (data: { answer: RTCSessionDescriptionInit }) => {
-      if (data.answer) {
-        this.webrtcAnswerSubject.next(data.answer);
-        console.log('Received WebRTC answer:', data.answer);
+    // Handle WebRTC offer
+    this.socket.on(
+      'webrtc_offer',
+      (data: { offer: RTCSessionDescriptionInit }) => {
+        if (data.offer) {
+          this.webrtcOfferSubject.next(data.offer);
+          console.log('Received WebRTC offer:', data.offer);
+        }
       }
-    });
+    );
 
-    this.socket.on('webrtc_ice_candidate', (data: { candidate: RTCIceCandidateInit }) => {
-      if (data.candidate) {
-        this.webrtcIceCandidateSubject.next(data.candidate);
-        console.log('Received ICE candidate:', data.candidate);
+    // Handle WebRTC answer
+    this.socket.on(
+      'webrtc_answer',
+      (data: { answer: RTCSessionDescriptionInit }) => {
+        if (data.answer) {
+          this.webrtcAnswerSubject.next(data.answer);
+          console.log('Received WebRTC answer:', data.answer);
+        }
       }
+    );
+
+    // Handle ICE candidates
+    this.socket.on(
+      'webrtc_ice_candidate',
+      (data: { candidate: RTCIceCandidateInit }) => {
+        if (data.candidate) {
+          this.webrtcIceCandidateSubject.next(data.candidate);
+          console.log('Received ICE candidate:', data.candidate);
+        }
+      }
+    );
+
+    // Handle 'partnerDisconnected' event
+    this.socket.on('partnerDisconnected', () => {
+      console.log('Received partnerDisconnected event from server.');
+      this.partnerDisconnectedSubject.next();
     });
 
     // Handle socket errors if needed
@@ -192,7 +217,10 @@ export class SignalingService implements OnDestroy {
     }
   }
 
-  sendWebRTCIceCandidate(roomId: string, candidate: RTCIceCandidateInit): void {
+  sendWebRTCIceCandidate(
+    roomId: string,
+    candidate: RTCIceCandidateInit
+  ): void {
     if (this.socket && this.isConnected) {
       this.socket.emit('webrtc_ice_candidate', { roomId, candidate });
       console.log('Sent ICE candidate.');

@@ -67,77 +67,118 @@ export class BattlePageComponent implements OnInit, OnDestroy {
     this.startMatchmaking();
 
     // Subscribe to battle found event to handle room creation
-    const battleFoundSubscription = this.battleService.battleFound$.subscribe((data) => {
-      console.log('Battle found event received:', data);
-      this.showStartButton = this.battleService.isOfferer; // Show "Start Battle" only if offerer
+    const battleFoundSubscription = this.battleService.battleFound$.subscribe(
+      (data) => {
+        console.log('Battle found event received:', data);
+        this.showStartButton = this.battleService.isOfferer; // Show "Start Battle" only if offerer
 
-      if (this.battleService.isOfferer) {
-        // Offerer should see the "Start Battle" button
-        console.log('User is Offerer. Awaiting user action to start battle.');
-      } else {
-        // If answerer, automatically set battleStarted to true to render remoteVideo
-        this.battleStarted = true;
-        console.log('User is Answerer. Automatically starting battle.');
+        if (this.battleService.isOfferer) {
+          // Offerer should see the "Start Battle" button
+          console.log('User is Offerer. Awaiting user action to start battle.');
+        } else {
+          // If answerer, automatically set battleStarted to true to render remoteVideo
+          this.battleStarted = true;
+          console.log('User is Answerer. Automatically starting battle.');
+        }
       }
-    });
+    );
     this.subscriptions.add(battleFoundSubscription);
 
     // Subscribe to connection state to handle WebRTC connection updates
-    const connectionStateSubscription = this.battleService.connectionState$.subscribe((state) => {
-      console.log('WebRTC Connection State:AKIIIIIIIIIIIIIIIIIIIIIIIIIIII', state);
-      if (state !== 'disconnected') {
-        // Once connected, assign the remote stream to the remote video element
-        this.remoteStreamSubscription = this.battleService.remoteStream$.subscribe((stream) => {
-          console.log('WebRTC Connection State:AKIIIIIIIIIIIIIIIIIIIIIIIIIIII', stream);
+    const connectionStateSubscription =
+      this.battleService.connectionState$.subscribe((state) => {
+        console.log(
+          'WebRTC Connection State:',
+          state
+        );
+        if (state !== 'disconnected') {
+          // Once connected, assign the remote stream to the remote video element
+          this.remoteStreamSubscription =
+            this.battleService.remoteStream$.subscribe((stream) => {
+              console.log(
+                'WebRTC Connection State:',
+                stream
+              );
 
-          if (stream && this.remoteVideo) {
-            // Ensure the video element is available
-            setTimeout(() => {
-              this.remoteVideo.nativeElement.srcObject = stream;
-              console.log('Remote video stream assigned.');
-              this.cdr.detectChanges(); // Trigger change detection
-            }, 0);
-          } else {
-            console.warn('Remote stream received but remoteVideo is undefined.');
+              if (stream && this.remoteVideo) {
+                // Ensure the video element is available
+                setTimeout(() => {
+                  this.remoteVideo.nativeElement.srcObject = stream;
+                  console.log('Remote video stream assigned.');
+                  this.battleStarted = true;
+                  this.cdr.detectChanges(); // Trigger change detection
+                }, 0);
+              } else {
+                console.warn(
+                  'Remote stream received but remoteVideo is undefined.'
+                );
+              }
+            });
+          this.subscriptions.add(this.remoteStreamSubscription);
+        } else if (state === 'disconnected') {
+          // Clear remote video stream
+          if (this.remoteVideo) {
+            this.remoteVideo.nativeElement.srcObject = null;
+            console.log('Remote video stream cleared.');
           }
-        });
-        this.subscriptions.add(this.remoteStreamSubscription);
-      } else if (state === 'disconnected') {
-        // Clear remote video stream
-        if (this.remoteVideo) {
-          this.remoteVideo.nativeElement.srcObject = null;
-          console.log('Remote video stream cleared.');
         }
-      }
-    });
+      });
     this.subscriptions.add(connectionStateSubscription);
 
     // Existing Subscriptions for Battle Mechanics
-    const timeLeftSubscription = this.battleService.timeLeft$.subscribe((time) => {
-      this.timeLeft = time;
-    });
+    const timeLeftSubscription = this.battleService.timeLeft$.subscribe(
+      (time) => {
+        this.timeLeft = time;
+      }
+    );
     this.subscriptions.add(timeLeftSubscription);
 
-    const currentTurnSubscription = this.battleService.currentTurn$.subscribe((turn) => {
-      this.currentTurn = turn;
-      this.updateRapperData(turn);
-    });
+    const currentTurnSubscription = this.battleService.currentTurn$.subscribe(
+      (turn) => {
+        this.currentTurn = turn;
+        this.updateRapperData(turn);
+      }
+    );
     this.subscriptions.add(currentTurnSubscription);
 
-    const currentWordSubscription = this.battleService.currentWord$.subscribe((word) => {
-      this.word = word;
-    });
+    const currentWordSubscription = this.battleService.currentWord$.subscribe(
+      (word) => {
+        this.word = word;
+      }
+    );
     this.subscriptions.add(currentWordSubscription);
 
-    const viewerCountSubscription = this.battleService.viewerCount$.subscribe((count) => {
-      this.viewerCount = count;
-    });
+    const viewerCountSubscription = this.battleService.viewerCount$.subscribe(
+      (count) => {
+        this.viewerCount = count;
+      }
+    );
     this.subscriptions.add(viewerCountSubscription);
 
-    const voteCountSubscription = this.battleService.voteCount$.subscribe((count) => {
-      this.voteCount = count;
-    });
+    const voteCountSubscription = this.battleService.voteCount$.subscribe(
+      (count) => {
+        this.voteCount = count;
+      }
+    );
     this.subscriptions.add(voteCountSubscription);
+
+    // Subscribe to partnerDisconnected event
+    const partnerDisconnectedSubscription =
+      this.battleService.partnerDisconnected$.subscribe(() => {
+        console.log('Partner disconnected. Redirecting to /chat.');
+
+        // Show a user notification (optional)
+        alert(
+          'Your battle partner has disconnected. You will be redirected to the chat page.'
+        );
+
+        // Perform cleanup
+        this.hangUp(false);
+
+        // Redirect to /chat
+        this.router.navigate(['/chat']);
+      });
+    this.subscriptions.add(partnerDisconnectedSubscription);
   }
 
   ngOnDestroy(): void {
@@ -153,10 +194,15 @@ export class BattlePageComponent implements OnInit, OnDestroy {
     try {
       await this.battleService.initializeLocalStream();
       if (this.localVideo && this.battleService.localStream) {
-        this.localVideo.nativeElement.srcObject = this.battleService.localStream;
-        console.log('Local video stream assigned to local video element.');
+        this.localVideo.nativeElement.srcObject =
+          this.battleService.localStream;
+        console.log(
+          'Local video stream assigned to local video element.'
+        );
       } else {
-        console.warn('Local video element or localStream is undefined.');
+        console.warn(
+          'Local video element or localStream is undefined.'
+        );
       }
     } catch (error) {
       console.error('Failed to initialize local video:', error);
@@ -178,7 +224,13 @@ export class BattlePageComponent implements OnInit, OnDestroy {
 
   // Thumbs Up method for voting
   thumbsUp(): void {
+    if (this.hasVoted) {
+      console.warn('User has already voted.');
+      return;
+    }
+
     this.battleService.incrementVote();
+    this.hasVoted = true;
 
     this.triggerTada = !this.triggerTada;
     setTimeout(() => {
@@ -195,23 +247,36 @@ export class BattlePageComponent implements OnInit, OnDestroy {
   }
 
   // Hang Up method to end the battle and navigate away
-  hangUp(): void {
-    // Close WebRTC connections and stop streams
-    this.battleService.ngOnDestroy();
+  hangUp(navigate: boolean = true): void {
+    console.log('Hang Up method called. Ending battle.');
 
-    // Stop battle logic and navigate back
-    this.stopCamera();
-    this.router.navigate(['/field']);
+    // Close WebRTC connections and stop streams
+    this.battleService.closeConnection();
+
+    // Update battle state flags
+    this.battleStarted = false;
+
+    // Hide the "Start Battle" button if necessary
+    this.showStartButton = false;
+
+    if (navigate) {
+      // Navigate to /chat if invoked by user
+      this.router.navigate(['/chat']);
+    }
   }
 
   // Stop camera streams
   stopCamera(): void {
     if (this.battleService.localStream) {
-      this.battleService.localStream.getTracks().forEach((track) => track.stop());
+      this.battleService.localStream
+        .getTracks()
+        .forEach((track) => track.stop());
       console.log('Local media tracks stopped.');
     }
     if (this.battleService.remoteStream) {
-      this.battleService.remoteStream.getTracks().forEach((track) => track.stop());
+      this.battleService.remoteStream
+        .getTracks()
+        .forEach((track) => track.stop());
       console.log('Remote media tracks stopped.');
     }
   }

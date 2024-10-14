@@ -1,38 +1,38 @@
-require('./data/db');
-require('dotenv').config();
-const cors = require('cors');
-const express = require('express');
+require("./data/db"); // Database connection
+require("dotenv").config(); // Environment variables
+const cors = require("cors");
+const express = require("express");
 const app = express();
-const http = require('http');
+const http = require("http");
 const server = http.createServer(app);
-const passport = require('./passport');
-const session = require('express-session');
-const { Server } = require('socket.io');
-const jwt = require('jsonwebtoken');
-const User = require('./data/models/User');
-const { v4: uuidv4 } = require('uuid'); // For unique room IDs
+const passport = require("./passport"); // Passport configuration
+const session = require("express-session");
+const { Server } = require("socket.io");
+const jwt = require("jsonwebtoken");
+const User = require("./data/models/User");
+const { v4: uuidv4 } = require("uuid"); // For unique room IDs
 
-// Initialize Socket.io
+// Initialize Socket.io with CORS Configuration
 const io = new Server(server, {
   cors: {
-    origin: 'http://localhost:4200',
-    methods: ['GET', 'POST'],
+    origin: "http://localhost:4200", // Frontend URL
+    methods: ["GET", "POST"],
     credentials: true,
   },
 });
 
-// Middleware
+// Middleware Setup
 app.use(
   cors({
-    origin: 'http://localhost:4200',
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    origin: "http://localhost:4200",
+    methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })
 );
 app.use(express.json());
 app.use(
   session({
-    secret: process.env.SESSION_SECRET,
+    secret: process.env.SESSION_SECRET || "default_secret",
     resave: false,
     saveUninitialized: false,
   })
@@ -42,31 +42,45 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // Routes
-const authRoutes = require('./routes/auth');
-const userRoutes = require('./routes/users');
-app.use('/auth', authRoutes);
-app.use('/users', userRoutes);
+const authRoutes = require("./routes/auth");
+const userRoutes = require("./routes/users");
+app.use("/auth", authRoutes);
+app.use("/users", userRoutes);
 
-const PORT = 3000;
+// Server Port
+const PORT = process.env.PORT || 3000;
 
-// Matchmaking Queue - stores socketId's
-let matchmakingQueue = [];
+// Matchmaking Queue and Room Management
+let matchmakingQueue = []; // Stores socket IDs waiting for matchmaking
+const socketRoomMap = new Map(); // Maps socket.id to roomId
 
-io.on('connection', (socket) => {
-  console.log('A user connected:', socket.id);
+// Temporary Debugging Route (Remove in Production)
+app.get("/debug-rooms", (req, res) => {
+  const rooms = Array.from(io.sockets.adapter.rooms.entries()).map(
+    ([room, sockets]) => ({
+      room,
+      sockets: Array.from(sockets),
+    })
+  );
+  res.json(rooms);
+});
 
-  // Get token from query parameters
+// Socket.io Connection Handling
+io.on("connection", (socket) => {
+  console.log("A user connected:", socket.id);
+
+  // Retrieve token from query parameters
   const token = socket.handshake.query.token;
   if (!token) {
-    console.error('No token provided in socket handshake.');
+    console.error("No token provided in socket handshake.");
     socket.disconnect();
     return;
   }
 
-  // Verify the token
+  // Verify JWT Token
   jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
     if (err || !decoded || !decoded.id) {
-      console.error('Invalid token. Could not extract user ID.');
+      console.error("Invalid token. Could not extract user ID.");
       socket.disconnect();
       return;
     }
@@ -78,48 +92,55 @@ io.on('connection', (socket) => {
 
     try {
       // Update user online status
-      const user = await User.findByIdAndUpdate(userId, { isOnline: true }, { new: true });
+      const user = await User.findByIdAndUpdate(
+        userId,
+        { isOnline: true },
+        { new: true }
+      );
       if (user) {
         // Emit 'userOnline' event to all clients
-        io.emit('userOnline', { userId: user._id });
+        io.emit("userOnline", { userId: user._id });
         console.log(`User ${user._id} is now online.`);
       }
     } catch (err) {
-      console.error('Error updating user status:', err);
+      console.error("Error updating user status:", err);
     }
 
-    // Handle incoming messages
-    socket.on('message', (data) => {
+    // Handle Incoming Messages
+    socket.on("message", (data) => {
       const { tabId, message } = data;
 
-      if (tabId === 'general') {
-        // Broadcast message to all connected clients including the sender
-        io.emit('message', { tabId: 'general', message });
-        console.log('Broadcasted general message:', message);
+      if (tabId === "general") {
+        // Broadcast to all clients including sender
+        io.emit("message", { tabId: "general", message });
+        console.log("Broadcasted general message:", message);
       } else {
-        // Handle private messages
+        // Private message handling
         const recipientSocketId = tabId; // 'tabId' is recipient's socket.id
 
         const payloadToRecipient = {
-          tabId: socket.id, // The sender's socket.id
+          tabId: socket.id, // Sender's socket.id
           message,
         };
         const payloadToSender = {
-          tabId: recipientSocketId, // The recipient's socket.id
+          tabId: recipientSocketId, // Recipient's socket.id
           message,
         };
 
         // Send the message to the recipient's socket
-        io.to(recipientSocketId).emit('message', payloadToRecipient);
-        console.log(`Sent private message to ${recipientSocketId}:`, message);
+        io.to(recipientSocketId).emit("message", payloadToRecipient);
+        console.log(
+          `Sent private message from ${socket.id} to ${recipientSocketId}:`,
+          message
+        );
 
-        // Optionally, send confirmation back to the sender
-        socket.emit('message', payloadToSender);
+        // Optional: Send confirmation back to the sender
+        socket.emit("message", payloadToSender);
       }
     });
 
-    // Handle battle requests for matchmaking
-    socket.on('startRandomBattle', () => {
+    // Handle Battle Requests for Matchmaking
+    socket.on("startRandomBattle", async () => {
       console.log(`Socket ${socket.id} requested a random battle.`);
 
       // Check if socket is already in the matchmaking queue
@@ -133,7 +154,7 @@ io.on('connection', (socket) => {
       console.log(`Socket ${socket.id} added to matchmaking queue.`);
 
       // Log current matchmaking queue
-      console.log('Current matchmaking queue:', matchmakingQueue);
+      console.log("Current matchmaking queue:", matchmakingQueue);
 
       // If there are at least two sockets, pair them
       if (matchmakingQueue.length >= 2) {
@@ -147,53 +168,133 @@ io.on('connection', (socket) => {
           return;
         }
 
-        const roomId = uuidv4(); // Generate a unique room ID
+        // Generate a unique room ID
+        const roomId = uuidv4();
 
-        // Join both sockets to the room
-        io.sockets.sockets.get(socketId1)?.join(roomId);
-        io.sockets.sockets.get(socketId2)?.join(roomId);
+        // Retrieve socket instances
+        const socket1 = io.sockets.sockets.get(socketId1);
+        const socket2 = io.sockets.sockets.get(socketId2);
 
-        // Notify both sockets that they have been paired
-        io.to(socketId1).emit('battleFound', {
-          roomId,
-          partnerSocketId: socketId2,
-        });
-        io.to(socketId2).emit('battleFound', {
-          roomId,
-          partnerSocketId: socketId1,
-        });
+        if (!socket1 || !socket2) {
+          console.error(
+            `One or both sockets not found: ${socketId1}, ${socketId2}`
+          );
+          // Re-add sockets back to the queue if any are missing
+          if (socket1) matchmakingQueue.unshift(socketId1);
+          if (socket2) matchmakingQueue.unshift(socketId2);
+          return;
+        }
 
-        console.log(`Paired Socket ${socketId1} and Socket ${socketId2} in room ${roomId}.`);
+        try {
+          // Join socket1 to the room
+          await socket1.join(roomId);
+          console.log(`Socket ${socketId1} joined room ${roomId}.`);
+          socketRoomMap.set(socketId1, roomId);
+          console.log(
+            `Room '${roomId}' now has sockets:`,
+            io.sockets.adapter.rooms.get(roomId)
+          );
 
-        // Log pairing details
-        console.log(`Room ID: ${roomId}`);
+          // Join socket2 to the room
+          await socket2.join(roomId);
+          console.log(`Socket ${socketId2} joined room ${roomId}.`);
+          socketRoomMap.set(socketId2, roomId);
+          console.log(
+            `Room '${roomId}' now has sockets:`,
+            io.sockets.adapter.rooms.get(roomId)
+          );
+
+          // Notify both sockets that a battle has been found
+          io.to(socketId1).emit("battleFound", {
+            roomId,
+            partnerSocketId: socketId2,
+          });
+          io.to(socketId2).emit("battleFound", {
+            roomId,
+            partnerSocketId: socketId1,
+          });
+
+          console.log(
+            `Paired Socket ${socketId1} and Socket ${socketId2} in room ${roomId}.`
+          );
+        } catch (err) {
+          console.error(`Error joining sockets to room ${roomId}:`, err);
+          // Re-add sockets back to the queue in case of failure
+          matchmakingQueue.unshift(socketId1);
+          matchmakingQueue.unshift(socketId2);
+        }
       }
     });
 
-    // Handle WebRTC offers
-    socket.on('webrtc_offer', (data) => {
+    // Handle WebRTC Signaling Events
+
+    // Relay WebRTC Offers to the Room
+    socket.on("webrtc_offer", (data) => {
       const { roomId, offer } = data;
-      socket.to(roomId).emit('webrtc_offer', { offer });
-      console.log(`Relayed WebRTC offer to room ${roomId}.`);
+      if (!roomId || !offer) {
+        console.error("Invalid webrtc_offer data:", data);
+        return;
+      }
+      console.log(`Relaying WebRTC offer to room ${roomId}.`);
+      socket.to(roomId).emit("webrtc_offer", { offer });
     });
 
-    // Handle WebRTC answers
-    socket.on('webrtc_answer', (data) => {
+    // Relay WebRTC Answers to the Room
+    socket.on("webrtc_answer", (data) => {
       const { roomId, answer } = data;
-      socket.to(roomId).emit('webrtc_answer', { answer });
-      console.log(`Relayed WebRTC answer to room ${roomId}.`);
+      if (!roomId || !answer) {
+        console.error("Invalid webrtc_answer data:", data);
+        return;
+      }
+      console.log(`Relaying WebRTC answer to room ${roomId}.`);
+      socket.to(roomId).emit("webrtc_answer", { answer });
     });
 
-    // Handle ICE candidates
-    socket.on('webrtc_ice_candidate', (data) => {
+    // Relay ICE Candidates to the Room
+    socket.on("webrtc_ice_candidate", (data) => {
       const { roomId, candidate } = data;
-      socket.to(roomId).emit('webrtc_ice_candidate', { candidate });
-      console.log(`Relayed ICE candidate to room ${roomId}:`, candidate);
+      if (!roomId || !candidate) {
+        console.error("Invalid webrtc_ice_candidate data:", data);
+        return;
+      }
+      socket.to(roomId).emit("webrtc_ice_candidate", { candidate });
     });
 
-    // Handle disconnections
-    socket.on('disconnect', () => {
-      console.log('A user disconnected:', socket.id);
+    // Handle Disconnections
+    socket.on("disconnect", () => {
+      console.log("A user disconnected:", socket.id);
+      console.log("Current socketRoomMap:", socketRoomMap);
+
+      // Retrieve the room ID from the map
+      const roomId = socketRoomMap.get(socket.id);
+      if (roomId) {
+        console.log(`Socket ${socket.id} was in room ${roomId}.`);
+
+        // Retrieve all clients in the room
+        const clients = io.sockets.adapter.rooms.get(roomId);
+        if (clients) {
+          console.log(`Current clients in room ${roomId} before notifying:`, clients);
+          clients.forEach((clientId) => {
+            if (clientId !== socket.id) {
+              // Notify the remaining client in the room
+              io.to(clientId).emit("partnerDisconnected");
+              console.log(
+                `Notified ${clientId} that their partner disconnected from room ${roomId}.`
+              );
+
+              // Remove the mapping for the remaining client
+              socketRoomMap.delete(clientId);
+            }
+          });
+        } else {
+          console.log(`No remaining clients in room ${roomId} after disconnection.`);
+        }
+
+        // Remove the mapping for the disconnected socket
+        socketRoomMap.delete(socket.id);
+      } else {
+        console.log(`Socket ${socket.id} was not in any room.`);
+      }
 
       // Remove socket from matchmaking queue if present
       const initialQueueLength = matchmakingQueue.length;
@@ -205,21 +306,26 @@ io.on('connection', (socket) => {
       }
 
       // Update user online status
-      User.findByIdAndUpdate(userId, { isOnline: false }, { new: true })
-        .then((user) => {
-          if (user) {
-            // Emit 'userOffline' event to all clients
-            io.emit('userOffline', { userId: user._id });
-            console.log(`User ${user._id} is now offline.`);
-          }
-        })
-        .catch((err) => {
-          console.error('Error updating user status:', err);
-        });
+      if (socket.userId) {
+        User.findByIdAndUpdate(socket.userId, { isOnline: false }, { new: true })
+          .then((user) => {
+            if (user) {
+              // Emit 'userOffline' event to all clients
+              io.emit("userOffline", { userId: user._id });
+              console.log(`User ${user._id} is now offline.`);
+            }
+          })
+          .catch((err) => {
+            console.error("Error updating user status:", err);
+          });
+      } else {
+        console.log(`Socket ${socket.id} has no associated userId.`);
+      }
     });
-  });
+});
 });
 
+// Start the Server
 server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });

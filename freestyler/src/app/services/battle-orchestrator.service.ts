@@ -28,6 +28,10 @@ export class BattleOrchestratorService implements OnDestroy {
   private viewerCountSubject = new BehaviorSubject<number>(0);
   viewerCount$ = this.viewerCountSubject.asObservable();
 
+  // Subject to notify when partner disconnects
+  private partnerDisconnectedSubject = new Subject<void>();
+  public partnerDisconnected$ = this.partnerDisconnectedSubject.asObservable();
+
   // WebRTC Related
   public peerConnection: RTCPeerConnection | null = null;
   public remoteStream: MediaStream | null = null;
@@ -89,7 +93,9 @@ export class BattleOrchestratorService implements OnDestroy {
     const battleFoundSubscription = this.signalingService.battleFound$.subscribe(
       (data) => {
         if (this.isConnectedToPeer) {
-          console.warn('Already connected to a peer. Ignoring new battleFound event.');
+          console.warn(
+            'Already connected to a peer. Ignoring new battleFound event.'
+          );
           return;
         }
         this.roomId = data.roomId;
@@ -106,39 +112,78 @@ export class BattleOrchestratorService implements OnDestroy {
     this.subscriptions.add(battleFoundSubscription);
 
     // Subscribe to incoming WebRTC offers
-    const incomingOfferSubscription = this.signalingService.webrtcOffer$.subscribe(
-      (offer) => {
+    const incomingOfferSubscription =
+      this.signalingService.webrtcOffer$.subscribe((offer) => {
         if (this.isOfferer) {
           console.warn('Offerer should not receive offers. Ignoring.');
           return;
         }
         console.log('Received WebRTC offer:', offer);
         this.handleOffer(offer);
-      }
-    );
+      });
     this.subscriptions.add(incomingOfferSubscription);
 
     // Subscribe to incoming WebRTC answers
-    const incomingAnswerSubscription = this.signalingService.webrtcAnswer$.subscribe(
-      (answer) => {
+    const incomingAnswerSubscription =
+      this.signalingService.webrtcAnswer$.subscribe((answer) => {
         if (!this.isOfferer) {
           console.warn('Answerer should not receive answers. Ignoring.');
           return;
         }
         console.log('Received WebRTC answer:', answer);
         this.handleAnswer(answer);
-      }
-    );
+      });
     this.subscriptions.add(incomingAnswerSubscription);
 
     // Subscribe to incoming ICE candidates
-    const incomingIceCandidateSubscription = this.signalingService.webrtcIceCandidate$.subscribe(
-      (candidate) => {
+    const incomingIceCandidateSubscription =
+      this.signalingService.webrtcIceCandidate$.subscribe((candidate) => {
         console.log('Received ICE candidate:', candidate);
         this.handleIceCandidate(candidate);
-      }
-    );
+      });
     this.subscriptions.add(incomingIceCandidateSubscription);
+
+    // Subscribe to partnerDisconnected event
+    const partnerDisconnectedSubscription =
+      this.signalingService.partnerDisconnected$.subscribe(() => {
+        console.log('Partner has disconnected. Initiating cleanup.');
+        this.handlePartnerDisconnected();
+      });
+    this.subscriptions.add(partnerDisconnectedSubscription);
+  }
+
+  public closeConnection(): void {
+    console.log('Closing WebRTC connections.');
+
+    // Close peer connection if exists
+    if (this.peerConnection) {
+      this.peerConnection.close();
+      this.peerConnection = null;
+      console.log('Peer connection closed.');
+    }
+
+    // Stop local stream
+    if (this.localStream) {
+      this.localStream.getTracks().forEach((track) => track.stop());
+      this.localStream = null;
+      console.log('Local media tracks stopped.');
+    }
+
+    // Stop remote stream
+    if (this.remoteStream) {
+      this.remoteStream.getTracks().forEach((track) => track.stop());
+      this.remoteStream = null;
+      console.log('Remote media tracks stopped.');
+    }
+  }
+
+  private handlePartnerDisconnected(): void {
+    // Cleanup WebRTC connections and streams
+    this.closeConnection();
+
+    // Notify components about the disconnection
+    this.partnerDisconnectedSubject.next();
+    console.log('Emitted partnerDisconnected to subscribers.');
   }
 
   // Initialize local stream
@@ -157,7 +202,9 @@ export class BattleOrchestratorService implements OnDestroy {
   // Start the battle and initiate matchmaking
   async startBattle(): Promise<void> {
     if (this.isConnectedToPeer) {
-      console.warn('Already connected to a peer. Cannot start another battle.');
+      console.warn(
+        'Already connected to a peer. Cannot start another battle.'
+      );
       return;
     }
 
@@ -181,7 +228,9 @@ export class BattleOrchestratorService implements OnDestroy {
   // Determine role based on socket IDs and initiate WebRTC if offerer
   private determineRoleAndInitiate() {
     if (!this.ownSocketId || !this.partnerSocketId) {
-      console.error('Socket IDs not available for role determination.');
+      console.error(
+        'Socket IDs not available for role determination.'
+      );
       return;
     }
 
@@ -226,7 +275,10 @@ export class BattleOrchestratorService implements OnDestroy {
     // Handle ICE candidates
     this.peerConnection.onicecandidate = (event) => {
       if (event.candidate) {
-        this.signalingService.sendWebRTCIceCandidate(this.roomId, event.candidate);
+        this.signalingService.sendWebRTCIceCandidate(
+          this.roomId,
+          event.candidate
+        );
         console.log('Sent ICE candidate.');
       }
     };
@@ -292,7 +344,10 @@ export class BattleOrchestratorService implements OnDestroy {
     // Handle ICE candidates
     this.peerConnection.onicecandidate = (event) => {
       if (event.candidate) {
-        this.signalingService.sendWebRTCIceCandidate(this.roomId, event.candidate);
+        this.signalingService.sendWebRTCIceCandidate(
+          this.roomId,
+          event.candidate
+        );
         console.log('Sent ICE candidate.');
       }
     };
@@ -321,7 +376,9 @@ export class BattleOrchestratorService implements OnDestroy {
     }
 
     try {
-      await this.peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
+      await this.peerConnection.setRemoteDescription(
+        new RTCSessionDescription(offer)
+      );
       console.log('Set remote description with offer.');
 
       const answer = await this.peerConnection.createAnswer();
@@ -342,10 +399,14 @@ export class BattleOrchestratorService implements OnDestroy {
 
     console.log('Handling received answer.');
     try {
-      await this.peerConnection?.setRemoteDescription(new RTCSessionDescription(answer));
+      await this.peerConnection?.setRemoteDescription(
+        new RTCSessionDescription(answer)
+      );
       this.connectionStateSubject.next('connected');
       this.isConnectedToPeer = true;
-      console.log('Set remote description with answer. WebRTC connection established.');
+      console.log(
+        'Set remote description with answer. WebRTC connection established.'
+      );
     } catch (error) {
       console.error('Error setting remote description with answer:', error);
     }
