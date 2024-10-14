@@ -30,31 +30,18 @@ import { AuthService } from '../../../services/auth.service';
     tadaAnimation({ duration: 1000, delay: 0 }),
     zoomOutDownAnimation(),
     flipAnimation({ duration: 1500, delay: 0 }),
-    bounceOutRightAnimation({ duration: 1500, delay: 0 }),
-    bounceInAnimation(),
+    bounceOutRightAnimation({ duration: 1500, delay: 0 },
+    ),
+    bounceInAnimation()
+
   ],
 })
 export class BattlePageComponent implements OnInit, OnDestroy {
-  // Video Elements
-  @ViewChild('videoElement1') videoElement1!: ElementRef<HTMLVideoElement>; // Local Video
-  @ViewChild('videoElement2') videoElement2!: ElementRef<HTMLVideoElement>; // Remote Video
+  @ViewChild('localVideo') localVideo!: ElementRef<HTMLVideoElement>;
+  @ViewChild('remoteVideo') remoteVideo!: ElementRef<HTMLVideoElement>;
 
-  // Battle Mechanics Properties
-  timeLeft: number = 60;
-  currentTurn: string = 'Player 1';
-  word: string = '';
-  rapperName: string = 'Player 1';
-  viewerCount: number = 100;
-  voteCount: number = 0;
-  hasVoted: boolean = false;
-
-  // UI Animation Flags
-  triggerTada: boolean = false;
-  applyGlow: boolean = false;
+  // Flags and properties
   battleStarted: boolean = false;
-  triggerZoomOut: boolean = false;
-  triggerFlipAnimation: boolean = false;
-  triggerBounceIn: boolean = false;
   showStartButton: boolean = false;
 
   // Subscriptions
@@ -63,31 +50,48 @@ export class BattlePageComponent implements OnInit, OnDestroy {
 
   // Current User ID
   currentUserId!: string | null;
+  timeLeft: number = 60;
+  timerSubscription!: Subscription;
+  currentTurn: string = 'Player 1';
+  word: string = '';
+
+  // Battle Mechanics Properties
+  rapperName: string = 'Player 1';
+  viewerCount: number = 100;
+  voteCount: number = 0;
+  hasVoted: boolean = false;
+  triggerTada: boolean = false;
+  applyGlow: boolean = false;
+  triggerBounceIn: boolean = false;
+  triggerZoomOut: boolean = false;
+  triggerFlipAnimation: boolean = false;
+
 
   constructor(
-    private battleService: BattleOrchestratorService,
+    public battleService: BattleOrchestratorService, // Made public for template access
     private router: Router,
     private authService: AuthService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef // Inject ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
-    // Retrieve current user ID from AuthService
+    this.battleService.startBattle();
+    // Get current user ID from AuthService
     this.currentUserId = this.authService.getCurrentUserId();
     console.log('Current User ID:', this.currentUserId);
-    if (!this.currentUserId) {
-      console.error('User not authenticated.');
-      this.router.navigate(['/login']); // Redirect to login if not authenticated
-      return;
-    }
+    // if (!this.currentUserId) {
+    //   console.error('User not authenticated.');
+    //   this.router.navigate(['/login']); // Redirect to login if not authenticated
+    //   return;
+    // }
 
-    // Initialize local video stream and assign to videoElement1 (Local Video)
+    // Initialize local video stream
     this.initializeLocalVideo();
 
     // Automatically start matchmaking
     this.startMatchmaking();
 
-    // Subscribe to battle found event to handle room creation and role determination
+    // Subscribe to battle found event to handle room creation
     const battleFoundSubscription = this.battleService.battleFound$.subscribe(
       (data) => {
         console.log('Battle found event received:', data);
@@ -98,7 +102,7 @@ export class BattlePageComponent implements OnInit, OnDestroy {
           console.log('User is Offerer. Awaiting user action to start battle.');
         } else {
           // If answerer, automatically set battleStarted to true to render remoteVideo
-          this.battleStarted = true;
+          // this.battleStarted = true;
           console.log('User is Answerer. Automatically starting battle.');
         }
       }
@@ -112,82 +116,76 @@ export class BattlePageComponent implements OnInit, OnDestroy {
           'WebRTC Connection State:',
           state
         );
-
         if (state !== 'disconnected') {
           // Once connected, assign the remote stream to the remote video element
           this.remoteStreamSubscription =
             this.battleService.remoteStream$.subscribe((stream) => {
-              console.log('Received remote stream:', stream);
+              console.log(
+                'WebRTC Connection State:',
+                stream
+              );
 
-              if (stream && this.videoElement2) {
+              if (stream && this.remoteVideo) {
                 // Ensure the video element is available
                 setTimeout(() => {
-                  this.videoElement2.nativeElement.srcObject = stream;
+                  this.remoteVideo.nativeElement.srcObject = stream;
                   console.log('Remote video stream assigned.');
-                  this.battleStarted = true;
+                  // this.battleStarted = true;
                   this.cdr.detectChanges(); // Trigger change detection
                 }, 0);
               } else {
                 console.warn(
-                  'Remote stream received but videoElement2 is undefined.'
+                  'Remote stream received but remoteVideo is undefined.'
                 );
               }
             });
           this.subscriptions.add(this.remoteStreamSubscription);
         } else if (state === 'disconnected') {
           // Clear remote video stream
-          if (this.videoElement2) {
-            this.videoElement2.nativeElement.srcObject = null;
+          if (this.remoteVideo) {
+            this.remoteVideo.nativeElement.srcObject = null;
             console.log('Remote video stream cleared.');
           }
         }
       });
     this.subscriptions.add(connectionStateSubscription);
 
-    // Existing Subscriptions for Battle Mechanics
-    const timeLeftSubscription = this.battleService.timeLeft$.subscribe(
-      (time) => {
-        this.timeLeft = time;
-      }
-    );
-    this.subscriptions.add(timeLeftSubscription);
+    this.battleService.timeLeft$.subscribe((time) => {
+      this.timeLeft = time;
+    });
 
-    const currentTurnSubscription = this.battleService.currentTurn$.subscribe(
-      (turn) => {
-        this.currentTurn = turn;
-        this.updateRapperData(turn);
-      }
-    );
-    this.subscriptions.add(currentTurnSubscription);
+    this.battleService.currentTurn$.subscribe((turn) => {
+      this.currentTurn = turn;
+      this.updateRapperData(turn);
+    });
 
-    const currentWordSubscription = this.battleService.currentWord$.subscribe(
-      (word) => {
-        this.word = word;
-      }
-    );
-    this.subscriptions.add(currentWordSubscription);
+    this.battleService.currentWord$.subscribe((word) => {
+      this.word = word;
+    });
 
-    const viewerCountSubscription = this.battleService.viewerCount$.subscribe(
-      (count) => {
-        this.viewerCount = count;
-      }
-    );
-    this.subscriptions.add(viewerCountSubscription);
+    this.battleService.viewerCount$.subscribe((count) => {
+      this.viewerCount = count;
+    });
 
-    const voteCountSubscription = this.battleService.voteCount$.subscribe(
-      (count) => {
-        this.voteCount = count;
-      }
-    );
-    this.subscriptions.add(voteCountSubscription);
+    this.battleService.voteCount$.subscribe((count) => {
+      this.voteCount = count;
+    });
 
-    // Subscribe to partnerDisconnected event to handle partner disconnections gracefully
+    // Subscribe to partnerDisconnected event
     const partnerDisconnectedSubscription =
       this.battleService.partnerDisconnected$.subscribe(() => {
-        console.log('Partner disconnected. Rejoining matchmaking.');
-        // Optionally, show a user notification (e.g., toast message)
-        // Restart battle to rejoin matchmaking
-        this.restartBattle();
+        console.log('Partner disconnected. Redirecting to /chat.');
+
+        // Show a user notification (optional)
+        alert(
+          'Your battle partner has disconnected. You will be redirected to the chat page.'
+        );
+
+        // Perform cleanup
+        this.hangUp(false);
+this.battleStarted = false;
+        // Redirect to /chat
+        this.router.navigate(['/field']);
       });
     this.subscriptions.add(partnerDisconnectedSubscription);
   }
@@ -200,23 +198,19 @@ export class BattlePageComponent implements OnInit, OnDestroy {
     this.subscriptions.unsubscribe();
   }
 
-  // Initialize local video stream and assign to videoElement1 (Local Video)
+  // Initialize local video stream and assign to the local video element
   async initializeLocalVideo(): Promise<void> {
     try {
       await this.battleService.initializeLocalStream();
-      if (
-        this.videoElement1 &&
-        this.battleService.localStream &&
-        this.videoElement1.nativeElement
-      ) {
-        this.videoElement1.nativeElement.srcObject =
+      if (this.localVideo && this.battleService.localStream) {
+        this.localVideo.nativeElement.srcObject =
           this.battleService.localStream;
         console.log(
-          'Local video stream assigned to videoElement1 (Local Video).'
+          'Local video stream assigned to local video element.'
         );
       } else {
         console.warn(
-          'videoElement1 or localStream is undefined. Cannot assign local video stream.'
+          'Local video element or localStream is undefined.'
         );
       }
     } catch (error) {
@@ -230,43 +224,36 @@ export class BattlePageComponent implements OnInit, OnDestroy {
     this.battleService.startBattle();
   }
 
-  // Restart Battle by re-initiating matchmaking
-  private async restartBattle(): Promise<void> {
-    console.log('Restarting battle and re-initiating matchmaking.');
-    // Clean up existing connections if any
-    this.battleService.closeConnection();
-    // Reset battle-related states if necessary
-    this.battleStarted = false;
-    this.showStartButton = false;
-    // Re-initiate matchmaking
-    await this.startBattle();
-  }
-
-  // Start Battle method triggered by the "Start Battle" button
+  // Start Battle method triggered by the "Start Battle" button (now optional)
   startBattle(): void {
     this.triggerFlipAnimation = true;
 
-    // Trigger flip animation after 300ms
+    // Trigger flip animation after 1 second
     setTimeout(() => {
       this.triggerZoomOut = true;
+
     }, 300);
 
-    // Trigger bounce animation and start battle mechanics after 1500ms
+    // Trigger zoom out after 2 seconds
     setTimeout(() => {
-      this.showStartButton = false; // Hide the "Start Battle" button
-      this.battleService.startBattle();
-      this.triggerBounceIn = true;
+      this.showStartButton = !this.showStartButton;
+
+    }, 1500);
+
+    // Start the battle after 3 seconds
+    setTimeout(() => {
       this.battleStarted = true;
-      console.log('Battle started.');
+      this.battleService.startBattleOrchestration();
+      this.triggerBounceIn = !this.triggerBounceIn;
     }, 1500);
   }
 
   // Thumbs Up method for voting
   thumbsUp(): void {
-    if (this.hasVoted) {
-      console.warn('User has already voted.');
-      return;
-    }
+    // if (this.hasVoted) {
+    //   console.warn('User has already voted.');
+    //   return;
+    // }
 
     this.battleService.incrementVote();
     this.hasVoted = true;
@@ -299,12 +286,12 @@ export class BattlePageComponent implements OnInit, OnDestroy {
     this.showStartButton = false;
 
     if (navigate) {
-      // Navigate to /battle (matchmaking queue) if needed
-      this.router.navigate(['/battle']);
+      // Navigate to /chat if invoked by user
+      this.router.navigate(['/chat']);
     }
   }
 
-  // Optional: Stop camera streams if you have separate controls
+  // Stop camera streams
   stopCamera(): void {
     if (this.battleService.localStream) {
       this.battleService.localStream

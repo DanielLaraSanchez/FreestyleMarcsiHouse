@@ -210,11 +210,11 @@ export class BattleOrchestratorService implements OnDestroy {
     }
 
     // Reset battle state
-    this.currentTurnSubject.next('Player 1');
-    this.timeLeftSubject.next(60);
-    this.voteCountSubject.next(0);
-    this.viewerCountSubject.next(0);
-    this.currentWordSubject.next('');
+    // this.currentTurnSubject.next('Player 1');
+    // this.timeLeftSubject.next(60);
+    // this.voteCountSubject.next(0);
+    // this.viewerCountSubject.next(0);
+    // this.currentWordSubject.next('');
 
     // Initialize local stream if not already
     if (!this.localStream) {
@@ -224,6 +224,21 @@ export class BattleOrchestratorService implements OnDestroy {
     // Start matchmaking
     this.signalingService.startRandomBattle();
     console.log('Matchmaking initiated.');
+  }
+
+  async startBattleOrchestration() {
+        // Reset battle state
+        this.currentTurnSubject.next('Player 1');
+        this.timeLeftSubject.next(60);
+        this.voteCountSubject.next(0);
+        this.viewerCountSubject.next(0);
+        this.currentWordSubject.next('');
+
+        // Initialize local stream if not already
+        // if (!this.localStream) {
+        //   await this.initializeLocalStream();
+        // }
+
   }
 
 
