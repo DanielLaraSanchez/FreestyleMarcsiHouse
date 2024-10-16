@@ -17,7 +17,7 @@ const io = new Server(server, {
   cors: {
     origin: "http://localhost:4200", // Frontend URL
     methods: ["GET", "POST"],
-    credentials: true,
+    credentials: false,
   },
 });
 
@@ -70,49 +70,49 @@ app.get("/debug-rooms", (req, res) => {
 
 // Socket.io Connection Handling
 io.on("connection", (socket) => {
+
   console.log("A user connected:", socket.id);
   console.log(
     "Current matchmaking queue before authentication:",
     Array.from(matchmakingQueue),
     socketRoomMap
   );
-
-  // Retrieve token from query parameters
-  const token = socket.handshake.query.token;
-  if (!token) {
-    console.error("No token provided in socket handshake.");
-    socket.disconnect();
-    return;
-  }
-
-  // Verify JWT Token
-  jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
-    if (err || !decoded || !decoded.id) {
-      console.error("Invalid token. Could not extract user ID.");
-      socket.disconnect();
-      return;
-    }
-
-    const userId = decoded.id;
-    socket.userId = userId;
-
-    console.log(`Socket ${socket.id} belongs to User ${userId}`);
-
-    try {
-      // Update user online status
-      const user = await User.findByIdAndUpdate(
-        userId,
-        { isOnline: true },
-        { new: true }
-      );
-      if (user) {
-        // Emit 'userOnline' event to all clients
-        io.emit("userOnline", { userId: socket.id });
-        console.log(`User ${socket.id} is now online.`);
-      }
-    } catch (err) {
-      console.error("Error updating user status:", err);
-    }
+   // Retrieve token from query parameters
+   const token = socket.handshake.query.token;
+   if (!token) {
+     console.error("No token provided in socket handshake.");
+     socket.disconnect();
+     return;
+   }
+ 
+   // Verify JWT Token
+   jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
+     if (err || !decoded || !decoded.id) {
+       console.error("Invalid token. Could not extract user ID.");
+       socket.disconnect();
+       return;
+     }
+ 
+     const userId = decoded.id;
+     socket.userId = userId;
+ 
+     console.log(`Socket ${socket.id} belongs to User ${userId}`);
+ 
+     try {
+       // Update user online status
+       const user = await User.findByIdAndUpdate(
+         userId,
+         { isOnline: true },
+         { new: true }
+       );
+       if (user) {
+         // Emit 'userOnline' event to all clients
+         io.emit("userOnline", { userId: socket.id });
+         console.log(`User ${socket.id} is now online.`);
+       }
+     } catch (err) {
+       console.error("Error updating user status:", err);
+     }
 
     // Handle Incoming Messages
     socket.on("message", (data) => {
