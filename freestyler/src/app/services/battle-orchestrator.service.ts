@@ -48,9 +48,12 @@ export class BattleOrchestratorService implements OnDestroy {
 
   private stream!: MediaStream;
 
-  // Subject to notify when partner disconnects
+  // Subjects to notify when partner disconnects or hangs up
   private partnerDisconnectedSubject = new Subject<void>();
   public partnerDisconnected$ = this.partnerDisconnectedSubject.asObservable();
+
+  private partnerHangUpSubject = new Subject<void>();
+  public partnerHangUp$ = this.partnerHangUpSubject.asObservable();
 
   // WebRTC Related
   public peerConnection: RTCPeerConnection | null = null;
@@ -68,12 +71,14 @@ export class BattleOrchestratorService implements OnDestroy {
   private battleFoundSubject = new Subject<BattleFoundData>();
   public battleFound$ = this.battleFoundSubject.asObservable();
 
+  // Subject for battle start
+  private battleStartSubject = new Subject<void>();
+  public battleStart$ = this.battleStartSubject.asObservable();
+
   // ICE Configuration
   private iceConfig: RTCConfiguration = {
-    iceServers: [
-      { urls: 'stun:stun.l.google.com:19302' },
-      // Add TURN servers here for production
-    ],
+    iceServers: [{ urls: 'stun:stun.l.google.com:19302' }],
+    // Add TURN servers here for production
   };
 
   // Matchmaking and WebRTC Subscriptions
@@ -89,7 +94,15 @@ export class BattleOrchestratorService implements OnDestroy {
   public isOfferer: boolean = false;
 
   // Flag to prevent multiple connections
-  private isConnectedToPeer: boolean = false;
+  public isConnectedToPeer: boolean = false;
+
+  // Battle Started Flag
+  public battleStarted: boolean = false;
+
+  // Local Flags for Animations (optional, based on your original code)
+  public triggerFlipAnimation: boolean = false;
+  public triggerZoomOut: boolean = false;
+  public triggerBounceIn: boolean = false;
 
   constructor(
     private signalingService: SignalingService,
@@ -108,23 +121,35 @@ export class BattleOrchestratorService implements OnDestroy {
     const battleFoundSubscription = this.signalingService.battleFound$.subscribe(
       (data) => {
         if (this.isConnectedToPeer) {
-          console.warn('Already connected to a peer. Ignoring new battleFound event.');
+          console.warn(
+            'Already connected to a peer. Ignoring new battleFound event.'
+          );
           return;
         }
         this.roomId = data.roomId;
         this.partnerSocketId = data.partnerSocketId;
-        console.log(`Battle found! Room ID: ${this.roomId}, Partner Socket ID: ${this.partnerSocketId}`);
+        console.log(
+          `Battle found! Room ID: ${this.roomId}, Partner Socket ID: ${this.partnerSocketId}`
+        );
         // Notify subscribers about battle found
         this.battleFoundSubject.next(data);
         // Determine role based on socket IDs
         this.determineRoleAndInitiate();
-
-        // Start battle mechanics after matchmaking
-        this.startTimer();
-        this.startWordChange();
       }
     );
     this.subscriptions.add(battleFoundSubscription);
+
+    // Subscribe to battleStart event from SignalingService
+    const battleStartSubscription = this.signalingService.battleStart$.subscribe(
+      () => {
+        console.log('Received battleStart event. Commencing battle.');
+        this.initiateBattle();
+
+        // Emit to the battleStart$ observable
+        this.battleStartSubject.next();
+      }
+    );
+    this.subscriptions.add(battleStartSubscription);
 
     // Subscribe to incoming WebRTC offers
     const incomingOfferSubscription =
@@ -161,11 +186,34 @@ export class BattleOrchestratorService implements OnDestroy {
     // Subscribe to partnerDisconnected event
     const partnerDisconnectedSubscription =
       this.signalingService.partnerDisconnected$.subscribe(() => {
-        console.log('Partner has disconnected. Initiating cleanup and re-joining matchmaking.');
+        console.log(
+          'Partner has disconnected. Initiating cleanup and re-joining matchmaking.'
+        );
         this.handlePartnerDisconnected();
         this.restartBattle(); // Automatically re-initiate matchmaking
       });
     this.subscriptions.add(partnerDisconnectedSubscription);
+
+    // Subscribe to partnerHangUp event
+    const partnerHangUpSubscription =
+      this.signalingService.partnerHangUp$.subscribe(() => {
+        console.log(
+          'Partner has hung up the battle. Initiating cleanup and allowing new battles.'
+        );
+
+        this.handlePartnerHangUp();
+
+        this.restartBattle(); // Automatically re-initiate matchmaking
+
+      });
+    this.subscriptions.add(partnerHangUpSubscription);
+  }
+
+  public hangUp(): void {
+    console.log('Calling hangUp() in BattleOrchestratorService.');
+    this.signalingService.hangUp();
+    this.closeConnection();
+    console.log('Emitted hangUp event and closed connections.');
   }
 
   public closeConnection(): void {
@@ -191,6 +239,9 @@ export class BattleOrchestratorService implements OnDestroy {
       this.remoteStream = null;
       console.log('Remote media tracks stopped.');
     }
+
+    // Reset battle flags
+    this.battleStarted = false;
   }
 
   private handlePartnerDisconnected(): void {
@@ -205,7 +256,26 @@ export class BattleOrchestratorService implements OnDestroy {
 
     // Notify components about the disconnection
     this.partnerDisconnectedSubject.next();
-    console.log('Emitted partnerDisconnected to subscribers and reset state.');
+    console.log(
+      'Emitted partnerDisconnected to subscribers and reset state.'
+    );
+  }
+
+  private handlePartnerHangUp(): void {
+    // Cleanup WebRTC connections and streams
+    this.closeConnection();
+
+    // Reset battle-related states
+    this.roomId = '';
+    this.partnerSocketId = '';
+    this.isOfferer = false;
+    this.isConnectedToPeer = false;
+
+    // Notify components about the hang up
+    this.partnerHangUpSubject.next();
+    console.log(
+      'Emitted partnerHangUp to subscribers and reset state.'
+    );
   }
 
   // Initialize local stream
@@ -240,13 +310,9 @@ export class BattleOrchestratorService implements OnDestroy {
       await this.initializeLocalStream();
     }
 
-    // Start battle mechanics
-    this.startTimer();
-    this.startWordChange();
-
     // Start matchmaking
     this.signalingService.startRandomBattle();
-    console.log('Matchmaking initiated and battle mechanics started.');
+    console.log('Matchmaking initiated.');
   }
 
   private startTimer(): void {
@@ -301,6 +367,10 @@ export class BattleOrchestratorService implements OnDestroy {
     this.timeLeft = this.totalTime;
     this.timeLeftSubject.next(this.timeLeft);
     console.log(`Turn switched to ${nextTurn}.`);
+
+    // Restart timer and word change for the next turn
+    this.startTimer();
+    this.startWordChange();
   }
 
   async handleOffer(offer: RTCSessionDescriptionInit) {
@@ -496,6 +566,34 @@ export class BattleOrchestratorService implements OnDestroy {
     }
   }
 
+  // Initiate battle logic upon receiving 'battleStart'
+  private initiateBattle(): void {
+    this.battleStarted = true; // Flag to indicate battle has started
+
+    // Start battle mechanics
+    this.startTimer();
+    this.startWordChange();
+
+    // Initialize WebRTC connections if not already done
+    this.initializeWebRTC();
+
+    console.log('Battle has been initiated.');
+  }
+
+  // Emit 'readyToStart' when user is ready
+  public userReadyToStart(): void {
+    this.signalingService.emitReadyToStart();
+    console.log('User is ready to start the battle.');
+  }
+
+  // Initialize WebRTC connections
+  private initializeWebRTC(): void {
+    // Your existing WebRTC initiation logic
+    if (!this.isConnectedToPeer) {
+      this.determineRoleAndInitiate();
+    }
+  }
+
   // Restart Battle by re-initiating matchmaking
   private async restartBattle(): Promise<void> {
     console.log('Restarting battle and re-initiating matchmaking.');
@@ -503,7 +601,6 @@ export class BattleOrchestratorService implements OnDestroy {
   }
 
   ngOnDestroy(): void {
-    // Cleanup subscriptions
     this.subscriptions.unsubscribe();
     this.wordChangeSubscription?.unsubscribe();
     this.stopTimer();

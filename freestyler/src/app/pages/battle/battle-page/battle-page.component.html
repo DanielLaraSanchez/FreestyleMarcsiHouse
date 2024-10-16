@@ -1,59 +1,76 @@
 <div class="battle-page-container">
+  <!-- Local Video Stream -->
   <div class="main-video-container">
     <video #localVideo autoplay playsinline></video>
   </div>
 
+  <!-- Remote Video Stream -->
   <div class="small-video-container">
     <video #remoteVideo autoplay playsinline muted></video>
   </div>
 
-  <div class="opponent-name"
-       [ngClass]="{ 'glow-name': applyGlow }"
-       [@tada]="triggerTada">
-    <p class="long-text">MC HAMMER</p>
+  <!-- Opponent Name Display -->
+  <div class="opponent-name" [ngClass]="{ 'glow-name': applyGlow }" [@tada]="triggerTada">
+    <p class="long-text">{{ rapperName }}</p>
   </div>
 
+  <!-- Top Controls: Timer, Current Word, Start Button, Vote Button -->
   <div class="top-controls">
-    <div class="timer-container"
-         [class.invisible]="!battleStarted"
-         [@bounceIn]="triggerBounceIn">
-      <p-knob [(ngModel)]="timeLeft"
-              valueColor="#e91e63"
-              rangeColor="SlateGray"
-              [size]="80"
-              [strokeWidth]="5"
-              [readonly]="true"
-              textColor="white"
-              [min]="0"
-              [max]="60">
+    <!-- Timer -->
+    <div
+      class="timer-container"
+      [class.invisible]="!battleStarted"
+      [@bounceIn]="triggerBounceIn"
+    >
+      <p-knob
+        [(ngModel)]="timeLeft"
+        valueColor="#e91e63"
+        rangeColor="SlateGray"
+        [size]="80"
+        [strokeWidth]="5"
+        [readonly]="true"
+        textColor="white"
+        [min]="0"
+        [max]="60"
+      >
       </p-knob>
     </div>
 
+    <!-- Current Word -->
     <div class="current-word" *ngIf="battleStarted">
-      <p style class="current-word-p" [@bounceIn]="triggerBounceIn">{{ word }}</p>
+      <p class="current-word-p" [@bounceIn]="triggerBounceIn">{{ word }}</p>
     </div>
 
-    <button *ngIf="!showStartButton"
-            class="start-button"
-            (click)="startBattle()"
-            [@bounceOutRight]="triggerZoomOut">
+    <!-- Start Battle Button -->
+    <button
+      *ngIf="showStartButton"
+      class="start-button"
+      [@bounceOutRight]="triggerZoomOut"
+    >
       START
     </button>
 
-    <button class="vote-button"
-            [class.invisible]="!battleStarted"
-            [@bounceIn]="triggerBounceIn"
-            (click)="thumbsUp()">
+    <!-- Vote Button -->
+    <button
+      class="vote-button"
+      [class.invisible]="showStartButton"
+      [@bounceIn]="triggerBounceIn"
+      (click)="thumbsUp()"
+    >
       <i class="pi pi-thumbs-up-fill"></i>
     </button>
   </div>
 
+  <!-- Bottom Controls: Hang Up Button -->
   <div class="bottom-controls">
     <button class="hangup-btn" (click)="hangUp()">
       <i class="pi pi-phone"></i>
     </button>
   </div>
+
+  <!-- Waiting Messages -->
+  <div *ngIf="showWaitingMessage" class="waiting-message">
+    <p *ngIf="showStartButton">Waiting for an opponent to join...</p>
+    <p *ngIf="!showStartButton">Waiting for the battle to start...</p>
+  </div>
 </div>
-
-
-

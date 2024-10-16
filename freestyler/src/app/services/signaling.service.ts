@@ -48,6 +48,14 @@ export class SignalingService implements OnDestroy {
   private partnerDisconnectedSubject = new Subject<void>();
   public partnerDisconnected$ = this.partnerDisconnectedSubject.asObservable();
 
+  // Subject for battle start
+  private battleStartSubject = new Subject<void>();
+  public battleStart$ = this.battleStartSubject.asObservable();
+
+  // Subject for partner hang up
+  private partnerHangUpSubject = new Subject<void>();
+  public partnerHangUp$ = this.partnerHangUpSubject.asObservable();
+
   private subscriptions = new Subscription();
 
   constructor(private authService: AuthService) {
@@ -64,8 +72,8 @@ export class SignalingService implements OnDestroy {
 
   private connectSocket(token: string) {
     if (this.isConnected && this.socket) {
-      console.log("Existing socket detected. Disconnecting for a fresh connection.");
-      this.disconnectSocket(); // Force disconnect existing socket for fresh connection
+      console.log('Existing socket detected. Disconnecting for a fresh connection.');
+      this.disconnectSocket(); // Force disconnect existing socket for a fresh connection
     }
 
     if (!token) {
@@ -127,45 +135,48 @@ export class SignalingService implements OnDestroy {
       console.log('Received battleFound event:', data);
     });
 
+    // Handle battle start event
+    this.socket.on('battleStart', () => {
+      console.log('Battle has started!');
+      this.battleStartSubject.next();
+    });
+
     // Handle WebRTC signaling events
 
     // Handle WebRTC offer
-    this.socket.on(
-      'webrtc_offer',
-      (data: { offer: RTCSessionDescriptionInit }) => {
-        if (data.offer) {
-          this.webrtcOfferSubject.next(data.offer);
-          console.log('Received WebRTC offer:', data.offer);
-        }
+    this.socket.on('webrtc_offer', (data: { offer: RTCSessionDescriptionInit }) => {
+      if (data.offer) {
+        this.webrtcOfferSubject.next(data.offer);
+        console.log('Received WebRTC offer:', data.offer);
       }
-    );
+    });
 
     // Handle WebRTC answer
-    this.socket.on(
-      'webrtc_answer',
-      (data: { answer: RTCSessionDescriptionInit }) => {
-        if (data.answer) {
-          this.webrtcAnswerSubject.next(data.answer);
-          console.log('Received WebRTC answer:', data.answer);
-        }
+    this.socket.on('webrtc_answer', (data: { answer: RTCSessionDescriptionInit }) => {
+      if (data.answer) {
+        this.webrtcAnswerSubject.next(data.answer);
+        console.log('Received WebRTC answer:', data.answer);
       }
-    );
+    });
 
     // Handle ICE candidates
-    this.socket.on(
-      'webrtc_ice_candidate',
-      (data: { candidate: RTCIceCandidateInit }) => {
-        if (data.candidate) {
-          this.webrtcIceCandidateSubject.next(data.candidate);
-          console.log('Received ICE candidate:', data.candidate);
-        }
+    this.socket.on('webrtc_ice_candidate', (data: { candidate: RTCIceCandidateInit }) => {
+      if (data.candidate) {
+        this.webrtcIceCandidateSubject.next(data.candidate);
+        console.log('Received ICE candidate:', data.candidate);
       }
-    );
+    });
 
     // Handle 'partnerDisconnected' event
     this.socket.on('partnerDisconnected', () => {
       console.log('Partner disconnected. Notifying BattleOrchestratorService.');
       this.partnerDisconnectedSubject.next();
+    });
+
+    // Handle 'partnerHangUp' event
+    this.socket.on('partnerHangUp', () => {
+      console.log('Partner has hung up the battle.');
+      this.partnerHangUpSubject.next();
     });
 
     // Handle socket errors
@@ -231,6 +242,26 @@ export class SignalingService implements OnDestroy {
     if (this.socket && this.isConnected) {
       this.socket.emit('webrtc_ice_candidate', { roomId, candidate });
       console.log('Sent ICE candidate.');
+    } else {
+      console.error('Socket is not connected.');
+    }
+  }
+
+  // New method to emit 'readyToStart'
+  emitReadyToStart(): void {
+    if (this.socket && this.isConnected) {
+      this.socket.emit('readyToStart');
+      console.log('Emitted readyToStart event.');
+    } else {
+      console.error('Socket is not connected.');
+    }
+  }
+
+  // New method to emit 'hangUp'
+  hangUp(): void {
+    if (this.socket && this.isConnected) {
+      this.socket.emit('hangUp');
+      console.log('Emitted hangUp event.');
     } else {
       console.error('Socket is not connected.');
     }
