@@ -65,11 +65,103 @@ export class BattlePageComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    // Step 1: Cleanup any residual data from previous battles
+    this.cleanupPreviousBattle();
+
+    // Step 2: Initialize local video
     this.initializeLocalVideo();
 
-    // Automatically start matchmaking upon entering the battle page
+    // Step 3: Automatically start matchmaking upon entering the battle page
     this.startMatchmaking();
 
+    // Step 4: Subscribe to battle events and other observables
+    this.subscribeToBattleEvents();
+  }
+
+  ngOnDestroy(): void {
+    // Unsubscribe from all subscriptions to prevent memory leaks
+    this.subscriptions.unsubscribe();
+
+    // Perform additional cleanup if necessary
+    this.battleService.closeConnection();
+  }
+
+  /**
+   * Cleans up any residual data from previous battles.
+   */
+  private cleanupPreviousBattle(): void {
+    console.log('Checking for residual battle data...');
+
+    // Check if there's an ongoing battle
+    if (this.battleService.isConnectedToPeer || this.battleService.battleStarted) {
+      console.log('Residual battle data found. Performing cleanup...');
+      this.battleService.closeConnection();
+      this.battleService.isConnectedToPeer = false; // Perform cleanup without navigating
+      this.battleService.battleStarted = false;
+    } else {
+      console.log('No residual battle data found.');
+    }
+
+    // Reset component state variables
+    this.resetComponentState();
+  }
+
+  /**
+   * Resets all component-specific state variables to their default values.
+   */
+  private resetComponentState(): void {
+    this.timeLeft = 60;
+    this.currentTurn = 'Player 1';
+    this.word = '';
+
+    this.rapperName = 'Player 1';
+    this.viewerCount = 100;
+    this.voteCount = 0;
+
+    this.hasVoted = false;
+    this.triggerTada = false;
+    this.applyGlow = false;
+    this.battleStarted = false;
+    this.triggerZoomOut = false;
+    this.triggerFlipAnimation = false;
+    this.triggerBounceIn = false;
+    this.showStartButton = true;
+    this.showWaitingMessage = false;
+
+    console.log('Component state has been reset.');
+  }
+
+  /**
+   * Initializes the local video stream and assigns it to the video element.
+   */
+  async initializeLocalVideo(): Promise<void> {
+    try {
+      await this.battleService.initializeLocalStream();
+      if (this.localVideo && this.battleService.localStream) {
+        this.localVideo.nativeElement.srcObject = this.battleService.localStream;
+        this.localVideo.nativeElement.play();
+        console.log('Local video stream assigned to local video element.');
+      } else {
+        console.warn('Local video element or localStream is undefined.');
+      }
+    } catch (error) {
+      console.error('Failed to initialize local video:', error);
+    }
+  }
+
+  /**
+   * Starts matchmaking to find a random battle opponent.
+   */
+  startMatchmaking(): void {
+    console.log('Starting matchmaking automatically.');
+    this.battleService.startBattle();
+    this.showWaitingMessage = true; // Show waiting message
+  }
+
+  /**
+   * Subscribes to various battle-related events and observables.
+   */
+  private subscribeToBattleEvents(): void {
     // Subscribe to battle found event to handle room creation
     const battleFoundSubscription = this.battleService.battleFound$.subscribe(
       (data) => {
@@ -154,12 +246,11 @@ export class BattlePageComponent implements OnInit, OnDestroy {
 
         // Perform cleanup
         this.hangUp(false);
-        this.router.navigate(['/battle'])
+        this.router.navigate(['/battle']);
       });
     this.subscriptions.add(partnerHangUpSubscription);
 
-    // Additional subscriptions for battle mechanics can be added here
-    // e.g., timeLeft$, currentWord$, voteCount$, viewerCount$, etc.
+    // Additional subscriptions for battle mechanics
     const timeLeftSubscription = this.battleService.timeLeft$.subscribe(
       (time) => {
         this.timeLeft = time;
@@ -198,36 +289,9 @@ export class BattlePageComponent implements OnInit, OnDestroy {
     this.subscriptions.add(voteCountSubscription);
   }
 
-  ngOnDestroy(): void {
-    // Unsubscribe from all subscriptions
-    this.subscriptions.unsubscribe();
-
-    // Optionally, perform additional cleanup
-    this.battleService.closeConnection();
-  }
-
-  async initializeLocalVideo(): Promise<void> {
-    try {
-      await this.battleService.initializeLocalStream();
-      if (this.localVideo && this.battleService.localStream) {
-        this.localVideo.nativeElement.srcObject = this.battleService.localStream;
-        this.localVideo.nativeElement.play();
-        console.log('Local video stream assigned to local video element.');
-      } else {
-        console.warn('Local video element or localStream is undefined.');
-      }
-    } catch (error) {
-      console.error('Failed to initialize local video:', error);
-    }
-  }
-
-  // Automatically start matchmaking upon entering the battle page
-  startMatchmaking(): void {
-    console.log('Starting matchmaking automatically.');
-    this.battleService.startBattle();
-    this.showWaitingMessage = true; // Show waiting message
-  }
-
+  /**
+   * Handles the initiation of the battle after receiving the 'battleStart' event.
+   */
   handleBattleStart(): void {
     console.log('Battle has started!');
     this.battleStarted = true;
@@ -249,7 +313,9 @@ export class BattlePageComponent implements OnInit, OnDestroy {
     }, 1500);
   }
 
-  // Thumbs Up (Vote) Functionality
+  /**
+   * Thumbs Up (Vote) functionality to cast a vote.
+   */
   thumbsUp(): void {
     if (this.hasVoted) {
       alert('You have already voted!');
@@ -269,26 +335,39 @@ export class BattlePageComponent implements OnInit, OnDestroy {
     this.hasVoted = true;
   }
 
-  // Update Rapper Data Based on Current Turn
+  /**
+   * Updates the rapper's name based on the current turn.
+   * @param turn - The current turn identifier.
+   */
   updateRapperData(turn: string): void {
     this.rapperName = turn;
   }
 
-  // Formatted Time Display
+  /**
+   * Formats the remaining time into a MM:SS string.
+   */
   get formattedTime(): string {
     const minutes = Math.floor(this.timeLeft / 60);
     const seconds = this.timeLeft % 60;
     return `${minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
   }
 
-  // Hang Up method to end the battle and navigate away
+  /**
+   * Hang Up method to end the battle and navigate away.
+   * @param navigate - Determines whether to navigate after hanging up.
+   */
   hangUp(navigate: boolean = true): void {
     console.log('Hang Up method called. Ending battle.');
 
     // Emit 'hangUp' event via BattleOrchestratorService
-    console.log('Called BattleOrchestratorService.hangUp()');
-    // Close WebRTC connections and stop streams
-    this.battleService.closeConnection();
+    if (this.battleService.isConnectedToPeer || this.battleService.battleStarted) {
+      console.log('Calling BattleOrchestratorService.hangUp()');
+      // Close WebRTC connections and stop streams
+      this.battleService.closeConnection();
+      this.battleService.hangUp();
+    } else {
+      console.log('No active battle to hang up.');
+    }
 
     // Update battle state flags
     this.battleStarted = false;
@@ -302,13 +381,11 @@ export class BattlePageComponent implements OnInit, OnDestroy {
     this.triggerBounceIn = false;
 
     if (navigate) {
-      this.battleService.hangUp();
-
-      // Navigate to /battle if invoked by user
+      // Navigate to /chat if invoked by user
       this.router.navigate(['/chat']);
     }
 
-    // Optionally, re-initiate matchmaking if desired
-    // this.startMatchmaking();
+    // Reset component state variables
+    this.resetComponentState();
   }
 }
