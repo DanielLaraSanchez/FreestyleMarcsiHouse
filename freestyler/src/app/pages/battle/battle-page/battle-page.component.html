@@ -1,3 +1,5 @@
+<!-- battle-page.component.html -->
+
 <div class="battle-page-container">
   <!-- Local Video Stream -->
   <div class="main-video-container">
@@ -19,7 +21,7 @@
     <!-- Timer -->
     <div
       class="timer-container"
-      [class.invisible]="!battleStarted"
+      *ngIf="battleStarted"
       [@bounceIn]="triggerBounceIn"
     >
       <p-knob
@@ -46,6 +48,7 @@
       *ngIf="showStartButton"
       class="start-button"
       [@bounceOutRight]="triggerZoomOut"
+
     >
       START
     </button>

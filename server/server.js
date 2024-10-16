@@ -1,34 +1,26 @@
 require("./data/db"); // Database connection
-require("dotenv").config(); // Environment variables
-const cors = require("cors");
+require("dotenv").config(); // Load environment variables
+
 const express = require("express");
-const app = express();
+const cors = require("cors");
 const http = require("http");
-const server = http.createServer(app);
-const passport = require("./passport"); // Passport configuration
 const session = require("express-session");
+const passport = require("./passport"); // Passport configuration
 const { Server } = require("socket.io");
 const jwt = require("jsonwebtoken");
 const User = require("./data/models/User");
 const { v4: uuidv4 } = require("uuid"); // For unique room IDs
 
-// Initialize Socket.io with CORS Configuration
-const io = new Server(server, {
-  cors: {
-    origin: "http://localhost:4200", // Frontend URL
-    methods: ["GET", "POST"],
-    credentials: false,
-  },
-});
+const app = express();
+const server = http.createServer(app);
 
-// Middleware Setup
-app.use(
-  cors({
-    origin: "http://localhost:4200",
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true,
-  })
-);
+// CORS Configuration
+const corsOptions = {
+  origin: process.env.CLIENT_URL || "http://localhost:4200",
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true,
+};
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(
   session({
@@ -37,7 +29,6 @@ app.use(
     saveUninitialized: false,
   })
 );
-
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -47,414 +38,274 @@ const userRoutes = require("./routes/users");
 app.use("/auth", authRoutes);
 app.use("/users", userRoutes);
 
+// Initialize Socket.io with CORS
+const io = new Server(server, {
+  cors: corsOptions,
+});
+
 // Server Port
 const PORT = process.env.PORT || 3000;
 
-// Matchmaking Queue and Room Management
-let matchmakingQueue = new Set(); // Stores unique socket IDs waiting for matchmaking
-const socketRoomMap = new Map(); // Maps socket.id to roomId
+// Matchmaking and Room Management
+class Matchmaker {
+  constructor(io) {
+    this.io = io;
+    this.queue = new Set();
+    this.socketRoomMap = new Map();
+    this.roomReadiness = new Map();
+  }
 
-// Map to track readiness: roomId => Set of ready socket IDs
-const roomReadiness = new Map();
+  addToQueue(socketId) {
+    this.queue.add(socketId);
+    this.pairIfPossible();
+  }
+
+  removeFromQueue(socketId) {
+    this.queue.delete(socketId);
+  }
+
+  pairIfPossible() {
+    while (this.queue.size >= 2) {
+      const iterator = this.queue.values();
+      const socketId1 = iterator.next().value;
+      const socketId2 = iterator.next().value;
+
+      this.queue.delete(socketId1);
+      this.queue.delete(socketId2);
+
+      // Prevent pairing the same socket with itself
+      if (socketId1 === socketId2) {
+        console.log(`Cannot pair Socket ${socketId1} with itself. Re-adding to queue.`);
+        this.queue.add(socketId1);
+        continue;
+      }
+
+      this.createBattleRoom(socketId1, socketId2);
+    }
+  }
+
+  async createBattleRoom(socketId1, socketId2) {
+    const roomId = uuidv4();
+    console.log(`Creating room ${roomId} with sockets ${socketId1} and ${socketId2}`);
+
+    const socket1 = this.io.sockets.sockets.get(socketId1);
+    const socket2 = this.io.sockets.sockets.get(socketId2);
+
+    if (!socket1 || !socket2) {
+      console.error(`One or both sockets not found: ${socketId1}, ${socketId2}`);
+      if (socket1) this.queue.add(socketId1);
+      if (socket2) this.queue.add(socketId2);
+      return;
+    }
+
+    try {
+      await socket1.join(roomId);
+      await socket2.join(roomId);
+      this.socketRoomMap.set(socketId1, roomId);
+      this.socketRoomMap.set(socketId2, roomId);
+      console.log(`Sockets ${socketId1} and ${socketId2} joined room ${roomId}`);
+
+      // Notify both sockets
+      this.io.to(socketId1).emit("battleFound", { roomId, partnerSocketId: socketId2 });
+      this.io.to(socketId2).emit("battleFound", { roomId, partnerSocketId: socketId1 });
+    } catch (err) {
+      console.error(`Error joining room ${roomId}:`, err);
+      if (socket1) this.queue.add(socketId1);
+      if (socket2) this.queue.add(socketId2);
+    }
+  }
+
+  handleDisconnect(socketId) {
+    this.removeFromQueue(socketId);
+    const roomId = this.socketRoomMap.get(socketId);
+    if (roomId) {
+      const room = this.io.sockets.adapter.rooms.get(roomId);
+      if (room) {
+        room.forEach((clientId) => {
+          if (clientId !== socketId) {
+            this.io.to(clientId).emit("partnerDisconnected");
+            this.socketRoomMap.delete(clientId);
+            this.queue.add(clientId);
+          }
+        });
+      }
+      this.socketRoomMap.delete(socketId);
+    }
+  }
+
+  handleHangUp(socketId) {
+    const roomId = this.socketRoomMap.get(socketId);
+    if (roomId) {
+      const room = this.io.sockets.adapter.rooms.get(roomId);
+      if (room) {
+        room.forEach((clientId) => {
+          if (clientId !== socketId) {
+            this.io.to(clientId).emit("partnerHangUp");
+            this.socketRoomMap.delete(clientId);
+            this.queue.add(clientId);
+          }
+        });
+      }
+      this.socketRoomMap.delete(socketId);
+    }
+  }
+
+  handleReadyToStart(socketId) {
+    const roomId = this.socketRoomMap.get(socketId);
+    if (!roomId) {
+      console.error(`Socket ${socketId} is not in any room.`);
+      return;
+    }
+
+    if (!this.roomReadiness.has(roomId)) {
+      this.roomReadiness.set(roomId, new Set());
+    }
+
+    const readySet = this.roomReadiness.get(roomId);
+    readySet.add(socketId);
+
+    const room = this.io.sockets.adapter.rooms.get(roomId);
+    if (room) {
+      const allReady = Array.from(room).every(sId => readySet.has(sId));
+      if (allReady) {
+        this.io.to(roomId).emit("battleStart");
+        this.roomReadiness.delete(roomId);
+        console.log(`Battle in room ${roomId} started.`);
+      }
+    }
+  }
+}
+
+const matchmaker = new Matchmaker(io);
 
 // Temporary Debugging Route (Remove in Production)
 app.get("/debug-rooms", (req, res) => {
-  const rooms = Array.from(io.sockets.adapter.rooms.entries()).map(
-    ([room, sockets]) => ({
+  const rooms = Array.from(io.sockets.adapter.rooms.entries())
+    .filter(([room, sockets]) => !io.sockets.sockets.get(room)) // Exclude individual sockets
+    .map(([room, sockets]) => ({
       room,
       sockets: Array.from(sockets),
-    })
-  );
+    }));
   res.json(rooms);
+});
+
+// Middleware for socket.io authentication
+io.use((socket, next) => {
+  const token = socket.handshake.query.token;
+  if (!token) {
+    return next(new Error("Authentication error: No token provided."));
+  }
+
+  jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
+    if (err || !decoded || !decoded.id) {
+      return next(new Error("Authentication error: Invalid token."));
+    }
+
+    try {
+      const user = await User.findById(decoded.id);
+      if (!user) {
+        return next(new Error("Authentication error: User not found."));
+      }
+      socket.userId = user._id.toString();
+      next();
+    } catch (err) {
+      console.error("Authentication error:", err);
+      next(new Error("Authentication error."));
+    }
+  });
 });
 
 // Socket.io Connection Handling
 io.on("connection", (socket) => {
+  console.log(`User connected: Socket ID ${socket.id}, User ID ${socket.userId}`);
 
-  console.log("A user connected:", socket.id);
-  console.log(
-    "Current matchmaking queue before authentication:",
-    Array.from(matchmakingQueue),
-    socketRoomMap
-  );
-   // Retrieve token from query parameters
-   const token = socket.handshake.query.token;
-   if (!token) {
-     console.error("No token provided in socket handshake.");
-     socket.disconnect();
-     return;
-   }
- 
-   // Verify JWT Token
-   jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
-     if (err || !decoded || !decoded.id) {
-       console.error("Invalid token. Could not extract user ID.");
-       socket.disconnect();
-       return;
-     }
- 
-     const userId = decoded.id;
-     socket.userId = userId;
- 
-     console.log(`Socket ${socket.id} belongs to User ${userId}`);
- 
-     try {
-       // Update user online status
-       const user = await User.findByIdAndUpdate(
-         userId,
-         { isOnline: true },
-         { new: true }
-       );
-       if (user) {
-         // Emit 'userOnline' event to all clients
-         io.emit("userOnline", { userId: socket.id });
-         console.log(`User ${socket.id} is now online.`);
-       }
-     } catch (err) {
-       console.error("Error updating user status:", err);
-     }
+  // Set user online status
+  User.findByIdAndUpdate(socket.userId, { isOnline: true }, { new: true })
+    .then(user => {
+      if (user) {
+        io.emit("userOnline", { userId: user._id.toString() });
+        console.log(`User ${user._id} is now online.`);
+      }
+    })
+    .catch(err => console.error("Error updating user status:", err));
 
-    // Handle Incoming Messages
-    socket.on("message", (data) => {
-      const { tabId, message } = data;
-
-      if (tabId === "general") {
-        // Broadcast to all clients including sender
-        io.emit("message", { tabId: "general", message });
-        console.log("Broadcasted general message:", message);
+  // Handle 'message' event
+  socket.on("message", (data) => {
+    const { tabId, message } = data;
+    if (tabId === "general") {
+      io.emit("message", { tabId: "general", message });
+      console.log(`Broadcasted general message: ${message}`);
+    } else {
+      // Private message
+      const recipientSocketId = tabId;
+      if (io.sockets.sockets.has(recipientSocketId)) {
+        io.to(recipientSocketId).emit("message", { tabId: socket.id, message });
+        // Optionally, confirm to sender
+        socket.emit("message", { tabId: recipientSocketId, message });
+        console.log(`Sent private message from ${socket.id} to ${recipientSocketId}: ${message}`);
       } else {
-        // Private message handling
-        const recipientSocketId = tabId; // 'tabId' is recipient's socket.id
-
-        const payloadToRecipient = {
-          tabId: socket.id, // Sender's socket.id
-          message,
-        };
-        const payloadToSender = {
-          tabId: recipientSocketId, // Recipient's socket.id
-          message,
-        };
-
-        // Send the message to the recipient's socket
-        io.to(recipientSocketId).emit("message", payloadToRecipient);
-        console.log(
-          `Sent private message from ${socket.id} to ${recipientSocketId}:`,
-          message
-        );
-
-        // Optional: Send confirmation back to the sender
-        socket.emit("message", payloadToSender);
+        console.error(`Recipient socket ID ${recipientSocketId} not found.`);
       }
-    });
+    }
+  });
 
-    // Handle Battle Requests for Matchmaking
-    socket.on("startRandomBattle", async () => {
-      console.log(`Socket ${socket.id} requested a random battle.`);
+  // Handle 'startRandomBattle' event
+  socket.on("startRandomBattle", () => {
+    console.log(`Socket ${socket.id} requested a random battle.`);
+    matchmaker.addToQueue(socket.id);
+  });
 
-      // Check if socket is already in the matchmaking queue
-      if (matchmakingQueue.has(socket.id)) {
-        console.log(`Socket ${socket.id} is already in the matchmaking queue.`);
-        return;
-      }
+  // Handle 'readyToStart' event
+  socket.on("readyToStart", () => {
+    console.log(`Socket ${socket.id} is ready to start the battle.`);
+    matchmaker.handleReadyToStart(socket.id);
+  });
 
-      // Add socket to the matchmaking queue
-      matchmakingQueue.add(socket.id);
-      console.log(`Socket ${socket.id} added to matchmaking queue.`);
-
-      // Log current matchmaking queue
-      console.log(
-        "Current matchmaking queue:",
-        Array.from(matchmakingQueue),
-        socketRoomMap
-      );
-
-      // If there are at least two sockets, pair them
-      if (matchmakingQueue.size >= 2) {
-        const iterator = matchmakingQueue.values();
-        const socketId1 = iterator.next().value;
-        matchmakingQueue.delete(socketId1);
-        console.log(
-          `Socket ${socketId1} removed from matchmaking queue for pairing.`
-        );
-        const socketId2 = iterator.next().value;
-        matchmakingQueue.delete(socketId2);
-        console.log(
-          `Socket ${socketId2} removed from matchmaking queue for pairing.`
-        );
-
-        // Prevent pairing the same socket with itself
-        if (socketId1 === socketId2) {
-          console.log(`Cannot pair Socket ${socketId1} with itself.`);
-          // Re-add the socket to the queue
-          matchmakingQueue.add(socketId1);
-          console.log(
-            `Socket ${socketId1} re-added to matchmaking queue due to self-pairing attempt.`
-          );
-          return;
-        }
-
-        // Generate a unique room ID
-        const roomId = uuidv4();
-        console.log(
-          `Generated room ID: ${roomId} for pairing Socket ${socketId1} and Socket ${socketId2}.`
-        );
-
-        // Retrieve socket instances
-        const socket1 = io.sockets.sockets.get(socketId1);
-        const socket2 = io.sockets.sockets.get(socketId2);
-
-        if (!socket1 || !socket2) {
-          console.error(`One or both sockets not found: ${socketId1}, ${socketId2}`);
-          // Re-add sockets back to the queue if any are missing
-          if (socket1) matchmakingQueue.add(socketId1);
-          if (socket2) matchmakingQueue.add(socketId2);
-          return;
-        }
-
-        try {
-          // Join socket1 to the room
-          await socket1.join(roomId);
-          console.log(`Socket ${socketId1} joined room ${roomId}.`);
-          socketRoomMap.set(socketId1, roomId);
-          console.log(
-            `Room '${roomId}' now has sockets:`,
-            Array.from(io.sockets.adapter.rooms.get(roomId) || [])
-          );
-
-          // Join socket2 to the room
-          await socket2.join(roomId);
-          console.log(`Socket ${socketId2} joined room ${roomId}.`);
-          socketRoomMap.set(socketId2, roomId);
-          console.log(
-            `Room '${roomId}' now has sockets:`,
-            Array.from(io.sockets.adapter.rooms.get(roomId) || [])
-          );
-
-          // Notify both sockets that a battle has been found
-          io.to(socketId1).emit("battleFound", {
-            roomId,
-            partnerSocketId: socketId2,
-          });
-          io.to(socketId2).emit("battleFound", {
-            roomId,
-            partnerSocketId: socketId1,
-          });
-
-          console.log(
-            `Paired Socket ${socketId1} and Socket ${socketId2} in room ${roomId}.`
-          );
-        } catch (err) {
-          console.error(`Error joining sockets to room ${roomId}:`, err);
-          // Re-add sockets back to the queue in case of failure
-          matchmakingQueue.add(socketId1);
-          matchmakingQueue.add(socketId2);
-          console.log(
-            `Re-added Socket ${socketId1} and Socket ${socketId2} to matchmaking queue due to error.`
-          );
-        }
-      }
-    });
-
-    // Handle 'readyToStart' event
-    socket.on("readyToStart", () => {
-      const roomId = socketRoomMap.get(socket.id);
+  // WebRTC Signaling Events
+  const signalingEvents = ['webrtc_offer', 'webrtc_answer', 'webrtc_ice_candidate'];
+  signalingEvents.forEach(event => {
+    socket.on(event, (data) => {
+      const roomId = matchmaker.socketRoomMap.get(socket.id);
       if (!roomId) {
-        console.error(`Socket ${socket.id} is not in any room.`);
+        console.error(`Socket ${socket.id} is not in any room. Cannot emit ${event}.`);
         return;
       }
-
-      console.log(`Socket ${socket.id} is ready to start the battle in room ${roomId}.`);
-
-      // Initialize the set if it doesn't exist
-      if (!roomReadiness.has(roomId)) {
-        roomReadiness.set(roomId, new Set());
-      }
-
-      const readySet = roomReadiness.get(roomId);
-      readySet.add(socket.id);
-
-      // Get all sockets in the room
-      const room = io.sockets.adapter.rooms.get(roomId);
-      if (room) {
-        // Check if all sockets in the room are ready
-        const allReady = Array.from(room).every((sId) => readySet.has(sId));
-        if (allReady) {
-          console.log(`All users in room ${roomId} are ready. Starting battle.`);
-
-          // Emit 'battleStart' to all users in the room
-          io.to(roomId).emit("battleStart");
-
-          // Optionally, clear the readiness map for the room if battles are one-time
-          roomReadiness.delete(roomId);
-        } else {
-          console.log(`Waiting for other users in room ${roomId} to be ready.`);
-        }
-      }
+      socket.to(roomId).emit(event, data);
+      console.log(`Relayed ${event} from ${socket.id} to room ${roomId}`);
     });
+  });
 
-    // Handle WebRTC Signaling Events
+  // Handle 'hangUp' event
+  socket.on("hangUp", () => {
+    console.log(`Socket ${socket.id} initiated hang up.`);
+    matchmaker.handleHangUp(socket.id);
+  });
 
-    // Relay WebRTC Offers to the Room
-    socket.on("webrtc_offer", (data) => {
-      const { roomId, offer } = data;
-      if (!roomId || !offer) {
-        console.error("Invalid webrtc_offer data:", data);
-        return;
-      }
-      console.log(`Relaying WebRTC offer to room ${roomId}.`);
-      socket.to(roomId).emit("webrtc_offer", { offer });
-    });
+  // Handle disconnections
+  socket.on("disconnect", () => {
+    console.log(`User disconnected: Socket ID ${socket.id}, User ID ${socket.userId}`);
+    matchmaker.handleDisconnect(socket.id);
 
-    // Relay WebRTC Answers to the Room
-    socket.on("webrtc_answer", (data) => {
-      const { roomId, answer } = data;
-      if (!roomId || !answer) {
-        console.error("Invalid webrtc_answer data:", data);
-        return;
-      }
-      console.log(`Relaying WebRTC answer to room ${roomId}.`);
-      socket.to(roomId).emit("webrtc_answer", { answer });
-    });
-
-    // Relay ICE Candidates to the Room
-    socket.on("webrtc_ice_candidate", (data) => {
-      const { roomId, candidate } = data;
-      if (!roomId || !candidate) {
-        console.error("Invalid webrtc_ice_candidate data:", data);
-        return;
-      }
-      socket.to(roomId).emit("webrtc_ice_candidate", { candidate });
-    });
-
-    // Handle 'hangUp' event
-    socket.on("hangUp", () => {
-      console.log(`Socket ${socket.id} initiated hang up.`);
-
-      const roomId = socketRoomMap.get(socket.id);
-      if (roomId) {
-        const clients = io.sockets.adapter.rooms.get(roomId);
-        if (clients) {
-          clients.forEach((clientId) => {
-            if (clientId !== socket.id) {
-              // Notify the partner that the battle has been hung up
-              io.to(clientId).emit("partnerHangUp");
-              console.log(`Notified ${clientId} that their partner hung up.`);
-
-              // Remove the partner from the room mapping
-              socketRoomMap.delete(clientId);
-
-              // Re-add the partner to the matchmaking queue
-              matchmakingQueue.add(clientId);
-              console.log(`Re-added ${clientId} to matchmaking queue.`);
-            }
-          });
-        }
-
-        // Remove the current socket from the room mapping
-        socketRoomMap.delete(socket.id);
-
-        // Make the socket leave the room
-        socket.leave(roomId);
-        console.log(`Socket ${socket.id} left room ${roomId}.`);
-      }
-
-      // Remove the socket from the matchmaking queue if present
-      if (matchmakingQueue.has(socket.id)) {
-        matchmakingQueue.delete(socket.id);
-        console.log(`Socket ${socket.id} removed from matchmaking queue.`);
-      }
-    });
-
-    // Handle Disconnections
-    socket.on("disconnect", () => {
-      console.log("A user disconnected:", socket.id);
-      console.log("Current socketRoomMap before disconnect:", socketRoomMap);
-
-      // Retrieve the room ID from the map
-      const roomId = socketRoomMap.get(socket.id);
-      if (roomId) {
-        console.log(`Socket ${socket.id} was in room ${roomId}.`);
-
-        // Retrieve all clients in the room
-        const clients = io.sockets.adapter.rooms.get(roomId);
-        if (clients) {
-          console.log(
-            `Current clients in room ${roomId} before notifying:`,
-            Array.from(clients)
-          );
-          clients.forEach((clientId) => {
-            matchmakingQueue.delete(clientId);
-            socketRoomMap.delete(clientId);
-            if (clientId !== socket.id) {
-              // Notify the remaining client in the room
-              io.to(clientId).emit("partnerDisconnected");
-              console.log(`Notified ${clientId} that their partner disconnected from room ${roomId}.`);
-
-              // Remove the mapping for the remaining client
-              socketRoomMap.delete(clientId);
-
-              // Re-add the remaining client to the matchmaking queue
-              matchmakingQueue.add(clientId);
-              console.log(`Re-added ${clientId} to matchmaking queue.`);
-            }
-          });
-        } else {
-          console.log(`No remaining clients in room ${roomId} after disconnection.`);
-        }
-
-        // Remove the mapping for the disconnected socket
-        socketRoomMap.delete(socket.id);
-      } else {
-        console.log(`Socket ${socket.id} was not in any room.`);
-      }
-
-      // Remove socket from matchmaking queue if present
-      if (matchmakingQueue.has(socket.id)) {
-        matchmakingQueue.delete(socket.id);
-        console.log(
-          `Socket ${socket.id} removed from matchmaking queue. Current queue length: ${matchmakingQueue.size}`
-        );
-      } else {
-        console.log(`Socket ${socket.id} was not in the matchmaking queue.`);
-      }
-
-      // Handle readiness map cleanup
-      if (roomId && roomReadiness.has(roomId)) {
-        const readySet = roomReadiness.get(roomId);
-        readySet.delete(socket.id);
-        console.log(`Socket ${socket.id} removed from readiness set of room ${roomId}.`);
-        if (readySet.size === 0) {
-          roomReadiness.delete(roomId);
-          console.log(`Cleaned up readiness map for room ${roomId}.`);
-        }
-      }
-
-      // Update user online status
-      if (socket.userId) {
-        User.findByIdAndUpdate(socket.userId, { isOnline: false }, { new: true })
-          .then((user) => {
-            if (user) {
-              // Emit 'userOffline' event to all clients
-              io.emit("userOffline", { userId: socket.id });
-              console.log(`User ${socket.id} is now offline.`);
-            }
-          })
-          .catch((err) => {
-            console.error("Error updating user status:", err);
-          });
-      } else {
-        console.log(`Socket ${socket.id} has no associated userId.`);
-      }
-    });
+    // Set user offline status
+    if (socket.userId) {
+      User.findByIdAndUpdate(socket.userId, { isOnline: false }, { new: true })
+        .then(user => {
+          if (user) {
+            io.emit("userOffline", { userId: user._id.toString() });
+            console.log(`User ${user._id} is now offline.`);
+          }
+        })
+        .catch(err => console.error("Error updating user status:", err));
+    }
   });
 });
 
-// Handle unexpected errors to prevent server crash
+// Handle unexpected errors to prevent server crashes
 io.on("error", (error) => {
   console.error("Socket.io Error:", error);
 });
 
-// Start the Server
+// Start the server
 server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });

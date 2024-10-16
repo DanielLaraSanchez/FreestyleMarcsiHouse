@@ -12,16 +12,15 @@ interface BattleFoundData {
   providedIn: 'root',
 })
 export class BattleOrchestratorService implements OnDestroy {
-  // Battle Mechanics Subjects
-  private totalTime: number = 60; // Total time in seconds
-  private timeLeft: number = this.totalTime;
-  private timerSubscription!: Subscription;
-  private wordChangeSubscription!: Subscription;
+  // Battle mechanics
+  private readonly TOTAL_TIME: number = 60; // seconds
+  private timerSubscription: Subscription | null = null;
+  private wordChangeSubscription: Subscription | null = null;
 
   private currentTurnSubject = new BehaviorSubject<string>('Player 1');
   currentTurn$ = this.currentTurnSubject.asObservable();
 
-  private timeLeftSubject = new BehaviorSubject<number>(this.timeLeft);
+  private timeLeftSubject = new BehaviorSubject<number>(this.TOTAL_TIME);
   timeLeft$ = this.timeLeftSubject.asObservable();
 
   private currentWordSubject = new BehaviorSubject<string>('');
@@ -48,20 +47,19 @@ export class BattleOrchestratorService implements OnDestroy {
 
   private stream!: MediaStream;
 
-  // Subjects to notify when partner disconnects or hangs up
+  // Partner events
   private partnerDisconnectedSubject = new Subject<void>();
   public partnerDisconnected$ = this.partnerDisconnectedSubject.asObservable();
 
   private partnerHangUpSubject = new Subject<void>();
   public partnerHangUp$ = this.partnerHangUpSubject.asObservable();
 
-  // WebRTC Related
+  // WebRTC
   public peerConnection: RTCPeerConnection | null = null;
   public remoteStream: MediaStream | null = null;
   public roomId: string = '';
   public partnerSocketId: string = '';
 
-  // Subjects to emit WebRTC connection status and remote stream
   private connectionStateSubject = new BehaviorSubject<string>('disconnected');
   public connectionState$ = this.connectionStateSubject.asObservable();
 
@@ -71,35 +69,27 @@ export class BattleOrchestratorService implements OnDestroy {
   private battleFoundSubject = new Subject<BattleFoundData>();
   public battleFound$ = this.battleFoundSubject.asObservable();
 
-  // Subject for battle start
   private battleStartSubject = new Subject<void>();
   public battleStart$ = this.battleStartSubject.asObservable();
 
-  // ICE Configuration
-  private iceConfig: RTCConfiguration = {
+  private readonly ICE_CONFIG: RTCConfiguration = {
     iceServers: [{ urls: 'stun:stun.l.google.com:19302' }],
-    // Add TURN servers here for production
+    // Add TURN servers for production
   };
 
-  // Matchmaking and WebRTC Subscriptions
   private subscriptions = new Subscription();
 
-  // Local Stream
   public localStream: MediaStream | null = null;
 
-  // Store own socket ID
   private ownSocketId: string = '';
 
-  // Role Determination
   public isOfferer: boolean = false;
 
-  // Flag to prevent multiple connections
   public isConnectedToPeer: boolean = false;
 
-  // Battle Started Flag
   public battleStarted: boolean = false;
 
-  // Local Flags for Animations (optional, based on your original code)
+  // Animations flags
   public triggerFlipAnimation: boolean = false;
   public triggerZoomOut: boolean = false;
   public triggerBounceIn: boolean = false;
@@ -109,320 +99,268 @@ export class BattleOrchestratorService implements OnDestroy {
     private authService: AuthService
   ) {
     // Subscribe to own socket ID
-    const ownSocketIdSubscription = this.signalingService.ownSocketId$.subscribe(
-      (id) => {
-        this.ownSocketId = id;
-        console.log('Own Socket ID:', this.ownSocketId);
-      }
-    );
-    this.subscriptions.add(ownSocketIdSubscription);
+    const ownSocketIdSub = this.signalingService.ownSocketId$.subscribe(id => {
+      this.ownSocketId = id;
+      console.log(`Own Socket ID: ${this.ownSocketId}`);
+    });
+    this.subscriptions.add(ownSocketIdSub);
 
     // Subscribe to battle found event
-    const battleFoundSubscription = this.signalingService.battleFound$.subscribe(
-      (data) => {
-        if (this.isConnectedToPeer) {
-          console.warn(
-            'Already connected to a peer. Ignoring new battleFound event.'
-          );
-          return;
-        }
-        this.roomId = data.roomId;
-        this.partnerSocketId = data.partnerSocketId;
-        console.log(
-          `Battle found! Room ID: ${this.roomId}, Partner Socket ID: ${this.partnerSocketId}`
-        );
-        // Notify subscribers about battle found
-        this.battleFoundSubject.next(data);
-        // Determine role based on socket IDs
-        this.determineRoleAndInitiate();
+    const battleFoundSub = this.signalingService.battleFound$.subscribe(data => {
+      if (this.isConnectedToPeer) {
+        console.warn('Already connected to a peer. Ignoring new battleFound event.');
+        return;
       }
-    );
-    this.subscriptions.add(battleFoundSubscription);
+      this.roomId = data.roomId;
+      this.partnerSocketId = data.partnerSocketId;
+      console.log(`Battle found! Room ID: ${this.roomId}, Partner Socket ID: ${this.partnerSocketId}`);
+      this.battleFoundSubject.next(data);
+      this.determineRoleAndInitiate();
+    });
+    this.subscriptions.add(battleFoundSub);
 
-    // Subscribe to battleStart event from SignalingService
-    const battleStartSubscription = this.signalingService.battleStart$.subscribe(
-      () => {
-        console.log('Received battleStart event. Commencing battle.');
-        this.initiateBattle();
+    // Subscribe to battleStart event
+    const battleStartSub = this.signalingService.battleStart$.subscribe(() => {
+      console.log('BattleStart event received. Initiating battle.');
+      this.initiateBattle();
+      this.battleStartSubject.next();
+    });
+    this.subscriptions.add(battleStartSub);
 
-        // Emit to the battleStart$ observable
-        this.battleStartSubject.next();
+    // WebRTC Events
+    const offerSub = this.signalingService.webrtcOffer$.subscribe(offer => {
+      if (this.isOfferer) {
+        console.warn('Offerer should not receive offers. Ignoring.');
+        return;
       }
-    );
-    this.subscriptions.add(battleStartSubscription);
+      console.log('Received WebRTC offer.');
+      this.handleOffer(offer);
+    });
+    this.subscriptions.add(offerSub);
 
-    // Subscribe to incoming WebRTC offers
-    const incomingOfferSubscription =
-      this.signalingService.webrtcOffer$.subscribe((offer) => {
-        if (this.isOfferer) {
-          console.warn('Offerer should not receive offers. Ignoring.');
-          return;
-        }
-        console.log('Received WebRTC offer:', offer);
-        this.handleOffer(offer);
-      });
-    this.subscriptions.add(incomingOfferSubscription);
+    const answerSub = this.signalingService.webrtcAnswer$.subscribe(answer => {
+      if (!this.isOfferer) {
+        console.warn('Answerer should not receive answers. Ignoring.');
+        return;
+      }
+      console.log('Received WebRTC answer.');
+      this.handleAnswer(answer);
+    });
+    this.subscriptions.add(answerSub);
 
-    // Subscribe to incoming WebRTC answers
-    const incomingAnswerSubscription =
-      this.signalingService.webrtcAnswer$.subscribe((answer) => {
-        if (!this.isOfferer) {
-          console.warn('Answerer should not receive answers. Ignoring.');
-          return;
-        }
-        console.log('Received WebRTC answer:', answer);
-        this.handleAnswer(answer);
-      });
-    this.subscriptions.add(incomingAnswerSubscription);
+    const iceCandidateSub = this.signalingService.webrtcIceCandidate$.subscribe(candidate => {
+      console.log('Received ICE candidate.');
+      this.handleIceCandidate(candidate);
+    });
+    this.subscriptions.add(iceCandidateSub);
 
-    // Subscribe to incoming ICE candidates
-    const incomingIceCandidateSubscription =
-      this.signalingService.webrtcIceCandidate$.subscribe((candidate) => {
-        console.log('Received ICE candidate:', candidate);
-        this.handleIceCandidate(candidate);
-      });
-    this.subscriptions.add(incomingIceCandidateSubscription);
+    // Partner events
+    const partnerDisconnectedSub = this.signalingService.partnerDisconnected$.subscribe(() => {
+      console.log('Partner has disconnected. Cleaning up and re-initiating matchmaking.');
+      this.handlePartnerDisconnected();
+      this.restartBattle();
+    });
+    this.subscriptions.add(partnerDisconnectedSub);
 
-    // Subscribe to partnerDisconnected event
-    const partnerDisconnectedSubscription =
-      this.signalingService.partnerDisconnected$.subscribe(() => {
-        console.log(
-          'Partner has disconnected. Initiating cleanup and re-joining matchmaking.'
-        );
-        this.handlePartnerDisconnected();
-        this.restartBattle(); // Automatically re-initiate matchmaking
-      });
-    this.subscriptions.add(partnerDisconnectedSubscription);
-
-    // Subscribe to partnerHangUp event
-    const partnerHangUpSubscription =
-      this.signalingService.partnerHangUp$.subscribe(() => {
-        console.log(
-          'Partner has hung up the battle. Initiating cleanup and allowing new battles.'
-        );
-
-        this.handlePartnerHangUp();
-
-        this.restartBattle(); // Automatically re-initiate matchmaking
-
-      });
-    this.subscriptions.add(partnerHangUpSubscription);
+    const partnerHangUpSub = this.signalingService.partnerHangUp$.subscribe(() => {
+      console.log('Partner has hung up. Cleaning up and re-initiating matchmaking.');
+      this.handlePartnerHangUp();
+      this.restartBattle();
+    });
+    this.subscriptions.add(partnerHangUpSub);
   }
 
-  public hangUp(): void {
-    console.log('Calling hangUp() in BattleOrchestratorService.');
-    this.signalingService.hangUp();
-    this.closeConnection();
-    console.log('Emitted hangUp event and closed connections.');
+  /**
+   * Sends a 'readyToStart' signal to the server.
+   */
+  public userReadyToStart(): void {
+    this.signalingService.emitReadyToStart();
+    this.triggerFlipAnimation = false;
+    this.triggerZoomOut = false;
+    this.triggerBounceIn = false;
+    console.log('User marked as ready to start the battle.');
   }
 
-  public closeConnection(): void {
-    console.log('Closing WebRTC connections.');
+  /**
+   * Initiates the battle mechanics after battle start.
+   */
+  private initiateBattle(): void {
+    this.battleStarted = true;
+    this.triggerFlipAnimation = true;
 
-    // Close peer connection if exists
-    if (this.peerConnection) {
-      this.peerConnection.close();
-      this.peerConnection = null;
-      console.log('Peer connection closed.');
-    }
+    setTimeout(() => {
+      this.triggerZoomOut = true;
+    }, 300);
 
-    // Stop local stream
-    if (this.localStream) {
-      this.localStream.getTracks().forEach((track) => track.stop());
-      this.localStream = null;
-      console.log('Local media tracks stopped.');
-    }
-
-    // Stop remote stream
-    if (this.remoteStream) {
-      this.remoteStream.getTracks().forEach((track) => track.stop());
-      this.remoteStream = null;
-      console.log('Remote media tracks stopped.');
-    }
-
-    // Reset battle flags
-    this.battleStarted = false;
+    setTimeout(() => {
+      this.triggerBounceIn = !this.triggerBounceIn;
+      // Additional logic if required
+    }, 1500);
   }
 
-  private handlePartnerDisconnected(): void {
-    // Cleanup WebRTC connections and streams
-    this.closeConnection();
+  /**
+   * Starts the battle timers and word changes.
+   */
+  private startTimers(): void {
+    this.stopTimers(); // Clear existing timers
 
-    // Reset battle-related states
-    this.roomId = '';
-    this.partnerSocketId = '';
-    this.isOfferer = false;
-    this.isConnectedToPeer = false;
-
-    // Notify components about the disconnection
-    this.partnerDisconnectedSubject.next();
-    console.log(
-      'Emitted partnerDisconnected to subscribers and reset state.'
-    );
-  }
-
-  private handlePartnerHangUp(): void {
-    // Cleanup WebRTC connections and streams
-    this.closeConnection();
-
-    // Reset battle-related states
-    this.roomId = '';
-    this.partnerSocketId = '';
-    this.isOfferer = false;
-    this.isConnectedToPeer = false;
-
-    // Notify components about the hang up
-    this.partnerHangUpSubject.next();
-    console.log(
-      'Emitted partnerHangUp to subscribers and reset state.'
-    );
-  }
-
-  // Initialize local stream
-  async initializeLocalStream(): Promise<void> {
-    try {
-      this.localStream = await navigator.mediaDevices.getUserMedia({
-        video: true,
-        audio: true,
-      });
-      console.log('Local stream initialized.');
-    } catch (error) {
-      console.error('Error accessing media devices:', error);
-    }
-  }
-
-  // Start the battle and initiate matchmaking
-  async startBattle(): Promise<void> {
-    if (this.isConnectedToPeer) {
-      console.warn('Already connected to a peer. Cannot start another battle.');
-      return;
-    }
-
-    // Reset battle state
-    this.currentTurnSubject.next('Player 1');
-    this.timeLeftSubject.next(this.totalTime);
-    this.voteCountSubject.next(0);
-    this.viewerCountSubject.next(0);
-    this.currentWordSubject.next('');
-
-    // Initialize local stream if not already
-    if (!this.localStream) {
-      await this.initializeLocalStream();
-    }
-
-    // Start matchmaking
-    this.signalingService.startRandomBattle();
-    console.log('Matchmaking initiated.');
-  }
-
-  private startTimer(): void {
-    // Prevent multiple timers
-    this.stopTimer();
-
-    this.timeLeft = this.totalTime;
-    this.timeLeftSubject.next(this.timeLeft);
-
+    this.timeLeftSubject.next(this.TOTAL_TIME);
     this.timerSubscription = interval(1000).subscribe(() => {
-      if (this.timeLeft > 0) {
-        this.timeLeft--;
-        this.timeLeftSubject.next(this.timeLeft);
+      if (this.timeLeftSubject.getValue() > 0) {
+        this.timeLeftSubject.next(this.timeLeftSubject.getValue() - 1);
       } else {
-        this.stopTimer();
         this.switchTurn();
       }
     });
+
     console.log('Timer started.');
   }
 
+  /**
+   * Starts the word change interval.
+   */
   private startWordChange(): void {
-    // Prevent multiple word change subscriptions
     this.stopWordChange();
 
+    this.generateRandomWord(); // initial word
     this.wordChangeSubscription = interval(5000).subscribe(() => {
       this.generateRandomWord();
     });
-    this.generateRandomWord(); // Initial word
-    console.log('Word generation started.');
+
+    console.log('Word change initiated.');
   }
 
-  private stopTimer(): void {
+  /**
+   * Stops the battle timers.
+   */
+  private stopTimers(): void {
     if (this.timerSubscription) {
       this.timerSubscription.unsubscribe();
+      this.timerSubscription = null;
       console.log('Timer stopped.');
     }
   }
 
+  /**
+   * Stops the word change interval.
+   */
   private stopWordChange(): void {
     if (this.wordChangeSubscription) {
       this.wordChangeSubscription.unsubscribe();
-      console.log('Word generation stopped.');
+      this.wordChangeSubscription = null;
+      console.log('Word change stopped.');
     }
   }
 
+  /**
+   * Stops all battle-related timers and subscriptions.
+   */
+  private stopTimersAndWordChange(): void {
+    this.stopTimers();
+    this.stopWordChange();
+  }
+
+  /**
+   * Switches the current turn and restarts timers and word changes.
+   */
   private switchTurn(): void {
-    const current = this.currentTurnSubject.value;
+    const current = this.currentTurnSubject.getValue();
     const nextTurn = current === 'Player 1' ? 'Player 2' : 'Player 1';
     this.currentTurnSubject.next(nextTurn);
     this.voteCountSubject.next(0);
-    this.timeLeft = this.totalTime;
-    this.timeLeftSubject.next(this.timeLeft);
-    console.log(`Turn switched to ${nextTurn}.`);
+    this.timeLeftSubject.next(this.TOTAL_TIME);
 
-    // Restart timer and word change for the next turn
-    this.startTimer();
+    console.log(`Turn switched to ${nextTurn}.`);
+    this.startTimers();
     this.startWordChange();
   }
 
-  async handleOffer(offer: RTCSessionDescriptionInit) {
-    if (this.isOfferer) {
-      console.warn('Offerer should not handle offers. Ignoring.');
+  /**
+   * Generates a random word from the words list.
+   */
+  private generateRandomWord(): void {
+    const randomWord = this.words[Math.floor(Math.random() * this.words.length)];
+    this.currentWordSubject.next(randomWord);
+    console.log(`Generated word: ${randomWord}`);
+  }
+
+  /**
+   * Increments the vote count.
+   */
+  public incrementVote(): void {
+    const currentVotes = this.voteCountSubject.getValue();
+    this.voteCountSubject.next(currentVotes + 1);
+    console.log(`Vote count incremented to ${currentVotes + 1}`);
+  }
+
+  /**
+   * Determines the role (offerer/answerer) based on socket IDs and initiates WebRTC.
+   */
+  private determineRoleAndInitiate(): void {
+    if (!this.ownSocketId || !this.partnerSocketId) {
+      console.error('Socket IDs not available for role determination.');
       return;
     }
 
-    console.log('Handling received offer.');
-    this.connectionStateSubject.next('answering');
+    const comparison = this.ownSocketId.localeCompare(this.partnerSocketId);
+    this.isOfferer = comparison === -1;
 
-    this.peerConnection = new RTCPeerConnection(this.iceConfig);
-    console.log('RTCPeerConnection created for answering.');
+    if (this.isOfferer) {
+      console.log('Role: Offerer. Initiating WebRTC connection.');
+      this.initiateWebRTCConnection();
+    } else {
+      console.log('Role: Answerer. Waiting for offer.');
+    }
 
-    // Handle remote stream
-    this.peerConnection.ontrack = (event) => {
-      if (!this.remoteStream) {
-        this.remoteStream = new MediaStream();
-        this.remoteStreamSubject.next(this.remoteStream);
-        console.log('Remote stream initialized.');
-      }
-      this.remoteStream.addTrack(event.track);
-      console.log('Added remote track to remoteStream.');
-    };
+    console.log(`isOfferer: ${this.isOfferer}`);
+  }
 
-    // Handle ICE candidates
-    this.peerConnection.onicecandidate = (event) => {
-      if (event.candidate) {
-        this.signalingService.sendWebRTCIceCandidate(this.roomId, event.candidate);
-        console.log('Sent ICE candidate.');
-      }
-    };
+  /**
+   * Initiates WebRTC connection as offerer.
+   */
+  private async initiateWebRTCConnection(): Promise<void> {
+    if (!this.roomId) {
+      console.error('Cannot initiate WebRTC connection without roomId.');
+      return;
+    }
 
-    // Handle connection state changes
-    this.peerConnection.onconnectionstatechange = () => {
-      const state = this.peerConnection?.connectionState;
-      console.log(`RTCPeerConnection state: ${state}`);
-      if (state === 'connected') {
-        this.connectionStateSubject.next('connected');
-        this.isConnectedToPeer = true;
-      } else if (state === 'disconnected' || state === 'failed') {
-        this.connectionStateSubject.next('disconnected');
-        this.isConnectedToPeer = false;
-      }
-    };
+    this.connectionStateSubject.next('connecting');
+    this.peerConnection = new RTCPeerConnection(this.ICE_CONFIG);
+    console.log('RTCPeerConnection created for Offerer.');
 
-    // Add local stream tracks to the peer connection
+    this.setupPeerConnection();
+
     if (this.localStream) {
-      console.log('Adding local stream tracks to peer connection.');
-      this.localStream.getTracks().forEach((track) => {
-        this.peerConnection?.addTrack(track, this.localStream!);
-      });
+      this.localStream.getTracks().forEach(track => this.peerConnection?.addTrack(track, this.localStream!));
+      console.log('Added local tracks to RTCPeerConnection.');
+    } else {
+      console.warn('Local stream not initialized.');
+    }
+
+    try {
+      const offer = await this.peerConnection.createOffer();
+      await this.peerConnection.setLocalDescription(offer);
+      this.signalingService.sendWebRTCOffer(this.roomId, offer);
+      console.log('Sent WebRTC offer.');
+    } catch (error) {
+      console.error('Error creating or sending WebRTC offer:', error);
+    }
+  }
+
+  /**
+   * Handles incoming WebRTC offers.
+   * @param offer - The received WebRTC offer.
+   */
+  private async handleOffer(offer: RTCSessionDescriptionInit): Promise<void> {
+    this.connectionStateSubject.next('answering');
+    this.peerConnection = new RTCPeerConnection(this.ICE_CONFIG);
+    console.log('RTCPeerConnection created for Answerer.');
+
+    this.setupPeerConnection();
+
+    if (this.localStream) {
+      this.localStream.getTracks().forEach(track => this.peerConnection?.addTrack(track, this.localStream!));
+      console.log('Added local tracks to RTCPeerConnection.');
     } else {
       console.warn('Local stream not initialized.');
     }
@@ -436,193 +374,221 @@ export class BattleOrchestratorService implements OnDestroy {
       this.signalingService.sendWebRTCAnswer(this.roomId, answer);
       console.log('Sent WebRTC answer.');
     } catch (error) {
-      console.error('Error handling offer:', error);
+      console.error('Error handling WebRTC offer:', error);
     }
   }
 
-  async handleAnswer(answer: RTCSessionDescriptionInit) {
-    if (!this.isOfferer) {
-      console.warn('Answerer should not handle answers. Ignoring.');
+  /**
+   * Handles incoming WebRTC answers.
+   * @param answer - The received WebRTC answer.
+   */
+  private async handleAnswer(answer: RTCSessionDescriptionInit): Promise<void> {
+    if (!this.isOfferer || !this.peerConnection) {
+      console.warn('Not an offerer or no peerConnection exists. Ignoring answer.');
       return;
     }
 
-    console.log('Handling received answer.');
     try {
-      await this.peerConnection?.setRemoteDescription(new RTCSessionDescription(answer));
+      await this.peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
       this.connectionStateSubject.next('connected');
       this.isConnectedToPeer = true;
-      console.log('Set remote description with answer. WebRTC connection established.');
+      console.log('WebRTC connection established.');
     } catch (error) {
       console.error('Error setting remote description with answer:', error);
     }
   }
 
-  async handleIceCandidate(candidate: RTCIceCandidateInit) {
-    console.log('Adding received ICE candidate.');
+  /**
+   * Handles incoming ICE candidates.
+   * @param candidate - The received ICE candidate.
+   */
+  private async handleIceCandidate(candidate: RTCIceCandidateInit): Promise<void> {
+    if (!this.peerConnection) {
+      console.error('No RTCPeerConnection to add ICE candidate.');
+      return;
+    }
+
     try {
-      await this.peerConnection?.addIceCandidate(new RTCIceCandidate(candidate));
-      console.log('Added ICE candidate.');
+      await this.peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+      console.log('Added ICE candidate to RTCPeerConnection.');
     } catch (error) {
       console.error('Error adding received ICE candidate:', error);
     }
   }
 
-  incrementVote(): void {
-    const currentVotes = this.voteCountSubject.getValue();
-    this.voteCountSubject.next(currentVotes + 1);
-    console.log('Vote incremented:', currentVotes + 1);
-  }
+  /**
+   * Sets up RTCPeerConnection event handlers.
+   */
+  private setupPeerConnection(): void {
+    if (!this.peerConnection) return;
 
-  private generateRandomWord(): void {
-    const randomIndex = Math.floor(Math.random() * this.words.length);
-    const selectedWord = this.words[randomIndex];
-    this.currentWordSubject.next(selectedWord);
-    console.log('Generated word:', selectedWord);
-  }
-
-  private determineRoleAndInitiate() {
-    if (!this.ownSocketId || !this.partnerSocketId) {
-      console.error('Socket IDs not available for role determination.');
-      return;
-    }
-
-    // Use localeCompare for accurate string comparison
-    const comparison = this.ownSocketId.localeCompare(this.partnerSocketId);
-    if (comparison === -1) {
-      console.log('Role determined: Offerer');
-      this.isOfferer = true;
-      // Automatically initiate WebRTC connection for Offerer
-      this.initiateWebRTCConnection();
-    } else {
-      console.log('Role determined: Answerer');
-      this.isOfferer = false;
-      // Answerer will wait for the offer
-    }
-
-    console.log(`isOfferer: ${this.isOfferer}`);
-  }
-
-  // Initiate WebRTC Connection (Offerer)
-  async initiateWebRTCConnection() {
-    if (!this.roomId) {
-      console.error('Cannot initiate WebRTC connection without roomId.');
-      return;
-    }
-
-    this.connectionStateSubject.next('connecting');
-    this.peerConnection = new RTCPeerConnection(this.iceConfig);
-    console.log('RTCPeerConnection created.');
-
-    // Handle remote stream
-    this.peerConnection.ontrack = (event) => {
-      if (!this.remoteStream) {
-        this.remoteStream = new MediaStream();
-        this.remoteStreamSubject.next(this.remoteStream);
-        console.log('Remote stream initialized.');
-      }
-      this.remoteStream.addTrack(event.track);
-      console.log('Added remote track to remoteStream.');
-    };
-
-    // Handle ICE candidates
-    this.peerConnection.onicecandidate = (event) => {
+    this.peerConnection.onicecandidate = event => {
       if (event.candidate) {
         this.signalingService.sendWebRTCIceCandidate(this.roomId, event.candidate);
         console.log('Sent ICE candidate.');
       }
     };
 
-    // Handle connection state changes
+    this.peerConnection.ontrack = event => {
+      if (!this.remoteStream) {
+        this.remoteStream = new MediaStream();
+        this.remoteStreamSubject.next(this.remoteStream);
+        console.log('Remote stream initialized.');
+      }
+      this.remoteStream.addTrack(event.track);
+      console.log('Added remote track.');
+    };
+
     this.peerConnection.onconnectionstatechange = () => {
       const state = this.peerConnection?.connectionState;
       console.log(`RTCPeerConnection state: ${state}`);
+      this.connectionStateSubject.next(state || 'unknown');
+
       if (state === 'connected') {
-        this.connectionStateSubject.next('connected');
         this.isConnectedToPeer = true;
       } else if (state === 'disconnected' || state === 'failed') {
-        this.connectionStateSubject.next('disconnected');
         this.isConnectedToPeer = false;
       }
     };
+  }
 
-    // Add local stream tracks to the peer connection
+  /**
+   * Handles partner disconnection by cleaning up and re-initiating matchmaking.
+   */
+  private handlePartnerDisconnected(): void {
+    this.closeConnection();
+    this.roomId = '';
+    this.partnerSocketId = '';
+    this.isOfferer = false;
+    this.isConnectedToPeer = false;
+    this.partnerDisconnectedSubject.next();
+    console.log('Partner disconnected. Cleaned up connection.');
+  }
+
+  /**
+   * Handles partner hang up by cleaning up and re-initiating matchmaking.
+   */
+  private handlePartnerHangUp(): void {
+    this.closeConnection();
+    this.roomId = '';
+    this.partnerSocketId = '';
+    this.isOfferer = false;
+    this.isConnectedToPeer = false;
+    this.partnerHangUpSubject.next();
+    console.log('Partner hung up. Cleaned up connection.');
+  }
+
+  /**
+   * Closes WebRTC connections and stops media streams.
+   */
+  public closeConnection(): void {
+    console.log('Closing WebRTC connections and stopping streams.');
+
+    // Close peer connection
+    if (this.peerConnection) {
+      this.peerConnection.close();
+      this.peerConnection = null;
+      console.log('PeerConnection closed.');
+    }
+
+    // Stop local stream
     if (this.localStream) {
-      console.log('Adding local stream tracks to peer connection.');
-      this.localStream.getTracks().forEach((track) => {
-        this.peerConnection?.addTrack(track, this.localStream!);
-      });
+      this.localStream.getTracks().forEach(track => track.stop());
+      this.localStream = null;
+      console.log('Local stream stopped.');
+    }
+
+    // Stop remote stream
+    if (this.remoteStream) {
+      this.remoteStream.getTracks().forEach(track => track.stop());
+      this.remoteStream = null;
+      this.remoteStreamSubject.next(null);
+      console.log('Remote stream stopped.');
+    }
+
+    // Reset connection flags
+    this.isConnectedToPeer = false;
+    this.connectionStateSubject.next('disconnected');
+  }
+
+  /**
+   * Handles battle hanging up by the user.
+   */
+  public hangUp(): void {
+    console.log('Hang up initiated.');
+    if (this.isConnectedToPeer || this.battleStarted) {
+      this.signalingService.hangUp();
+      this.closeConnection();
+      console.log('Emitted hangUp event and closed connections.');
     } else {
-      console.warn('Local stream not initialized.');
-    }
-
-    // Create an offer
-    try {
-      const offer = await this.peerConnection.createOffer();
-      await this.peerConnection.setLocalDescription(offer);
-      this.signalingService.sendWebRTCOffer(this.roomId, offer);
-      console.log('Sent WebRTC offer.');
-    } catch (error) {
-      console.error('Error creating or sending offer:', error);
+      console.log('No active battle to hang up.');
     }
   }
 
-  // Initiate battle logic upon receiving 'battleStart'
-  private initiateBattle(): void {
-    this.battleStarted = true; // Flag to indicate battle has started
-
-    // Start battle mechanics
-    this.startTimer();
-    this.startWordChange();
-
-    // Initialize WebRTC connections if not already done
-    this.initializeWebRTC();
-
-    console.log('Battle has been initiated.');
-  }
-
-  // Emit 'readyToStart' when user is ready
-  public userReadyToStart(): void {
-    this.signalingService.emitReadyToStart();
-    console.log('User is ready to start the battle.');
-  }
-
-  // Initialize WebRTC connections
-  private initializeWebRTC(): void {
-    // Your existing WebRTC initiation logic
-    if (!this.isConnectedToPeer) {
-      this.determineRoleAndInitiate();
-    }
-  }
-
-  // Restart Battle by re-initiating matchmaking
+  /**
+   * Restarts the battle by resetting states and re-initiating matchmaking.
+   */
   private async restartBattle(): Promise<void> {
     console.log('Restarting battle and re-initiating matchmaking.');
+    this.resetBattleState();
     await this.startBattle();
+  }
+
+  /**
+   * Resets the battle-related states and observables.
+   */
+  private resetBattleState(): void {
+    this.currentTurnSubject.next('Player 1');
+    this.timeLeftSubject.next(this.TOTAL_TIME);
+    this.voteCountSubject.next(0);
+    this.viewerCountSubject.next(0);
+    this.currentWordSubject.next('');
+    this.battleStarted = false;
+    this.triggerFlipAnimation = false;
+    this.triggerZoomOut = false;
+    this.triggerBounceIn = false;
+
+    // Stop any existing timers or word change subscriptions
+    this.stopTimersAndWordChange();
+    console.log('Battle state has been reset.');
+  }
+
+  /**
+   * Initializes the local media stream.
+   */
+  public async initializeLocalStream(): Promise<void> {
+    try {
+      this.localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      console.log('Local media stream initialized.');
+    } catch (error) {
+      console.error('Error accessing media devices:', error);
+    }
+  }
+
+  /**
+   * Starts the battle by initiating matchmaking and resetting battle states.
+   */
+  public async startBattle(): Promise<void> {
+    if (this.isConnectedToPeer) {
+      console.warn('Already connected to a peer. Cannot start another battle.');
+      return;
+    }
+
+    this.resetBattleState();
+
+    if (!this.localStream) {
+      await this.initializeLocalStream();
+      // Assume that the component will handle assigning the stream to video elements
+    }
+
+    // Start matchmaking
+    this.signalingService.startRandomBattle();
+    console.log('Matchmaking initiated.');
   }
 
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
-    this.wordChangeSubscription?.unsubscribe();
-    this.stopTimer();
-
-    // Close WebRTC connection if it exists
-    if (this.peerConnection) {
-      this.peerConnection.close();
-      console.log('Peer connection closed.');
-      this.peerConnection = null;
-    }
-
-    // Stop all media tracks
-    if (this.localStream) {
-      this.localStream.getTracks().forEach((track) => track.stop());
-      console.log('Local media tracks stopped.');
-      this.localStream = null;
-    }
-
-    if (this.remoteStream) {
-      this.remoteStream.getTracks().forEach((track) => track.stop());
-      console.log('Remote media tracks stopped.');
-      this.remoteStream = null;
-    }
+    this.stopTimersAndWordChange();
+    this.closeConnection();
   }
 }

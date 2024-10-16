@@ -38,8 +38,8 @@ export class BattlePageComponent implements OnInit, OnDestroy {
   @ViewChild('remoteVideo') remoteVideo!: ElementRef<HTMLVideoElement>;
 
   private subscriptions = new Subscription();
-  private remoteStreamSubscription!: Subscription;
-  stream!: MediaStream;
+
+  // Battle state variables (Component-specific)
   timeLeft: number = 60;
   currentTurn: string = 'Player 1';
   word: string = '';
@@ -65,49 +65,35 @@ export class BattlePageComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    // Step 1: Cleanup any residual data from previous battles
     this.cleanupPreviousBattle();
-
-    // Step 2: Initialize local video
     this.initializeLocalVideo();
-
-    // Step 3: Automatically start matchmaking upon entering the battle page
     this.startMatchmaking();
-
-    // Step 4: Subscribe to battle events and other observables
     this.subscribeToBattleEvents();
   }
 
   ngOnDestroy(): void {
-    // Unsubscribe from all subscriptions to prevent memory leaks
     this.subscriptions.unsubscribe();
-
-    // Perform additional cleanup if necessary
     this.battleService.closeConnection();
   }
 
   /**
-   * Cleans up any residual data from previous battles.
+   * Cleans up any residual battle data from previous battles.
    */
   private cleanupPreviousBattle(): void {
     console.log('Checking for residual battle data...');
-
-    // Check if there's an ongoing battle
     if (this.battleService.isConnectedToPeer || this.battleService.battleStarted) {
       console.log('Residual battle data found. Performing cleanup...');
       this.battleService.closeConnection();
-      this.battleService.isConnectedToPeer = false; // Perform cleanup without navigating
+      this.battleService.isConnectedToPeer = false; // Reset flags
       this.battleService.battleStarted = false;
     } else {
       console.log('No residual battle data found.');
     }
-
-    // Reset component state variables
     this.resetComponentState();
   }
 
   /**
-   * Resets all component-specific state variables to their default values.
+   * Resets component state variables.
    */
   private resetComponentState(): void {
     this.timeLeft = 60;
@@ -134,13 +120,13 @@ export class BattlePageComponent implements OnInit, OnDestroy {
   /**
    * Initializes the local video stream and assigns it to the video element.
    */
-  async initializeLocalVideo(): Promise<void> {
+  private async initializeLocalVideo(): Promise<void> {
     try {
       await this.battleService.initializeLocalStream();
       if (this.localVideo && this.battleService.localStream) {
         this.localVideo.nativeElement.srcObject = this.battleService.localStream;
         this.localVideo.nativeElement.play();
-        console.log('Local video stream assigned to local video element.');
+        console.log('Local video stream assigned to video element.');
       } else {
         console.warn('Local video element or localStream is undefined.');
       }
@@ -150,187 +136,131 @@ export class BattlePageComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Starts matchmaking to find a random battle opponent.
+   * Starts matchmaking to find an opponent.
    */
-  startMatchmaking(): void {
-    console.log('Starting matchmaking automatically.');
+  private startMatchmaking(): void {
+    console.log('Starting matchmaking.');
     this.battleService.startBattle();
-    this.showWaitingMessage = true; // Show waiting message
+    this.showWaitingMessage = true;
   }
 
   /**
-   * Subscribes to various battle-related events and observables.
+   * Subscribes to various battle events and updates component state accordingly.
    */
   private subscribeToBattleEvents(): void {
-    // Subscribe to battle found event to handle room creation
-    const battleFoundSubscription = this.battleService.battleFound$.subscribe(
-      (data) => {
-        console.log('Battle found event received:', data);
-        this.showStartButton = true; // Show "Start Battle" when paired
-        this.showWaitingMessage = false; // Hide waiting message if any
+    // Battle found
+    const battleFoundSub = this.battleService.battleFound$.subscribe(data => {
+      console.log('Battle found:', data);
+      this.showStartButton = true;
+      this.showWaitingMessage = false;
+    });
+    this.subscriptions.add(battleFoundSub);
 
-        // Optionally, you can show a message indicating the user is paired and ready to start
-      }
-    );
-    this.subscriptions.add(battleFoundSubscription);
-
-    // Subscribe to battleStart event to initiate battle logic
-    const battleStartSubscription = this.battleService.battleStart$.subscribe(() => {
-      console.log('BattleStart event received in component.');
+    // Battle started
+    const battleStartSub = this.battleService.battleStart$.subscribe(() => {
+      console.log('Battle started. Handling battle initiation.');
       this.handleBattleStart();
     });
-    this.subscriptions.add(battleStartSubscription);
+    this.subscriptions.add(battleStartSub);
 
-    // Subscribe to connection state to handle WebRTC connection updates
-    const connectionStateSubscription =
-      this.battleService.connectionState$.subscribe((state) => {
-        console.log('WebRTC Connection State:', state);
-        if (state !== 'disconnected') {
-          // Once connected, assign the remote stream to the remote video element
-          this.remoteStreamSubscription =
-            this.battleService.remoteStream$.subscribe((stream) => {
-              console.log('Remote Stream:', stream);
-
-              if (stream && this.remoteVideo) {
-                // Ensure the video element is available
-                setTimeout(() => {
-                  this.remoteVideo.nativeElement.srcObject = stream;
-                  console.log('Remote video stream assigned.');
-                  this.battleStarted = true;
-                  this.cdr.detectChanges(); // Trigger change detection
-                }, 0);
-              } else {
-                console.warn(
-                  'Remote stream received but remoteVideo is undefined.'
-                );
-              }
-            });
-          this.subscriptions.add(this.remoteStreamSubscription);
-        } else if (state === 'disconnected') {
-          // Clear remote video stream
-          if (this.remoteVideo) {
-            this.remoteVideo.nativeElement.srcObject = null;
-            console.log('Remote video stream cleared.');
-          }
+    // WebRTC connection state
+    const connectionStateSub = this.battleService.connectionState$.subscribe(state => {
+      console.log(`WebRTC connection state: ${state}`);
+      if (state === 'connected') {
+        if (this.remoteVideo && this.battleService.remoteStream) {
+          this.remoteVideo.nativeElement.srcObject = this.battleService.remoteStream;
+          this.remoteVideo.nativeElement.play();
+          this.battleStarted = true;
+          this.cdr.detectChanges();
         }
-      });
-    this.subscriptions.add(connectionStateSubscription);
-
-    // Subscribe to partnerDisconnected event
-    const partnerDisconnectedSubscription =
-      this.battleService.partnerDisconnected$.subscribe(() => {
-        console.log('Partner disconnected. Redirecting to /battle.');
-
-        // Show a user notification (optional)
-        alert(
-          'Your battle partner has disconnected. You will be redirected to the battle page.'
-        );
-
-        // Perform cleanup
-        this.hangUp(false);
-
-        // Redirect to /battle
-        this.router.navigate(['/battle']);
-      });
-    this.subscriptions.add(partnerDisconnectedSubscription);
-
-    // Subscribe to partnerHangUp event
-    const partnerHangUpSubscription =
-      this.battleService.partnerHangUp$.subscribe(() => {
-        console.log('Partner hung up the battle. Notifying user.');
-
-        // Show a user notification (optional)
-        alert(
-          'Your battle partner hung up the battle. You can start a new battle now.'
-        );
-
-        // Perform cleanup
-        this.hangUp(false);
-        this.router.navigate(['/battle']);
-      });
-    this.subscriptions.add(partnerHangUpSubscription);
-
-    // Additional subscriptions for battle mechanics
-    const timeLeftSubscription = this.battleService.timeLeft$.subscribe(
-      (time) => {
-        this.timeLeft = time;
+      } else if (state === 'disconnected') {
+        if (this.remoteVideo) {
+          this.remoteVideo.nativeElement.srcObject = null;
+          console.log('Remote video stream cleared.');
+        }
       }
-    );
-    this.subscriptions.add(timeLeftSubscription);
+    });
+    this.subscriptions.add(connectionStateSub);
 
-    const currentTurnSubscription = this.battleService.currentTurn$.subscribe(
-      (turn) => {
-        this.currentTurn = turn;
-        this.updateRapperData(turn);
-      }
-    );
-    this.subscriptions.add(currentTurnSubscription);
+    // Partner disconnected
+    const partnerDisconnectedSub = this.battleService.partnerDisconnected$.subscribe(() => {
+      alert('Your opponent has disconnected. Redirecting to battle page.');
+      this.hangUp(false);
+      this.router.navigate(['/battle']);
+    });
+    this.subscriptions.add(partnerDisconnectedSub);
 
-    const currentWordSubscription = this.battleService.currentWord$.subscribe(
-      (word) => {
-        console.log(word, 'word');
-        this.word = word;
-      }
-    );
-    this.subscriptions.add(currentWordSubscription);
+    // Partner hang up
+    const partnerHangUpSub = this.battleService.partnerHangUp$.subscribe(() => {
+      alert('Your opponent has hung up. You can start a new battle.');
+      this.hangUp(false);
+      this.router.navigate(['/battle']);
+    });
+    this.subscriptions.add(partnerHangUpSub);
 
-    const viewerCountSubscription = this.battleService.viewerCount$.subscribe(
-      (count) => {
-        this.viewerCount = count;
-      }
-    );
-    this.subscriptions.add(viewerCountSubscription);
+    // Battle Mechanics
+    const timeLeftSub = this.battleService.timeLeft$.subscribe(time => {
+      this.timeLeft = time;
+    });
+    this.subscriptions.add(timeLeftSub);
 
-    const voteCountSubscription = this.battleService.voteCount$.subscribe(
-      (count) => {
-        this.voteCount = count;
-      }
-    );
-    this.subscriptions.add(voteCountSubscription);
+    const currentTurnSub = this.battleService.currentTurn$.subscribe(turn => {
+      this.currentTurn = turn;
+      this.updateRapperName(turn);
+    });
+    this.subscriptions.add(currentTurnSub);
+
+    const currentWordSub = this.battleService.currentWord$.subscribe(word => {
+      this.word = word;
+      console.log(`Current Word: ${word}`);
+    });
+    this.subscriptions.add(currentWordSub);
+
+    const viewerCountSub = this.battleService.viewerCount$.subscribe(count => {
+      this.viewerCount = count;
+    });
+    this.subscriptions.add(viewerCountSub);
+
+    const voteCountSub = this.battleService.voteCount$.subscribe(count => {
+      this.voteCount = count;
+    });
+    this.subscriptions.add(voteCountSub);
   }
 
   /**
-   * Handles the initiation of the battle after receiving the 'battleStart' event.
+   * Handles the initiation of the battle once started.
    */
-  handleBattleStart(): void {
-    console.log('Battle has started!');
+  private handleBattleStart(): void {
+    console.log('Handling battle start animations and state.');
     this.battleStarted = true;
     this.triggerFlipAnimation = true;
 
-    // Trigger flip animation after 0.3 seconds
     setTimeout(() => {
       this.triggerZoomOut = true;
     }, 300);
 
-    // Trigger zoom out after 1.5 seconds
-    setTimeout(() => {
-      this.showStartButton = false;
-    }, 1500);
-
-    // Start the battle after 1.5 seconds
     setTimeout(() => {
       this.triggerBounceIn = !this.triggerBounceIn;
+      // Additional logic if required
     }, 1500);
   }
 
   /**
-   * Thumbs Up (Vote) functionality to cast a vote.
+   * Casts a vote (Thumbs Up) during the battle.
    */
-  thumbsUp(): void {
+  public thumbsUp(): void {
     if (this.hasVoted) {
       alert('You have already voted!');
       return;
     }
 
     this.battleService.incrementVote();
-
     this.triggerTada = !this.triggerTada;
+    this.applyGlow = true;
+
     setTimeout(() => {
-      this.applyGlow = true;
-      setTimeout(() => {
-        this.applyGlow = false;
-      }, 2000);
-    }, 0);
+      this.applyGlow = false;
+    }, 2000);
 
     this.hasVoted = true;
   }
@@ -339,12 +269,13 @@ export class BattlePageComponent implements OnInit, OnDestroy {
    * Updates the rapper's name based on the current turn.
    * @param turn - The current turn identifier.
    */
-  updateRapperData(turn: string): void {
+  private updateRapperName(turn: string): void {
     this.rapperName = turn;
+    console.log(`Rapper name updated to: ${turn}`);
   }
 
   /**
-   * Formats the remaining time into a MM:SS string.
+   * Formats the remaining time into MM:SS format.
    */
   get formattedTime(): string {
     const minutes = Math.floor(this.timeLeft / 60);
@@ -353,39 +284,28 @@ export class BattlePageComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Hang Up method to end the battle and navigate away.
-   * @param navigate - Determines whether to navigate after hanging up.
+   * Hangs up the battle, cleans up connections, and navigates if required.
+   * @param navigate - Whether to navigate after hanging up.
    */
-  hangUp(navigate: boolean = true): void {
-    console.log('Hang Up method called. Ending battle.');
-
-    // Emit 'hangUp' event via BattleOrchestratorService
+  public hangUp(navigate: boolean = true): void {
+    console.log('Hang up initiated.');
     if (this.battleService.isConnectedToPeer || this.battleService.battleStarted) {
-      console.log('Calling BattleOrchestratorService.hangUp()');
-      // Close WebRTC connections and stop streams
-      this.battleService.closeConnection();
       this.battleService.hangUp();
+      console.log('Emitted hangUp event and closed connections.');
     } else {
       console.log('No active battle to hang up.');
     }
 
-    // Update battle state flags
     this.battleStarted = false;
-
-    // Hide the "Start Battle" button if necessary
     this.showStartButton = false;
-
-    // Reset animation triggers
     this.triggerFlipAnimation = false;
     this.triggerZoomOut = false;
     this.triggerBounceIn = false;
 
     if (navigate) {
-      // Navigate to /chat if invoked by user
       this.router.navigate(['/chat']);
     }
 
-    // Reset component state variables
     this.resetComponentState();
   }
 }
