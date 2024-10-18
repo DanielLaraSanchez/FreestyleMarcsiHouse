@@ -18,6 +18,7 @@ import {
   zoomOutDownAnimation,
 } from 'angular-animations';
 import { Router } from '@angular/router';
+import { BattleService } from '../../../services/battle.service';
 
 @Component({
   selector: 'app-battle-page',
@@ -59,9 +60,10 @@ export class BattlePageComponent implements OnInit, OnDestroy {
   showWaitingMessage: boolean = false;
 
   constructor(
-    private battleService: BattleOrchestratorService,
+    private battleService: BattleService,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private orchestratorService: BattleOrchestratorService
   ) {}
 
   ngOnInit(): void {
@@ -199,29 +201,29 @@ export class BattlePageComponent implements OnInit, OnDestroy {
     this.subscriptions.add(partnerHangUpSub);
 
     // Battle Mechanics
-    const timeLeftSub = this.battleService.timeLeft$.subscribe(time => {
+    const timeLeftSub = this.orchestratorService.timeLeft$.subscribe(time => {
       this.timeLeft = time;
     });
     this.subscriptions.add(timeLeftSub);
 
-    const currentTurnSub = this.battleService.currentTurn$.subscribe(turn => {
+    const currentTurnSub = this.orchestratorService.currentTurn$.subscribe(turn => {
       this.currentTurn = turn;
       this.updateRapperName(turn);
     });
     this.subscriptions.add(currentTurnSub);
 
-    const currentWordSub = this.battleService.currentWord$.subscribe(word => {
+    const currentWordSub = this.orchestratorService.currentWord$.subscribe(word => {
       this.word = word;
       console.log(`Current Word: ${word}`);
     });
     this.subscriptions.add(currentWordSub);
 
-    const viewerCountSub = this.battleService.viewerCount$.subscribe(count => {
+    const viewerCountSub = this.orchestratorService.viewerCount$.subscribe(count => {
       this.viewerCount = count;
     });
     this.subscriptions.add(viewerCountSub);
 
-    const voteCountSub = this.battleService.voteCount$.subscribe(count => {
+    const voteCountSub = this.orchestratorService.voteCount$.subscribe(count => {
       this.voteCount = count;
     });
     this.subscriptions.add(voteCountSub);
@@ -254,7 +256,7 @@ export class BattlePageComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.battleService.incrementVote();
+    this.orchestratorService.incrementVote();
     this.triggerTada = !this.triggerTada;
     this.applyGlow = true;
 
