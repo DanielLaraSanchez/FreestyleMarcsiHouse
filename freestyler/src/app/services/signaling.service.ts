@@ -3,13 +3,9 @@ import { default as io, Socket } from 'socket.io-client';
 import { BehaviorSubject, Subject, Subscription } from 'rxjs';
 import { Message } from '../models/message';
 import { AuthService } from './auth.service';
+import { BattleFoundData } from '../models/battle-found-data';
 
 const SOCKET_URL = 'http://localhost:3000'; // Prefer environment variable
-
-interface BattleFoundData {
-  roomId: string;
-  partnerSocketId: string;
-}
 
 @Injectable({
   providedIn: 'root',
@@ -55,7 +51,7 @@ export class SignalingService implements OnDestroy {
   private subscriptions = new Subscription();
 
   constructor(private authService: AuthService) {
-    const authSubscription = this.authService.token$.subscribe(token => {
+    const authSubscription = this.authService.token$.subscribe((token) => {
       if (token) {
         this.connectSocket(token);
       } else {
@@ -67,7 +63,9 @@ export class SignalingService implements OnDestroy {
 
   private connectSocket(token: string): void {
     if (this.socket && this.isConnected) {
-      console.warn('Existing socket detected. Disconnecting for a fresh connection.');
+      console.warn(
+        'Existing socket detected. Disconnecting for a fresh connection.'
+      );
       this.disconnectSocket();
     }
 
@@ -111,7 +109,7 @@ export class SignalingService implements OnDestroy {
     });
 
     // Battle events
-    this.socket.on('battleFound', (data: BattleFoundData) => {
+    this.socket.on('battleFound', (data: any) => {
       this.battleFoundSubject.next(data);
       console.log('Battle found:', data);
     });
@@ -122,36 +120,65 @@ export class SignalingService implements OnDestroy {
     });
 
     // WebRTC signaling events
-    this.socket.on('webrtc_offer', (data: { offer: RTCSessionDescriptionInit }) => {
-      if (data.offer) {
-        this.webrtcOfferSubject.next(data.offer);
-        console.log('Received WebRTC offer.');
+    this.socket.on(
+      'webrtc_offer',
+      (data: { offer: RTCSessionDescriptionInit }) => {
+        if (data.offer) {
+          this.webrtcOfferSubject.next(data.offer);
+          console.log('Received WebRTC offer.');
+        }
       }
-    });
+    );
 
-    this.socket.on('webrtc_answer', (data: { answer: RTCSessionDescriptionInit }) => {
-      if (data.answer) {
-        this.webrtcAnswerSubject.next(data.answer);
-        console.log('Received WebRTC answer.');
+    this.socket.on(
+      'webrtc_answer',
+      (data: { answer: RTCSessionDescriptionInit }) => {
+        if (data.answer) {
+          this.webrtcAnswerSubject.next(data.answer);
+          console.log('Received WebRTC answer.');
+        }
       }
-    });
+    );
 
-    this.socket.on('webrtc_ice_candidate', (data: { candidate: RTCIceCandidateInit }) => {
-      if (data.candidate) {
-        this.webrtcIceCandidateSubject.next(data.candidate);
-        console.log('Received ICE candidate.');
+    this.socket.on(
+      'webrtc_ice_candidate',
+      (data: { candidate: RTCIceCandidateInit }) => {
+        if (data.candidate) {
+          this.webrtcIceCandidateSubject.next(data.candidate);
+          console.log('Received ICE candidate.');
+        }
       }
-    });
+    );
 
     // Partner events
     this.socket.on('partnerDisconnected', () => {
       console.log('Partner disconnected.');
       this.partnerDisconnectedSubject.next();
+      const battleFoundData: BattleFoundData = {
+        roomId: '',
+        partner: {
+          name: '',
+          profilePicture: '',
+          socketId: '',
+          userId: '',
+        },
+      };
+      this.battleFoundSubject.next(battleFoundData);
     });
 
     this.socket.on('partnerHangUp', () => {
       console.log('Partner hung up.');
       this.partnerHangUpSubject.next();
+      const battleFoundData: BattleFoundData = {
+        roomId: '',
+        partner: {
+          name: '',
+          profilePicture: '',
+          socketId: '',
+          userId: '',
+        },
+      };
+      this.battleFoundSubject.next(battleFoundData);
     });
 
     // Errors

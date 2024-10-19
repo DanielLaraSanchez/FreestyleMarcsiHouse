@@ -3,11 +3,6 @@ import { BehaviorSubject, interval, Subject, Subscription } from 'rxjs';
 import { SignalingService } from './signaling.service';
 import { AuthService } from './auth.service';
 
-interface BattleFoundData {
-  roomId: string;
-  partnerSocketId: string;
-}
-
 @Injectable({
   providedIn: 'root',
 })

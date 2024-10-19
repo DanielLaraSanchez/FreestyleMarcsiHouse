@@ -8,6 +8,7 @@ passport.use(
       clientID: '22638002158-v7r9rsf3vjdn59vqsdsavt8mncui3k8m.apps.googleusercontent.com', // Your Google Client ID
       clientSecret: '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', // Your Google Client Secret
       callbackURL: '/auth/google/callback',
+      scope: ['profile', 'email']
     },
     async (accessToken, refreshToken, profile, done) => {
       // Find or create the user

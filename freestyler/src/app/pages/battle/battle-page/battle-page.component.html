@@ -1,5 +1,4 @@
-<!-- battle-page.component.html -->
-
+<!-- src/app/components/battle-page/battle-page.component.html -->
 <div class="battle-page-container">
   <!-- Local Video Stream -->
   <div class="main-video-container">
@@ -12,8 +11,12 @@
   </div>
 
   <!-- Opponent Name Display -->
-  <div class="opponent-name" [ngClass]="{ 'glow-name': applyGlow }" [@tada]="triggerTada">
-    <p class="long-text">{{ rapperName }}</p>
+  <div
+    class="opponent-name"
+    [ngClass]="{ 'glow-name': applyGlow }"
+    [@tada]="triggerTada ? 'in' : 'void'"
+  >
+    <p class="long-text">{{ battle?.partner?.name }}</p>
   </div>
 
   <!-- Top Controls: Timer, Current Word, Start Button, Vote Button -->
@@ -22,10 +25,10 @@
     <div
       class="timer-container"
       *ngIf="battleStarted"
-      [@bounceIn]="triggerBounceIn"
+      [@bounceIn]="triggerBounceIn ? 'in' : 'void'"
     >
       <p-knob
-        [(ngModel)]="timeLeft"
+        [ngModel]="timeLeft$ | async"
         valueColor="#e91e63"
         rangeColor="SlateGray"
         [size]="80"
@@ -40,27 +43,34 @@
 
     <!-- Current Word -->
     <div class="current-word" *ngIf="battleStarted">
-      <p class="current-word-p" [@bounceIn]="triggerBounceIn">{{ word }}</p>
+      <p
+        class="current-word-p"
+        [@bounceIn]="triggerBounceIn ? 'in' : 'void'"
+      >
+        {{ currentWord$ | async }}
+      </p>
     </div>
 
     <!-- Start Battle Button -->
     <button
       *ngIf="showStartButton"
       class="start-button"
-      [@bounceOutRight]="triggerZoomOut"
-
+      [@bounceOutRight]="triggerZoomOut ? 'out' : 'void'"
+      (click)="startBattle()"
     >
       START
     </button>
 
     <!-- Vote Button -->
     <button
+      *ngIf="battleStarted"
       class="vote-button"
-      [class.invisible]="showStartButton"
-      [@bounceIn]="triggerBounceIn"
+      [ngClass]="{ invisible: !battleStarted }"
+      [@bounceIn]="triggerBounceIn ? 'in' : 'void'"
       (click)="thumbsUp()"
     >
       <i class="pi pi-thumbs-up-fill"></i>
+      <span>{{ voteCount }}</span>
     </button>
   </div>
 
@@ -73,7 +83,7 @@
 
   <!-- Waiting Messages -->
   <div *ngIf="showWaitingMessage" class="waiting-message">
-    <p *ngIf="showStartButton">Waiting for an opponent to join...</p>
-    <p *ngIf="!showStartButton">Waiting for the battle to start...</p>
+    <p *ngIf="!showStartButton">Waiting for an opponent to join...</p>
+    <p *ngIf="showStartButton">Waiting for the opponent to be ready...</p>
   </div>
 </div>

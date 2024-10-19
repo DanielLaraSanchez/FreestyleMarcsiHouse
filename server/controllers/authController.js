@@ -68,9 +68,16 @@ const AuthController = {
     const token = jwt.sign({ id: user._id, tokenVersion: user.tokenVersion }, process.env.JWT_SECRET, {
       expiresIn: '1d',
     });
-  
-    // Redirect back to Angular app with token as a query parameter
-    res.redirect(`http://localhost:4200/auth/google/callback?token=${token}`);
+console.log(user, "AQUIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII")
+    // Selectively include user information
+    const userInfo = {
+      id: user._id,
+      name: user.name,
+      profilePicture: user.profilePicture
+    };
+
+    // Redirect back to Angular app with token and user info as query parameters
+    res.redirect(`http://localhost:4200/auth/google/callback?token=${token}&user=${encodeURIComponent(JSON.stringify(userInfo))}`);
   },
 };
 

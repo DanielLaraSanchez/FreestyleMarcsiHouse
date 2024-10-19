@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -44,6 +44,11 @@ import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { AuthCallbackComponent } from './components/auth-callback/auth-callback.component';
 import { BattleSidebarComponent } from './components/battle-sidebar/battle-sidebar.component';
 import { UserprofilePageComponent } from './pages/userprofile/userprofile-page/userprofile-page.component';
+import { ConfigService } from './services/config.service';
+
+export function initializeApp(configService: ConfigService) {
+  return () => configService.loadConfig();
+}
 
 @NgModule({
   declarations: [
@@ -99,7 +104,14 @@ import { UserprofilePageComponent } from './pages/userprofile/userprofile-page/u
     FormsModule, // Add FormsModule here
   ],
   providers: [{ provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
-    { provide: HTTP_INTERCEPTORS, useClass: HttpTokenInterceptor, multi: true }
+    { provide: HTTP_INTERCEPTORS, useClass: HttpTokenInterceptor, multi: true },
+    ConfigService,
+    {
+      provide: APP_INITIALIZER,
+      useFactory: initializeApp,
+      deps: [ConfigService],
+      multi: true,
+    },
   ],
   bootstrap: [AppComponent]
 })

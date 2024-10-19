@@ -1,0 +1,23 @@
+{
+  "totalTimePerTurn": 60,
+  "wordChangeInterval": 5,
+  "animationDurations": {
+    "flip": 1500,
+    "zoomOut": 300,
+    "bounceIn": 1500
+  },
+  "words": [
+    "Victory",
+    "Hustle",
+    "Flow",
+    "Rhythm",
+    "Battle",
+    "Street",
+    "Mic",
+    "Beats",
+    "Freestyle",
+    "Legend"
+  ],
+  "maxVoteCount": 10,
+  "initialViewerCount": 100
+}

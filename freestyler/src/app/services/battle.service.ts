@@ -3,11 +3,9 @@ import { BehaviorSubject, interval, Subject, Subscription } from 'rxjs';
 import { SignalingService } from './signaling.service';
 import { AuthService } from './auth.service';
 import { BattleOrchestratorService } from './battle-orchestrator.service';
+import { BattleFoundData } from '../models/battle-found-data';
+import { UserService } from './user.service';
 
-interface BattleFoundData {
-  roomId: string;
-  partnerSocketId: string;
-}
 
 @Injectable({
   providedIn: 'root',
@@ -62,7 +60,8 @@ export class BattleService implements OnDestroy {
   constructor(
     private signalingService: SignalingService,
     private authService: AuthService,
-    private orchestratorService:BattleOrchestratorService
+    private orchestratorService:BattleOrchestratorService,
+    private userService: UserService
   ) {
     // Subscribe to own socket ID
     const ownSocketIdSub = this.signalingService.ownSocketId$.subscribe(id => {
@@ -77,11 +76,11 @@ export class BattleService implements OnDestroy {
         console.warn('Already connected to a peer. Ignoring new battleFound event.');
         return;
       }
-      this.roomId = data.roomId;
-      this.partnerSocketId = data.partnerSocketId;
-      console.log(`Battle found! Room ID: ${this.roomId}, Partner Socket ID: ${this.partnerSocketId}`);
-      this.battleFoundSubject.next(data);
-      this.determineRoleAndInitiate();
+          this.roomId = data.roomId;
+          this.partnerSocketId = data.partner.socketId;
+          console.log(`Battle found! Room ID: ${this.roomId}, Partner Socket ID: ${this.partnerSocketId}`);
+          this.battleFoundSubject.next(data);
+          this.determineRoleAndInitiate();
     });
     this.subscriptions.add(battleFoundSub);
 
@@ -143,7 +142,7 @@ export class BattleService implements OnDestroy {
    */
   private determineRoleAndInitiate(): void {
     if (!this.ownSocketId || !this.partnerSocketId) {
-      console.error('Socket IDs not available for role determination.');
+      console.log('Socket IDs not available for role determination.', this.ownSocketId, this.partnerSocketId);
       return;
     }
 

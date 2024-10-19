@@ -194,7 +194,7 @@ export class ChatPageComponent implements OnInit, AfterViewChecked {
   }
 
   openPrivateChat(user: User) {
-    this.selectTab(user._id);
+    this.selectTab(user._id || '');
   }
 
   selectTab(tabId: string) {

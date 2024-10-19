@@ -9,8 +9,8 @@ const authMiddleware = async (req, res, next) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const user = await User.findById(decoded.id);
 
-    console.log('Auth Middleware - Token decoded:', decoded);
-    console.log('Auth Middleware - User tokenVersion:', user.tokenVersion);
+    // console.log('Auth Middleware - Token decoded:', decoded);
+    // console.log('Auth Middleware - User tokenVersion:', user.tokenVersion);
 
     if (!user || user.tokenVersion !== decoded.tokenVersion) {
       return res.status(401).json({ message: 'Invalid token' });
