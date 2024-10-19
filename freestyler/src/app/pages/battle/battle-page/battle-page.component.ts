@@ -50,11 +50,9 @@ export class BattlePageComponent implements OnInit, OnDestroy {
   currentTurn: string = 'Player 1';
   word: string = '';
 
-  rapperName: string = 'Player 1';
   viewerCount: number = 100;
   voteCount: number = 0;
 
-  hasVoted: boolean = false;
   triggerTada: boolean = false;
   applyGlow: boolean = false;
   battleStarted: boolean = false;
@@ -62,6 +60,7 @@ export class BattlePageComponent implements OnInit, OnDestroy {
   triggerFlipAnimation: boolean = false;
   triggerBounceIn: boolean = false;
   showStartButton: boolean = true;
+
   showWaitingMessage: boolean = false;
 
   battle: BattleFoundData | null = null;
@@ -130,7 +129,10 @@ export class BattlePageComponent implements OnInit, OnDestroy {
       )
       .subscribe(completeData => {
         this.battle = completeData;
-        console.log('Opponent data received:', completeData);
+        if(completeData) {
+          console.log('Opponent data received:', completeData);
+        }
+
         // Here you can manage the UI updates based on opponent data
       });
 
@@ -142,6 +144,7 @@ export class BattlePageComponent implements OnInit, OnDestroy {
       console.log('Own user data:', user);
     });
     this.subscriptions.add(ownUserSub);
+
   }
 
   ngOnInit(): void {
@@ -149,6 +152,9 @@ export class BattlePageComponent implements OnInit, OnDestroy {
     this.initializeLocalVideo();
     this.startMatchmaking();
     this.subscribeToBattleEvents();
+    this.currentWord$.subscribe(res => {
+      console.log(res, "dani7")
+    })
   }
 
   ngOnDestroy(): void {
@@ -183,11 +189,9 @@ export class BattlePageComponent implements OnInit, OnDestroy {
     this.currentTurn = 'Player 1';
     this.word = '';
 
-    this.rapperName = 'Player 1';
     this.viewerCount = 100;
     this.voteCount = 0;
 
-    this.hasVoted = false;
     this.triggerTada = false;
     this.applyGlow = false;
     this.battleStarted = false;
@@ -274,7 +278,6 @@ export class BattlePageComponent implements OnInit, OnDestroy {
       this.battleService.partnerDisconnected$.subscribe(() => {
         alert('Your opponent has disconnected. Redirecting to battle page.');
         this.hangUp(false);
-        // this.router.navigate(['/battle']);
       });
     this.subscriptions.add(partnerDisconnectedSub);
 
@@ -282,45 +285,9 @@ export class BattlePageComponent implements OnInit, OnDestroy {
     const partnerHangUpSub = this.battleService.partnerHangUp$.subscribe(() => {
       alert('Your opponent has hung up. You can start a new battle.');
       this.hangUp(false);
-      // this.router.navigate(['/battle']);
     });
     this.subscriptions.add(partnerHangUpSub);
 
-    // Battle Mechanics
-    const timeLeftSub = this.orchestratorService.timeLeft$.subscribe((time) => {
-      this.timeLeft = time;
-    });
-    this.subscriptions.add(timeLeftSub);
-
-    const currentTurnSub = this.orchestratorService.currentTurn$.subscribe(
-      (turn) => {
-        this.currentTurn = turn;
-        this.updateRapperName(turn);
-      }
-    );
-    this.subscriptions.add(currentTurnSub);
-
-    const currentWordSub = this.orchestratorService.currentWord$.subscribe(
-      (word) => {
-        this.word = word;
-        console.log(`Current Word: ${word}`);
-      }
-    );
-    this.subscriptions.add(currentWordSub);
-
-    const viewerCountSub = this.orchestratorService.viewerCount$.subscribe(
-      (count) => {
-        this.viewerCount = count;
-      }
-    );
-    this.subscriptions.add(viewerCountSub);
-
-    const voteCountSub = this.orchestratorService.voteCount$.subscribe(
-      (count) => {
-        this.voteCount = count;
-      }
-    );
-    this.subscriptions.add(voteCountSub);
   }
 
   /**
@@ -329,16 +296,18 @@ export class BattlePageComponent implements OnInit, OnDestroy {
   private handleBattleStart(): void {
     console.log('Handling battle start animations and state.');
     this.battleStarted = true;
-    this.triggerFlipAnimation = true;
-
+    this.triggerFlipAnimation = !this.triggerFlipAnimation;
+    this.showWaitingMessage =  true;
     setTimeout(() => {
-      this.triggerZoomOut = true;
+      this.triggerZoomOut = !this.triggerZoomOut;
+
     }, 300);
 
     setTimeout(() => {
+      this.showStartButton = false;
       this.triggerBounceIn = !this.triggerBounceIn;
-      // Additional logic if required
-    }, 1500);
+
+    }, 2000);
   }
 
    startBattle(): void {
@@ -350,12 +319,7 @@ export class BattlePageComponent implements OnInit, OnDestroy {
    * Casts a vote (Thumbs Up) during the battle.
    */
   public thumbsUp(): void {
-    if (this.hasVoted) {
-      alert('You have already voted!');
-      return;
-    }
-
-    this.orchestratorService.incrementVote();
+    // this.orchestratorService.incrementVote();
     this.triggerTada = !this.triggerTada;
     this.applyGlow = true;
 
@@ -363,17 +327,8 @@ export class BattlePageComponent implements OnInit, OnDestroy {
       this.applyGlow = false;
     }, 2000);
 
-    this.hasVoted = true;
   }
 
-  /**
-   * Updates the rapper's name based on the current turn.
-   * @param turn - The current turn identifier.
-   */
-  private updateRapperName(turn: string): void {
-    this.rapperName = turn;
-    console.log(`Rapper name updated to: ${turn}`);
-  }
 
   /**
    * Formats the remaining time into MM:SS format.

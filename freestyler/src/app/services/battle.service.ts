@@ -414,7 +414,6 @@ export class BattleService implements OnDestroy {
 
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
-    this.orchestratorService.stopTimersAndWordChange();
     this.closeConnection();
   }
 }

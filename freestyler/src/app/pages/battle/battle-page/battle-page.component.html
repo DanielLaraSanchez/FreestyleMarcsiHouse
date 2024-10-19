@@ -12,9 +12,10 @@
 
   <!-- Opponent Name Display -->
   <div
+  *ngIf="battle?.partner?.name"
     class="opponent-name"
     [ngClass]="{ 'glow-name': applyGlow }"
-    [@tada]="triggerTada ? 'in' : 'void'"
+    [@tada]="triggerTada"
   >
     <p class="long-text">{{ battle?.partner?.name }}</p>
   </div>
@@ -24,11 +25,11 @@
     <!-- Timer -->
     <div
       class="timer-container"
-      *ngIf="battleStarted"
+      *ngIf="!showStartButton"
       [@bounceIn]="triggerBounceIn"
     >
       <p-knob
-        [ngModel]="timeLeft$ | async"
+        [ngModel]="(timeLeft$ | async)"
         valueColor="#e91e63"
         rangeColor="SlateGray"
         [size]="80"
@@ -42,10 +43,11 @@
     </div>
 
     <!-- Current Word -->
-    <div class="current-word" *ngIf="battleStarted">
+    <div class="current-word" *ngIf="!showStartButton">
       <p
         class="current-word-p"
-        [@bounceIn]="triggerBounceIn ? 'in' : 'void'"
+        *ngIf="!showStartButton"
+        [@bounceIn]="triggerBounceIn"
       >
         {{ currentWord$ | async }}
       </p>
@@ -53,9 +55,9 @@
 
     <!-- Start Battle Button -->
     <button
-      *ngIf="!battleStarted"
+      *ngIf="showStartButton"
       class="start-button"
-      [@bounceOutRight]="triggerZoomOut ? 'out' : 'void'"
+      [@bounceOutRight]="triggerZoomOut"
       (click)="startBattle()"
     >
       START
@@ -63,10 +65,9 @@
 
     <!-- Vote Button -->
     <button
-      *ngIf="battleStarted"
       class="vote-button"
-      [ngClass]="{ invisible: !battleStarted }"
-      [@bounceIn]="triggerBounceIn ? 'in' : 'void'"
+      [ngClass]="{ invisible: showStartButton }"
+      [@bounceIn]="triggerBounceIn"
       (click)="thumbsUp()"
     >
       <i class="pi pi-thumbs-up-fill"></i>
