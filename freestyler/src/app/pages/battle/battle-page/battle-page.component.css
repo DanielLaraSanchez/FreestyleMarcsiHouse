@@ -15,7 +15,7 @@
   left: 0;
   right: 0;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   padding: 10px;
   /* background: linear-gradient(90deg, rgba(153, 50, 204, 0.075),rgba(169, 158, 175, 0.123), rgba(153, 50, 204, 0.062)); */
@@ -33,7 +33,10 @@
   left: 75px;
   width: 40%;
   height: 50%;
-  border-radius: 25px;
+  border-top-left-radius: 0px;
+  border-top-right-radius: 31px;
+  border-bottom-right-radius: 31px;
+  border-bottom-left-radius: 31px;
   border: 2px solid #fff;
 
 }
@@ -42,7 +45,10 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: 25px;
+  border-top-left-radius: 0px;
+  border-top-right-radius: 28px;
+  border-bottom-right-radius: 28px;
+  border-bottom-left-radius: 28px;
 
 }
 
@@ -71,14 +77,17 @@
 
 .opponent-name {
   position: absolute;
-  top: 18px;
-  left: 112px;
+  top: 180px;
+  left: 75px;
   background-color: rgba(0, 0, 0, 0.5);
   color: #fff;
   font-size: 18px;
   padding: 5px 10px;
-  border-radius: 25px;
-  max-width: 15%;
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
+  border-bottom-right-radius: 0px;
+  border-bottom-left-radius: 0px;
+    max-width: 15%;
   overflow: hidden;
   text-overflow: ellipsis " [..]";
   white-space: nowrap;
@@ -128,10 +137,23 @@
   opacity: 0
 }
 
+.round-title {
+  margin-bottom: -14px;
+}
+
 .timer-container,
 .current-word,
 .vote-button {
   pointer-events: none;
+}
+
+.timer-container {
+  position: absolute;
+  left: 10px;
+  display: flex;
+  width: 225px;
+  color:white;
+  justify-content: space-around;
 }
 
 .current-word {
@@ -223,6 +245,7 @@
 @media (max-width: 667px) {
   .start-button{
     margin-right:0px;
+    margin-left:50px;
   }
   .small-video-container {
     position: absolute;
@@ -262,8 +285,8 @@
 
   .opponent-name {
     position: absolute;
-    top: 83px;
-    left: -1px;
+    top: 85px;
+    left: 7px;
     background-color: rgba(0, 0, 0, 0.5);
     color: #fff;
     font-size: 18px;
@@ -297,11 +320,13 @@
   left: 0;
   right: 0;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   padding: 0px;
   /* background-color: rgba(0, 0, 0, 0.2); */
-  background: linear-gradient(90deg, rgba(153, 50, 204, 0.788),rgba(0, 0, 0, 0.89),rgba(0, 0, 0, 0.89), rgba(153, 50, 204, 0.699));
+  /* background: linear-gradient(90deg, rgba(153, 50, 204, 0.788),rgba(0, 0, 0, 0.89), rgba(153, 50, 204, 0.699)); */
+  background: linear-gradient(90deg, rgba(153, 50, 204, 0.788), rgba(153, 50, 204, 0.699));
+
 
   z-index: 3;
   max-height:85px;

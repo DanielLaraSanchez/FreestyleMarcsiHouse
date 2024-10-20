@@ -1,18 +1,18 @@
 <!-- src/app/components/battle-page/battle-page.component.html -->
 <div class="battle-page-container">
+  <p-toast [breakpoints]="{ '920px': { width: '100%', right: '0', left: '0' } }" />
   <!-- Local Video Stream -->
   <div class="main-video-container">
-    <video #localVideo autoplay playsinline></video>
+    <video #remoteVideo autoplay playsinline></video>
   </div>
 
   <!-- Remote Video Stream -->
   <div class="small-video-container">
-    <video #remoteVideo autoplay playsinline muted></video>
+    <video #localVideo autoplay playsinline muted></video>
   </div>
 
   <!-- Opponent Name Display -->
   <div
-  *ngIf="battle?.partner?.name"
     class="opponent-name"
     [ngClass]="{ 'glow-name': applyGlow }"
     [@tada]="triggerTada"
@@ -28,28 +28,36 @@
       *ngIf="!showStartButton"
       [@bounceIn]="triggerBounceIn"
     >
+      <div [@bounceIn]="triggerBounceIn">
+        <h3 class="round-title">Round {{round}}</h3>
+        <p>{{ turn ? ownUser?.name : battle?.partner?.name }}</p>
+      </div>
       <p-knob
-        [ngModel]="(timeLeft$ | async)"
+        [(ngModel)]="currentTime"
         valueColor="#e91e63"
         rangeColor="SlateGray"
-        [size]="80"
+        [size]="70"
         [strokeWidth]="5"
         [readonly]="true"
         textColor="white"
         [min]="0"
-        [max]="60"
+        [max]="10"
       >
       </p-knob>
     </div>
 
     <!-- Current Word -->
-    <div class="current-word" *ngIf="!showStartButton">
+    <div
+      class="current-word"
+      [@bounceIn]="triggerBounceIn"
+      *ngIf="!showStartButton"
+    >
       <p
         class="current-word-p"
         *ngIf="!showStartButton"
         [@bounceIn]="triggerBounceIn"
       >
-        {{ currentWord$ | async }}
+        {{ currentWord }}
       </p>
     </div>
 

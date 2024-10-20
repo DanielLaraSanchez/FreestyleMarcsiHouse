@@ -32,6 +32,9 @@ export class BattleService implements OnDestroy {
   private remoteStreamSubject = new Subject<MediaStream | null>();
   public remoteStream$ = this.remoteStreamSubject.asObservable();
 
+  private isOffererSubject = new Subject<boolean>();
+  public isOfferer$ = this.isOffererSubject.asObservable();
+
   private battleFoundSubject = new Subject<BattleFoundData>();
   public battleFound$ = this.battleFoundSubject.asObservable();
 
@@ -148,6 +151,8 @@ export class BattleService implements OnDestroy {
 
     const comparison = this.ownSocketId.localeCompare(this.partnerSocketId);
     this.isOfferer = comparison === -1;
+    this.isOffererSubject.next(this.isOfferer)
+    console.log(this.isOfferer, "dani13")
 
     if (this.isOfferer) {
       console.log('Role: Offerer. Initiating WebRTC connection.');

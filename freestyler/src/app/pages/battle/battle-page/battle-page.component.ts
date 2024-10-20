@@ -24,6 +24,7 @@ import { AuthService } from '../../../services/auth.service';
 import { BattleFoundData } from '../../../models/battle-found-data';
 import { UserService } from '../../../services/user.service';
 import { BattleConfig, ConfigService } from '../../../services/config.service';
+import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-battle-page',
@@ -35,8 +36,8 @@ import { BattleConfig, ConfigService } from '../../../services/config.service';
     tadaAnimation({ duration: 1000, delay: 0 }),
     zoomOutDownAnimation(),
     flipAnimation({ duration: 1500, delay: 0 }),
-    bounceOutRightAnimation({ duration: 1500, delay: 0 }),
-    bounceInAnimation(),
+    bounceOutRightAnimation({ duration: 1500, delay: 300 }),
+    bounceInAnimation({ duration: 1000, delay: 1500 }),
   ],
 })
 export class BattlePageComponent implements OnInit, OnDestroy {
@@ -48,10 +49,6 @@ export class BattlePageComponent implements OnInit, OnDestroy {
   // Battle state variables (Component-specific)
   timeLeft: number = 60;
   currentTurn: string = 'Player 1';
-  word: string = '';
-
-  viewerCount: number = 100;
-  voteCount: number = 0;
 
   triggerTada: boolean = false;
   applyGlow: boolean = false;
@@ -65,35 +62,11 @@ export class BattlePageComponent implements OnInit, OnDestroy {
 
   battle: BattleFoundData | null = null;
   ownUser: User | null = null;
+  currentWord: string = '';
+  currentTime: number = -1;
 
-  words: string[] = [];
-
-  readonly TOTAL_TIME: number;
-  readonly WORD_CHANGE_INTERVAL: number;
-  readonly ANIMATION_DURATIONS: {
-    flip: number;
-    zoomOut: number;
-    bounceIn: number;
-  };
-
-    // Battle mechanics
-    private timerSubscription: Subscription | null = null;
-    private wordChangeSubscription: Subscription | null = null;
-
-    private currentTurnSubject = new BehaviorSubject<string>('Player 1');
-    currentTurn$ = this.currentTurnSubject.asObservable();
-
-    private timeLeftSubject = new BehaviorSubject<number>(0);
-    timeLeft$ = this.timeLeftSubject.asObservable();
-
-    private currentWordSubject = new BehaviorSubject<string>('');
-    currentWord$ = this.currentWordSubject.asObservable();
-
-    private voteCountSubject = new BehaviorSubject<number>(0);
-    voteCount$ = this.voteCountSubject.asObservable();
-
-    private viewerCountSubject = new BehaviorSubject<number>(0);
-    viewerCount$ = this.viewerCountSubject.asObservable();
+  turn: boolean = false;
+  round: number = 1;
 
   constructor(
     private battleService: BattleService,
@@ -102,20 +75,14 @@ export class BattlePageComponent implements OnInit, OnDestroy {
     private orchestratorService: BattleOrchestratorService,
     private authService: AuthService,
     private userService: UserService,
-    private configService: ConfigService
+    private messageService: MessageService
   ) {
-    const config: BattleConfig = this.configService.battleConfig;
-    this.TOTAL_TIME = config.totalTimePerTurn;
-    this.WORD_CHANGE_INTERVAL = config.wordChangeInterval;
-    this.ANIMATION_DURATIONS = config.animationDurations;
-    this.words = config.words;
-    this.viewerCountSubject.next(config.initialViewerCount);
     // Fetch opponent data when a battle is found
     const opponentSub = this.battleService.battleFound$
       .pipe(
-        switchMap(data =>
+        switchMap((data) =>
           this.userService.getUserById(data.partner.userId).pipe(
-            map(user => ({
+            map((user) => ({
               ...data,
               partner: {
                 userId: user._id || '',
@@ -127,9 +94,9 @@ export class BattlePageComponent implements OnInit, OnDestroy {
           )
         )
       )
-      .subscribe(completeData => {
+      .subscribe((completeData) => {
         this.battle = completeData;
-        if(completeData) {
+        if (completeData) {
           console.log('Opponent data received:', completeData);
         }
 
@@ -139,22 +106,53 @@ export class BattlePageComponent implements OnInit, OnDestroy {
     this.subscriptions.add(opponentSub);
 
     // Subscribe to own user data
-    const ownUserSub = this.authService.user$.subscribe(user => {
+    const ownUserSub = this.authService.user$.subscribe((user) => {
       this.ownUser = user;
       console.log('Own user data:', user);
     });
     this.subscriptions.add(ownUserSub);
 
+    // Subscribe to own user data
+    const isOffererSub = this.battleService.isOfferer$.subscribe((turn) => {
+      this.turn = turn;
+    });
+    this.subscriptions.add(isOffererSub);
   }
 
   ngOnInit(): void {
+    // Subscribe to the word$ observable to receive word updates
+    const wordSub = this.orchestratorService.word$.subscribe((word) => {
+      this.currentWord = word;
+    });
+
+    // Subscribe to the timer
+    const timerSub = this.orchestratorService.timer$.subscribe((time) => {
+      this.currentTime = time;
+      if (time === 0 && this.round < 2) {
+        console.log('esta pasando', time);
+        this.turn = !this.turn;
+        this.round = 2;
+
+        this.orchestratorService.resetBattleState();
+        this.orchestratorService.initiateBattle();
+      } else if (time === 0 && this.round >= 2) {
+        this.cleanupPreviousBattle();
+        // this.subscriptions.unsubscribe();
+        this.battleService.closeConnection();
+        this.router.navigate(['/battle']);
+
+        this.startMatchmaking();
+        this.subscribeToBattleEvents();
+      }
+    });
+
+    this.subscriptions.add(wordSub);
+    this.subscriptions.add(timerSub);
+
     this.cleanupPreviousBattle();
     this.initializeLocalVideo();
     this.startMatchmaking();
     this.subscribeToBattleEvents();
-    this.currentWord$.subscribe(res => {
-      console.log(res, "dani7")
-    })
   }
 
   ngOnDestroy(): void {
@@ -187,10 +185,8 @@ export class BattlePageComponent implements OnInit, OnDestroy {
   private resetComponentState(): void {
     this.timeLeft = 60;
     this.currentTurn = 'Player 1';
-    this.word = '';
-
-    this.viewerCount = 100;
-    this.voteCount = 0;
+    this.currentWord = '';
+    this.turn = false;
 
     this.triggerTada = false;
     this.applyGlow = false;
@@ -276,18 +272,27 @@ export class BattlePageComponent implements OnInit, OnDestroy {
     // Partner disconnected
     const partnerDisconnectedSub =
       this.battleService.partnerDisconnected$.subscribe(() => {
-        alert('Your opponent has disconnected. Redirecting to battle page.');
+        this.messageService.add({
+          severity: 'contrast',
+          summary: 'Battle Ended',
+          detail:
+            'Your opponent has disconnected. You will be paired up again!',
+        });
+
         this.hangUp(false);
       });
     this.subscriptions.add(partnerDisconnectedSub);
 
     // Partner hang up
     const partnerHangUpSub = this.battleService.partnerHangUp$.subscribe(() => {
-      alert('Your opponent has hung up. You can start a new battle.');
+      this.messageService.add({
+        severity: 'contrast',
+        summary: 'Battle Ended',
+        detail: 'Your opponent hung up. You will be paired up again!',
+      });
       this.hangUp(false);
     });
     this.subscriptions.add(partnerHangUpSub);
-
   }
 
   /**
@@ -297,22 +302,17 @@ export class BattlePageComponent implements OnInit, OnDestroy {
     console.log('Handling battle start animations and state.');
     this.battleStarted = true;
     this.triggerFlipAnimation = !this.triggerFlipAnimation;
-    this.showWaitingMessage =  true;
-    setTimeout(() => {
-      this.triggerZoomOut = !this.triggerZoomOut;
-
-    }, 300);
+    this.showWaitingMessage = true;
+    this.triggerZoomOut = !this.triggerZoomOut;
+    this.triggerBounceIn = !this.triggerBounceIn;
 
     setTimeout(() => {
       this.showStartButton = false;
-      this.triggerBounceIn = !this.triggerBounceIn;
-
-    }, 2000);
+    }, 1500);
   }
 
-   startBattle(): void {
-    this.orchestratorService.userReadyToStart()
-
+  startBattle(): void {
+    this.orchestratorService.userReadyToStart();
   }
 
   /**
@@ -326,9 +326,7 @@ export class BattlePageComponent implements OnInit, OnDestroy {
     setTimeout(() => {
       this.applyGlow = false;
     }, 2000);
-
   }
-
 
   /**
    * Formats the remaining time into MM:SS format.
@@ -360,6 +358,7 @@ export class BattlePageComponent implements OnInit, OnDestroy {
     this.triggerFlipAnimation = false;
     this.triggerZoomOut = false;
     this.triggerBounceIn = false;
+    this.turn = false;
 
     if (navigate) {
       this.router.navigate(['/chat']);

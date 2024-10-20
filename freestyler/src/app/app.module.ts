@@ -23,6 +23,7 @@ import { PanelModule } from 'primeng/panel';
 import { CardModule } from 'primeng/card';
 import { OverlayPanelModule } from 'primeng/overlaypanel';
 import { KnobModule } from 'primeng/knob';
+import { ToastModule } from 'primeng/toast';
 
 
 import { JwtModule, JwtInterceptor } from '@auth0/angular-jwt';
@@ -34,6 +35,7 @@ import { CarouselModule } from 'primeng/carousel';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { DividerModule } from 'primeng/divider';
+import { MessageService } from 'primeng/api';
 
 import { TooltipModule } from 'primeng/tooltip';
 import { TabViewModule } from 'primeng/tabview';
@@ -94,6 +96,7 @@ export function initializeApp(configService: ConfigService) {
     ButtonModule,
     ProgressSpinnerModule,
     MenubarModule,
+    ToastModule,
     AvatarModule,
     RippleModule,
     InputTextModule,
@@ -112,6 +115,7 @@ export function initializeApp(configService: ConfigService) {
       deps: [ConfigService],
       multi: true,
     },
+    MessageService
   ],
   bootstrap: [AppComponent]
 })

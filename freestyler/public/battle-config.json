@@ -1,6 +1,6 @@
 {
-  "totalTimePerTurn": 60,
-  "wordChangeInterval": 5,
+  "totalTimePerTurn": 5,
+  "wordChangeInterval": 2,
   "animationDurations": {
     "flip": 1500,
     "zoomOut": 300,
