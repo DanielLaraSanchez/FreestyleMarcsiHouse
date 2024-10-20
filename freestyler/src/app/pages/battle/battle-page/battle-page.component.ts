@@ -136,13 +136,15 @@ export class BattlePageComponent implements OnInit, OnDestroy {
         this.orchestratorService.resetBattleState();
         this.orchestratorService.initiateBattle();
       } else if (time === 0 && this.round >= 2) {
+        this.round = 1;
+
         this.cleanupPreviousBattle();
         // this.subscriptions.unsubscribe();
-        this.battleService.closeConnection();
-        this.router.navigate(['/battle']);
+        // this.subscribeToBattleEvents();
+
+        // this.router.navigate(['/battle']);
 
         this.startMatchmaking();
-        this.subscribeToBattleEvents();
       }
     });
 
