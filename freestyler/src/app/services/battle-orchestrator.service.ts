@@ -10,12 +10,16 @@ export class BattleOrchestratorService implements OnDestroy {
   public battleStarted: boolean = false;
 
   // Observable to emit the current word
-  private wordSubject: BehaviorSubject<string> = new BehaviorSubject<string>('');
+  private wordSubject: BehaviorSubject<string> = new BehaviorSubject<string>(
+    ''
+  );
   public word$ = this.wordSubject.asObservable();
 
-    // Observable to emit the remaining time
-    private timerSubject: BehaviorSubject<number> = new BehaviorSubject<number>(-1);
-    public timer$ = this.timerSubject.asObservable();
+  // Observable to emit the remaining time
+  private timerSubject: BehaviorSubject<number> = new BehaviorSubject<number>(
+    -1
+  );
+  public timer$ = this.timerSubject.asObservable();
 
   private wordRotationSubscription!: Subscription;
   private timerSubscription!: Subscription;
@@ -24,7 +28,6 @@ export class BattleOrchestratorService implements OnDestroy {
 
   private currentWordIndex: number = 0;
   private remainingTime: number = 0;
-
 
   constructor(
     private configService: ConfigService,
@@ -69,7 +72,7 @@ export class BattleOrchestratorService implements OnDestroy {
   /**
    * Initiates the battle mechanics and starts word rotation.
    */
-  public initiateBattle(): void {
+  public initiateBattle(delay: number = 0): void {
     if (this.battleStarted) {
       console.warn('Battle has already been initiated.');
       return;
@@ -77,23 +80,23 @@ export class BattleOrchestratorService implements OnDestroy {
 
     this.battleStarted = true;
     console.log('Battle has been initiated.');
-
-    // Emit the first word immediately
-    this.emitCurrentWord();
-
-    // Start the interval for rotating words
-    const intervalTime = this.configService.wordChangeInterval * 1000; // Convert to milliseconds
-    this.wordRotationSubscription = interval(intervalTime).subscribe(() => {
-      this.advanceWord();
+    setTimeout(() => {
+      // Emit the first word immediately
       this.emitCurrentWord();
-    });
 
-        // Initialize and start the timer
-        this.remainingTime = this.configService.totalTimePerTurn;
-        this.timerSubject.next(this.remainingTime);
-        this.startTimer();
+      // Start the interval for rotating words
+      const intervalTime = this.configService.wordChangeInterval * 1000; // Convert to milliseconds
+      this.wordRotationSubscription = interval(intervalTime).subscribe(() => {
+        this.advanceWord();
+        this.emitCurrentWord();
+      });
+
+      // Initialize and start the timer
+      this.remainingTime = this.configService.totalTimePerTurn;
+      this.timerSubject.next(this.remainingTime);
+      this.startTimer();
+    }, delay);
   }
-
 
   /**
    * Advances the word index to the next word.
@@ -118,30 +121,29 @@ export class BattleOrchestratorService implements OnDestroy {
     console.log(`Emitting word: ${word}`);
   }
 
-    /**
+  /**
    * Starts the countdown timer.
    */
-    public startTimer(): void {
-      this.timerSubscription = interval(1000).subscribe(() => {
-        this.remainingTime -= 1;
-        this.timerSubject.next(this.remainingTime);
-        console.log(`Remaining Time: ${this.remainingTime}`);
+  public startTimer(): void {
+    this.timerSubscription = interval(1000).subscribe(() => {
+      this.remainingTime -= 1;
+      this.timerSubject.next(this.remainingTime);
+      console.log(`Remaining Time: ${this.remainingTime}`);
 
-        if (this.remainingTime <= 0) {
-          this.endTurn();
-        }
-      });
-    }
+      if (this.remainingTime <= 0) {
+        this.endTurn();
+      }
+    });
+  }
 
-    /**
-     * Ends the turn when the timer reaches zero.
-     */
-    private endTurn(): void {
-      console.log('Turn ended.');
-      this.resetBattleState();
-      // Optionally, trigger events or callbacks for turn completion
-    }
-
+  /**
+   * Ends the turn when the timer reaches zero.
+   */
+  private endTurn(): void {
+    console.log('Turn ended.');
+    this.resetBattleState();
+    // Optionally, trigger events or callbacks for turn completion
+  }
 
   ngOnDestroy(): void {
     if (this.wordRotationSubscription) {

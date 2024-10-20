@@ -90,7 +90,7 @@ export class BattleService implements OnDestroy {
     // Subscribe to battleStart event
     const battleStartSub = this.signalingService.battleStart$.subscribe(() => {
       console.log('BattleStart event received. Initiating battle.');
-      this.orchestratorService.initiateBattle();
+      this.orchestratorService.initiateBattle(3000);
       this.battleStartSubject.next();
     });
     this.subscriptions.add(battleStartSub);

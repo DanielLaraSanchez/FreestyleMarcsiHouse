@@ -25,25 +25,42 @@
     <!-- Timer -->
     <div
       class="timer-container"
-      *ngIf="!showStartButton"
-      [@bounceIn]="triggerBounceIn"
-    >
-      <div [@bounceIn]="triggerBounceIn">
+      [ngClass]="{ invisible: showStartButton }">
+
+
+
+      <div class="round-block">
         <h3 class="round-title">Round {{round}}</h3>
-        <p>{{ turn ? ownUser?.name : battle?.partner?.name }}</p>
-      </div>
-      <p-knob
+        <p-knob *ngIf="isMobile"
+        [@flip]="triggerFlipAnimation"
+        [@bounceIn]="triggerBounceIn"
         [(ngModel)]="currentTime"
         valueColor="#e91e63"
         rangeColor="SlateGray"
-        [size]="70"
+        [size]="40"
+        [style]="{ position: 'fixed', top: '-20px', left: '-10'}"
         [strokeWidth]="5"
         [readonly]="true"
         textColor="white"
         [min]="0"
-        [max]="10"
-      >
-      </p-knob>
+        [max]="60"
+      ></p-knob>
+        <p>{{ turn ? ownUser?.name : battle?.partner?.name }}</p>
+      </div>
+      <p-knob *ngIf="isDesktop"
+      [@flip]="triggerFlipAnimation"
+      [@bounceIn]="triggerBounceIn"
+      [(ngModel)]="currentTime"
+      valueColor="#e91e63"
+      rangeColor="SlateGray"
+      [size]="70"
+      [strokeWidth]="5"
+      [readonly]="true"
+      textColor="white"
+      [min]="0"
+      [max]="60"
+    ></p-knob>
+
     </div>
 
     <!-- Current Word -->

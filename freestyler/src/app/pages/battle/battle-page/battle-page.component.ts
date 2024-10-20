@@ -10,6 +10,7 @@ import { BehaviorSubject, map, Subscription, switchMap } from 'rxjs';
 import { BattleOrchestratorService } from '../../../services/battle-orchestrator.service';
 import {
   bounceInAnimation,
+  bounceInUpAnimation,
   bounceOutRightAnimation,
   flipAnimation,
   heartBeatAnimation,
@@ -25,6 +26,7 @@ import { BattleFoundData } from '../../../models/battle-found-data';
 import { UserService } from '../../../services/user.service';
 import { BattleConfig, ConfigService } from '../../../services/config.service';
 import { MessageService } from 'primeng/api';
+import { DeviceDetectorService } from '../../../services/device-detector.service';
 
 @Component({
   selector: 'app-battle-page',
@@ -37,7 +39,8 @@ import { MessageService } from 'primeng/api';
     zoomOutDownAnimation(),
     flipAnimation({ duration: 1500, delay: 0 }),
     bounceOutRightAnimation({ duration: 1500, delay: 300 }),
-    bounceInAnimation({ duration: 1000, delay: 1500 }),
+    bounceInAnimation({ duration: 1000, delay: 0 }),
+    bounceInUpAnimation({ duration: 1000, delay: 1000 }),
   ],
 })
 export class BattlePageComponent implements OnInit, OnDestroy {
@@ -68,6 +71,9 @@ export class BattlePageComponent implements OnInit, OnDestroy {
   turn: boolean = false;
   round: number = 1;
 
+  isDesktop: boolean = false;
+  isMobile: boolean = false;
+
   constructor(
     private battleService: BattleService,
     private router: Router,
@@ -75,7 +81,8 @@ export class BattlePageComponent implements OnInit, OnDestroy {
     private orchestratorService: BattleOrchestratorService,
     private authService: AuthService,
     private userService: UserService,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private deviceDetectorService: DeviceDetectorService
   ) {
     // Fetch opponent data when a battle is found
     const opponentSub = this.battleService.battleFound$
@@ -120,6 +127,21 @@ export class BattlePageComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+
+        // Subscribe to device type observables
+        this.subscriptions.add(
+          this.deviceDetectorService.isDesktop$.subscribe((isDesktop) => {
+            console.log('Is Desktop:', isDesktop);
+            this.isDesktop = isDesktop;
+          })
+        );
+
+        this.subscriptions.add(
+          this.deviceDetectorService.isMobile$.subscribe((isMobile) => {
+            console.log('Is Mobile:', isMobile);
+            this.isMobile = isMobile;
+          })
+        );
     // Subscribe to the word$ observable to receive word updates
     const wordSub = this.orchestratorService.word$.subscribe((word) => {
       this.currentWord = word;
@@ -128,23 +150,23 @@ export class BattlePageComponent implements OnInit, OnDestroy {
     // Subscribe to the timer
     const timerSub = this.orchestratorService.timer$.subscribe((time) => {
       this.currentTime = time;
+
       if (time === 0 && this.round < 2) {
-        console.log('esta pasando', time);
         this.turn = !this.turn;
         this.round = 2;
+        this.triggerFlipAnimation = !this.triggerFlipAnimation;
+        // this.triggerBounceIn = !this.triggerBounceIn;
 
         this.orchestratorService.resetBattleState();
-        this.orchestratorService.initiateBattle();
+        this.orchestratorService.initiateBattle(1000);
       } else if (time === 0 && this.round >= 2) {
         this.round = 1;
-
         this.cleanupPreviousBattle();
-        // this.subscriptions.unsubscribe();
-        // this.subscribeToBattleEvents();
-
-        // this.router.navigate(['/battle']);
-
         this.startMatchmaking();
+      }
+
+      if (time && !this.turn) {
+        this.setLocalAudio(false);
       }
     });
 
@@ -179,6 +201,16 @@ export class BattlePageComponent implements OnInit, OnDestroy {
       console.log('No residual battle data found.');
     }
     this.resetComponentState();
+  }
+
+  private setLocalAudio(audioEnabled: boolean): void {
+    if (this.battleService.localStream) {
+      // Mute or unmute audio tracks
+      const audioTracks = this.battleService.localStream.getAudioTracks();
+      audioTracks?.forEach((track) => {
+        track.enabled = audioEnabled;
+      });
+    }
   }
 
   /**
@@ -303,14 +335,17 @@ export class BattlePageComponent implements OnInit, OnDestroy {
   private handleBattleStart(): void {
     console.log('Handling battle start animations and state.');
     this.battleStarted = true;
-    this.triggerFlipAnimation = !this.triggerFlipAnimation;
     this.showWaitingMessage = true;
     this.triggerZoomOut = !this.triggerZoomOut;
-    this.triggerBounceIn = !this.triggerBounceIn;
 
     setTimeout(() => {
       this.showStartButton = false;
+      this.triggerBounceIn = true;
     }, 1500);
+
+    setTimeout(() => {
+      this.triggerFlipAnimation = true;
+    }, 2000);
   }
 
   startBattle(): void {

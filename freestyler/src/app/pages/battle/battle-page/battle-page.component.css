@@ -243,6 +243,20 @@
 
 
 @media (max-width: 667px) {
+
+  .round-block {
+    position: absolute;
+
+  }
+
+  .timer-container {
+    position: absolute;
+    display: block;
+    left: 10px;
+    width: 225px;
+    color:white;
+    justify-content: space-around;
+  }
   .start-button{
     margin-right:0px;
     margin-left:50px;
@@ -342,6 +356,7 @@
 
 .current-word {
   font-size: 25px;
+  margin-left: 68px;
 }
 
 .vote-button {
