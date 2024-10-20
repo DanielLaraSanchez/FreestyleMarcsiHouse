@@ -29,7 +29,8 @@
 
 
 
-      <div class="round-block">
+      <div class="round-block" [@bounceIn]="triggerBounceIn"
+      >
         <h3 class="round-title">Round {{round}}</h3>
         <p-knob *ngIf="isMobile"
         [@flip]="triggerFlipAnimation"
@@ -37,8 +38,8 @@
         [(ngModel)]="currentTime"
         valueColor="#e91e63"
         rangeColor="SlateGray"
-        [size]="40"
-        [style]="{ position: 'fixed', top: '-20px', left: '-10'}"
+        [size]="70"
+        [style]="{ position: 'fixed', top: '7px', left: '-10'}"
         [strokeWidth]="5"
         [readonly]="true"
         textColor="white"
