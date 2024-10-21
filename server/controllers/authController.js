@@ -77,8 +77,8 @@ console.log(user, "AQUIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII")
     };
 
     // Redirect back to Angular app with token and user info as query parameters
-    res.redirect(`http://localhost:4200/auth/google/callback?token=${token}&user=${encodeURIComponent(JSON.stringify(userInfo))}`);
-  },
+    res.redirect(`http://localhost:3000/auth/callback?token=${token}&user=${encodeURIComponent(JSON.stringify(userInfo))}`);
+    },
 };
 
 module.exports = AuthController;

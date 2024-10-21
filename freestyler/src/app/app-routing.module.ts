@@ -18,7 +18,7 @@ const routes: Routes = [
   // Public routes
   { path: 'login', component: LoginComponent },
   { path: 'signup', component: SignupComponent },
-  { path: 'auth/google/callback', component: AuthCallbackComponent },
+  { path: 'auth/callback', component: AuthCallbackComponent },
   { path: 'battle', component: BattlePageComponent},
   { path: 'field', component: BattlefieldPageComponent },
   { path: 'user-profile', component: UserprofilePageComponent },

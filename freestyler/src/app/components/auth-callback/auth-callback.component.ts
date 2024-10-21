@@ -44,7 +44,7 @@ export class AuthCallbackComponent implements OnInit {
       } else {
         // Handle error
         console.error('AuthCallbackComponent: No token or user received');
-        this.router.navigate(['/login']);
+        // this.router.navigate(['/login']);
       }
     });
   }

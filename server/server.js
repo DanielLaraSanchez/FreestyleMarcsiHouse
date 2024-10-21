@@ -9,14 +9,14 @@ const passport = require("./passport"); // Passport configuration
 const { Server } = require("socket.io");
 const jwt = require("jsonwebtoken");
 const User = require("./data/models/User");
-
+const path = require('path');
 const Matchmaker = require('./models/matchMaker');
 const app = express();
 const server = http.createServer(app);
 
 // CORS Configuration
 const corsOptions = {
-  origin: process.env.CLIENT_URL || "http://localhost:4200",
+  origin: process.env.CLIENT_URL || "http://localhost:4200" || "http://localhost:3000",
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true,
 };
@@ -29,6 +29,10 @@ app.use(
     saveUninitialized: false,
   })
 );
+// Serve static files from the Angular app
+app.use(express.static(path.join(__dirname, '../freestyler/dist/freestyler/browser/')));
+
+
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -49,7 +53,10 @@ const matchmaker = new Matchmaker(io);
 // Server Port
 const PORT = process.env.PORT || 3000;
 
-
+// Serve index.html for all other routes (handle Angular routing)
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../freestyler/dist/freestyler/browser/index.html'));
+});
 
 // Temporary Debugging Route (Remove in Production)
 app.get("/debug-rooms", (req, res) => {
