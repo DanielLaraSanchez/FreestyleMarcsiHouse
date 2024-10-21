@@ -5,7 +5,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js",
-    "build-client": "cd freestyler && npm install && npm run build",
+    "build-client": "cd freestyler && npm install --legacy-peer-deps && npm run build",
     "postinstall": "npm run build-client"
   },
   "engines": {
