@@ -1,1 +1,14 @@
-**/node-modules
+# Node modules
+node_modules/
+freestyler/node_modules/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Environment variables
+.env
+
+# Build output
+freestyler/dist/
