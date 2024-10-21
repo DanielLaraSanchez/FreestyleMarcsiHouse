@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { User } from '../models/user';
 
-const API_URL = 'http://localhost:3000';
+const API_URL = 'https://enigmatic-sierra-94912-1a54ae768331.herokuapp.com';
 
 @Injectable({
   providedIn: 'root',

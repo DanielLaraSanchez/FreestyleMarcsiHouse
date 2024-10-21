@@ -73,7 +73,7 @@ export function initializeApp(configService: ConfigService) {
         tokenGetter: () => {
           return localStorage.getItem('auth-token');
         },
-        allowedDomains: ['localhost:3000'], // Adjust based on your backend domain
+        allowedDomains: ['localhost:3000', 'https://enigmatic-sierra-94912-1a54ae768331.herokuapp.com'], // Adjust based on your backend domain
       },
     }),
     BrowserModule,

@@ -23,18 +23,18 @@ export class AuthService {
   constructor(private http: HttpClient) {}
 
   login(email: string, password: string): Observable<{ token: string, user: User }> {
-    return this.http.post<{ token: string, user: User }>(`http://localhost:3000/auth/login`, { email, password }).pipe(
+    return this.http.post<{ token: string, user: User }>(`https://enigmatic-sierra-94912-1a54ae768331.herokuapp.com/auth/login`, { email, password }).pipe(
       tap((response) => {
         this.saveToken(response.token, response.user);
       })
     );
   }
   loginWithGoogle(): void {
-    window.location.href = 'http://localhost:3000/auth/google';
+    window.location.href = 'https://enigmatic-sierra-94912-1a54ae768331.herokuapp.com/auth/google';
   }
 
   signup(name: string, email: string, password: string): Observable<any> {
-    return this.http.post(`http://localhost:3000/auth/signup`, { name, email, password });
+    return this.http.post(`https://enigmatic-sierra-94912-1a54ae768331.herokuapp.com/auth/signup`, { name, email, password });
   }
 
   isAuthenticated(): boolean {

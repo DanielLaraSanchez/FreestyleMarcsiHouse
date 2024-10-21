@@ -5,7 +5,7 @@ import { Message } from '../models/message';
 import { AuthService } from './auth.service';
 import { BattleFoundData } from '../models/battle-found-data';
 
-const SOCKET_URL = 'http://localhost:3000'; // Prefer environment variable
+const SOCKET_URL = 'https://enigmatic-sierra-94912-1a54ae768331.herokuapp.com'; // Prefer environment variable
 
 @Injectable({
   providedIn: 'root',

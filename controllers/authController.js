@@ -77,7 +77,7 @@ console.log(user, "AQUIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII")
     };
 
     // Redirect back to Angular app with token and user info as query parameters
-    res.redirect(`http://localhost:3000/auth/callback?token=${token}&user=${encodeURIComponent(JSON.stringify(userInfo))}`);
+    res.redirect(`https://enigmatic-sierra-94912-1a54ae768331.herokuapp.com/auth/callback?token=${token}&user=${encodeURIComponent(JSON.stringify(userInfo))}`);
     },
 };
 

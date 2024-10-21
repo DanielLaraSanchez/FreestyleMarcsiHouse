@@ -16,7 +16,7 @@ const server = http.createServer(app);
 
 // CORS Configuration
 const corsOptions = {
-  origin: process.env.CLIENT_URL || "http://localhost:4200" || "http://localhost:3000",
+  origin: process.env.CLIENT_URL || "https://enigmatic-sierra-94912-1a54ae768331.herokuapp.com/" || "http://localhost:4200" || "http://localhost:3000",
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true,
 };
