@@ -30,7 +30,7 @@ app.use(
   })
 );
 // Serve static files from the Angular app
-app.use(express.static(path.join(__dirname, '../freestyler/dist/freestyler/browser/')));
+app.use(express.static(path.join(__dirname, './freestyler/dist/freestyler/browser/')));
 
 
 app.use(passport.initialize());
@@ -55,7 +55,7 @@ const PORT = process.env.PORT || 3000;
 
 // Serve index.html for all other routes (handle Angular routing)
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../freestyler/dist/freestyler/browser/index.html'));
+  res.sendFile(path.join(__dirname, './freestyler/dist/freestyler/browser/index.html'));
 });
 
 // Temporary Debugging Route (Remove in Production)
