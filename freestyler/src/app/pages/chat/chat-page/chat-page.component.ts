@@ -104,19 +104,19 @@ export class ChatPageComponent implements OnInit, AfterViewChecked {
             console.error('Error fetching current user:', error);
             // Handle error, possibly redirect to login
             this.authService.logout();
-            this.router.navigate(['/login']);
+            // this.router.navigate(['/login']);
           },
         });
       } else {
         // Invalid token
         console.error('Invalid token');
         this.authService.logout();
-        this.router.navigate(['/login']);
+        // this.router.navigate(['/login']);
       }
     } else {
       // Handle case where there is no token
       console.error('No auth token found, redirecting to login.');
-      this.router.navigate(['/login']);
+      // this.router.navigate(['/login']);
     }
 
     // Subscribe to chatTabs from ChatService

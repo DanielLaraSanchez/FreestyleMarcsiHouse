@@ -127,11 +127,6 @@
 }
 
 
-.hangup-btn{
-  animation: clickFeedback 0.3s forwards;
-
-}
-
 .timer-container.invisible {
   visibility: hidden;
   opacity: 0
@@ -195,14 +190,55 @@
 }
 
 .hangup-btn {
-  background-color: #f44336; /* Keep as red to indicate exit */
+  /* Basic Styles */
+  background-color: #f44336; /* Red color to indicate exit */
   border: none;
   color: #fff;
   padding: 15px;
   border-radius: 50%;
   cursor: pointer;
   font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* Animation */
+  animation: clickFeedback 0.3s forwards;
+
+  /* Transition for smooth hover effects */
+  transition: background-color 0.3s, transform 0.2s;
 }
+
+/* Hover Effects */
+.hangup-btn:hover {
+  background-color: #d32f2f; /* Darker red on hover */
+  transform: scale(1.05); /* Slightly enlarge the button */
+}
+
+/* Active (Click) Effects */
+.hangup-btn:active {
+  transform: scale(0.95); /* Slightly shrink the button on click */
+}
+
+/* Optional: Focus Styles for Accessibility */
+.hangup-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(244, 67, 54, 0.5);
+}
+
+/* Keyframes for Click Feedback Animation */
+@keyframes clickFeedback {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
 
 .vote-button {
   background-color: transparent;
@@ -368,10 +404,6 @@
   font-size: 20px;
 }
 
-.hangup-btn {
-  padding: 10px;
-  font-size: 15px;
-}
 
 }
 

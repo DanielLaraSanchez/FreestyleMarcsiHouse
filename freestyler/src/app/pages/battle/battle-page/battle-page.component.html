@@ -102,9 +102,13 @@
 
   <!-- Bottom Controls: Hang Up Button -->
   <div class="bottom-controls">
-    <button class="hangup-btn" (click)="hangUp()">
-      <i class="pi pi-phone"></i>
-    </button>
+<button 
+  pButton 
+  type="button" 
+  icon="pi pi-phone" 
+  class="hangup-btn p-button-rounded p-button-danger" 
+  (click)="hangUp()">
+</button>
   </div>
 
   <!-- Waiting Messages -->
