@@ -1,45 +1,7 @@
 <div class="chat-container">
   <!-- Desktop Layout -->
   <div class="desktop-layout" *ngIf="!isMobile">
-    <!-- Contacts List -->
-    <div class="contacts-list">
-      <div class="search-bar">
-        <!-- Bound searchTerm to enable filtering -->
-        <input
-          type="text"
-          pInputText
-          placeholder="Search or start new chat"
-          [(ngModel)]="searchTerm"
-        />
-      </div>
-      <div class="contacts">
-        <!-- General Chat -->
-        <div
-          class="contact-item general-chat"
-          [class.active]="activeTabId === 'general'"
-          (click)="selectTab('general')"
-        >
-          <p-avatar [image]="getUserProfilePicture('general')" shape="circle"></p-avatar>
-          <div class="contact-info">
-            <div class="contact-name">General</div>
-            <div class="contact-preview">{{ getLastMessage('general') }}</div>
-          </div>
-        </div>
-        <!-- Online Users -->
-        <div
-          *ngFor="let user of filteredUsers"
-          class="contact-item"
-          [class.active]="activeTabId === user._id?.toString()"
-          (click)="selectTab(user._id?.toString() || '')"
-        >
-          <p-avatar [image]="user.profilePicture" shape="circle"></p-avatar>
-          <div class="contact-info">
-            <div class="contact-name">{{ user.name }}</div>
-            <div class="contact-preview">{{ getLastMessage(user._id?.toString()) }}</div>
-          </div>
-        </div>
-      </div>
-    </div>
+
 
     <!-- Chat Conversation -->
     <div class="chat-conversation" *ngIf="selectedTab">
@@ -92,12 +54,52 @@
         <button pButton type="button" icon="pi pi-send" (click)="sendMessage()" class="send-button"></button>
       </div>
     </div>
+     <!-- Contacts List -->
+     <div class="contacts-list">
+      <div class="search-bar">
+        <!-- Bound searchTerm to enable filtering -->
+        <input
+          type="text"
+          pInputText
+          placeholder="Search or start new chat"
+          [(ngModel)]="searchTerm"
+        />
+      </div>
+      <div class="contacts">
+        <!-- General Chat -->
+        <div
+          class="contact-item general-chat"
+          [class.active]="activeTabId === 'general'"
+          (click)="selectTab('general')"
+        >
+          <p-avatar size="xlarge"
+          [image]="getUserProfilePicture('general')" shape="circle"></p-avatar>
+          <div class="contact-info">
+            <div class="contact-name">General</div>
+            <div class="contact-preview">{{ getLastMessage('general') }}</div>
+          </div>
+        </div>
+        <!-- Online Users -->
+        <div
+          *ngFor="let user of filteredUsers"
+          class="contact-item"
+          [class.active]="activeTabId === user._id?.toString()"
+          (click)="selectTab(user._id?.toString() || '')"
+        >
+          <p-avatar [image]="user.profilePicture" shape="circle"></p-avatar>
+          <div class="contact-info">
+            <div class="contact-name">{{ user.name }}</div>
+            <div class="contact-preview">{{ getLastMessage(user._id?.toString()) }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div class="mobile-layout" *ngIf="isMobile">
     <div *ngIf="selectedTab" class="mobile-chat-view">
       <div class="chat-header">
-        <p-avatar [image]="getUserProfilePicture(selectedTab.id)" shape="circle"></p-avatar>
+        <p-avatar size="large" [image]="getUserProfilePicture(selectedTab.id)" shape="circle"></p-avatar>
         <div class="chat-info">
           <div class="chat-name">{{ selectedTab.label }}</div>
         </div>

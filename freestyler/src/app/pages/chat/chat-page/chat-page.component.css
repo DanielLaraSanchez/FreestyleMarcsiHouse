@@ -361,7 +361,7 @@
 
   .message-input {
     /* Removed margin-bottom:60px; */
-    margin-bottom: 64px;
+    margin-bottom: 10%;
   }
 
   .contact-item {
