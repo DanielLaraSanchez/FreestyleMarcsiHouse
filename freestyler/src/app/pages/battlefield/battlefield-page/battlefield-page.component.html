@@ -12,14 +12,15 @@
           tabindex="0"
         >
           <!-- User Avatar -->
-          <p-avatar
-            [image]="user?.profilePicture"
-            shape="circle"
-            size="xlarge"
-            class="profile-picture"
-          ></p-avatar>
+          <div class="custom-avatar">
+            <img
+              [src]="user?.profilePicture"
+              alt="{{ user?.name }}"
+              class="avatar-img"
+            />
+          </div>
           <!-- User Name -->
-          <div class="user-name">{{ user?.name }}</div>
+          <span class="name">{{ user?.name }}</span>
         </div>
       </div>
     </div>
