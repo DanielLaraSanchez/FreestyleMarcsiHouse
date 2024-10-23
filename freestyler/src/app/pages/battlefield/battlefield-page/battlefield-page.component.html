@@ -1,57 +1,6 @@
-<!-- <div class="battlefield-container">
-  <div class="battlefield-content">
-    <div class="online-users">
-      <div class="users-grid">
-        <div
-          *ngFor="let user of usersInBattlefield"
-          class="user-card"
-          pRipple
-          role="button"
-          tabindex="0"
-        >
-          <div class="user-avatar-container">
-            <p-avatar
-              [image]="user?.profilePicture"
-              shape="circle"
-              size="large"
-              [styleClass]="'profile-picture'"
-            ></p-avatar>
-            <div class="user-name">{{ user?.name }}</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="chat-desktop" *ngIf="!isMobile">
-      <app-chat-page></app-chat-page>
-    </div>
-
-    <button
-      *ngIf="isMobile"
-      class="open-chat-btn"
-      (click)="toggleSidebar()"
-      aria-label="Open Chat"
-    >
-      💬 Chat
-    </button>
-
-    <p-sidebar
-      [(visible)]="sidebarVisible"
-      position="bottom"
-      [dismissible]="true"
-      [closeOnEscape]="true"
-      styleClass="custom-sidebar battle-sidebar"
-      [baseZIndex]="10000"
-      modal="false"
-    >
-      <app-chat-page></app-chat-page>
-    </p-sidebar>
-  </div>
-</div> -->
-
 <div class="battlefield-container">
   <div class="battlefield-content">
-    <!-- Online Users -->
+    <!-- Online Users Section -->
     <div class="online-users">
       <div class="users-grid">
         <!-- User Cards -->
@@ -62,17 +11,15 @@
           role="button"
           tabindex="0"
         >
-          <div class="user-avatar-container">
-            <!-- User Avatar -->
-            <p-avatar
-              [image]="user?.profilePicture"
-              shape="circle"
-              size="xlarge"
-              [styleClass]="'profile-picture'"
-            ></p-avatar>
-            <!-- User Name -->
-            <div class="user-name">{{ user?.name }}</div>
-          </div>
+          <!-- User Avatar -->
+          <p-avatar
+            [image]="user?.profilePicture"
+            shape="circle"
+            size="xlarge"
+            class="profile-picture"
+          ></p-avatar>
+          <!-- User Name -->
+          <div class="user-name">{{ user?.name }}</div>
         </div>
       </div>
     </div>
@@ -83,14 +30,19 @@
     </div>
 
     <!-- Button to Open Chat Sidebar on Mobile -->
-    <button *ngIf="isMobile" (click)="openChatSidebar()" class="open-chat-button">
+    <button
+      *ngIf="isMobile"
+      (click)="openChatSidebar()"
+      class="open-chat-button"
+      aria-label="Open Chat"
+    >
       <i class="pi pi-comments"></i>
     </button>
   </div>
 
   <!-- Chat Sidebar for Mobile -->
   <p-sidebar
-  [style]="{'height':'80%', 'padding':'0rem'}"
+    [style]="{ height: '80%', padding: '0rem' }"
     [(visible)]="chatSidebarVisible"
     position="bottom"
     [dismissible]="true"
