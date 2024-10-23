@@ -60,11 +60,6 @@
   justify-items: center;
 }
 
-@media (min-width: 768px) {
-  .user-grid {
-    grid-template-columns: repeat(5, 1fr); /* 5 columns on desktop */
-  }
-}
 
 /* User Item Styles */
 .user-item {
@@ -207,7 +202,9 @@ body {
 /* Open Chat Button for Mobile */
 @media (max-width: 767px) {
   /* General Container Styles */
-
+  .user-grid {
+    grid-template-columns: repeat(3, 1fr); /* 5 columns on desktop */
+  }
   .battle-fab {
     position: static;
     transform: none;
