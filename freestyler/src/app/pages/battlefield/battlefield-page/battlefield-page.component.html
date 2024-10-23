@@ -1,57 +1,82 @@
-<div class="battlefield-container">
-  <div class="battlefield-content">
-    <!-- Online Users Section -->
-    <div class="online-users">
-      <div class="users-grid">
-        <!-- User Cards -->
-        <div
-          *ngFor="let user of usersInBattlefield"
-          class="user-card"
-          pRipple
-          role="button"
-          tabindex="0"
-        >
-          <!-- User Avatar -->
-          <div class="custom-avatar">
-            <img
-              [src]="user?.profilePicture"
-              alt="{{ user?.name }}"
-              class="avatar-img"
-            />
-          </div>
-          <!-- User Name -->
-          <span class="name">{{ user?.name }}</span>
-        </div>
-      </div>
-    </div>
+<div class="battlefield-container"> 
+  <div class="battlefield-content"> 
+    <!-- Online Users Section --> 
+    <div class="online-users"> 
+      <div class="users-grid"> 
+        <!-- User Cards --> 
+        <div 
+          *ngFor="let user of usersInBattlefield" 
+          class="user-card" 
+          pRipple 
+          role="button" 
+          tabindex="0" 
+        > 
+          <!-- User Avatar with Hover Effect --> 
+          <div class="custom-avatar"> 
+            <svg viewBox="0 0 320 320">
+              <defs>
+                <circle id="circle-clip" cx="50%" cy="50%" r="25%" />
+                <clipPath id="avatar-clip">
+                  <use xlink:href="#circle-clip" />
+                </clipPath>
+              </defs>
 
-    <!-- Chat Component for Desktop -->
-    <div class="chat-desktop" *ngIf="!isMobile">
-      <app-chat-page></app-chat-page>
-    </div>
+              <!-- Ripple Effect -->
+              <g class="ripple-animation">
+                <circle cx="50%" cy="50%" r="25%" fill="white" fill-opacity="1">
+                  <animate attributeName="r" values="25%;50%" dur="4s" repeatCount="indefinite" />
+                  <animate attributeName="fill-opacity" values="1;0" dur="4s" repeatCount="indefinite" />
+                </circle>
+                <circle cx="50%" cy="50%" r="25%" fill="white" fill-opacity="1">
+                  <animate attributeName="r" values="25%;50%" dur="4s" begin="1s" repeatCount="indefinite" />
+                  <animate attributeName="fill-opacity" values="1;0" dur="4s" begin="1s" repeatCount="indefinite" />
+                </circle>
+                <circle cx="50%" cy="50%" r="25%" fill="white" fill-opacity="1">
+                  <animate attributeName="r" values="25%;50%" dur="4s" begin="2s" repeatCount="indefinite" />
+                  <animate attributeName="fill-opacity" values="1;0" dur="4s" begin="2s" repeatCount="indefinite" />
+                </circle>
+                <circle cx="50%" cy="50%" r="25%" fill="white" fill-opacity="1">
+                  <animate attributeName="r" values="25%;50%" dur="4s" begin="3s" repeatCount="indefinite" />
+                  <animate attributeName="fill-opacity" values="1;0" dur="4s" begin="3s" repeatCount="indefinite" />
+                </circle>
+              </g>
 
-    <!-- Button to Open Chat Sidebar on Mobile -->
-    <button
-      *ngIf="isMobile"
-      (click)="openChatSidebar()"
-      class="open-chat-button"
-      aria-label="Open Chat"
-    >
-      <i class="pi pi-comments"></i>
-    </button>
-  </div>
-
-  <!-- Chat Sidebar for Mobile -->
-  <p-sidebar
-    [style]="{ height: '80%', padding: '0rem' }"
-    [(visible)]="chatSidebarVisible"
-    position="bottom"
-    [dismissible]="true"
-    [modal]="true"
-    [baseZIndex]="10000"
-    showCloseIcon="true"
-    styleClass="chat-sidebar"
-  >
-    <app-chat-page></app-chat-page>
-  </p-sidebar>
+              <image height="50%" width="50%" x="25%" y="25%" [attr.href]="user?.profilePicture" clip-path="url(#avatar-clip)" />  
+            </svg>
+          </div> 
+          <!-- User Name --> 
+          <span class="name">{{ user?.name }}</span> 
+        </div> 
+      </div> 
+    </div> 
+   
+    <!-- Chat Component for Desktop --> 
+    <div class="chat-desktop" *ngIf="!isMobile"> 
+      <app-chat-page></app-chat-page> 
+    </div> 
+   
+    <!-- Button to Open Chat Sidebar on Mobile --> 
+    <button 
+      *ngIf="isMobile" 
+      (click)="openChatSidebar()" 
+      class="open-chat-button" 
+      aria-label="Open Chat" 
+    > 
+      <i class="pi pi-comments"></i> 
+    </button> 
+  </div> 
+   
+  <!-- Chat Sidebar for Mobile --> 
+  <p-sidebar 
+    [style]="{ height: '80%', padding: '0rem' }" 
+    [(visible)]="chatSidebarVisible" 
+    position="bottom" 
+    [dismissible]="true" 
+    [modal]="true" 
+    [baseZIndex]="10000" 
+    showCloseIcon="true" 
+    styleClass="chat-sidebar" 
+  > 
+    <app-chat-page></app-chat-page> 
+  </p-sidebar> 
 </div>
