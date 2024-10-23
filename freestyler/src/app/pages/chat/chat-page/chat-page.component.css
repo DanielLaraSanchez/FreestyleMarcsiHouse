@@ -227,8 +227,8 @@
 .chat-header {
   display: flex;
   align-items: center;
-  padding: 15px; /* Increased padding */
-  background-color: #3f51b5;
+  padding: 0.5rem; /* Increased padding */
+  background-color: #380d46da;
   color: white;
   border-bottom: 1px solid #ddd;
 }
@@ -333,6 +333,7 @@
 .send-button {
   margin-left: 15px; /* Increased margin */
   border-radius: 50%;
+  background-color: #7a3371;
 }
 
 /* Animations */
@@ -354,6 +355,9 @@
 }
 
 @media (max-width: 767px) {
+  .chat-container {
+    height: 85vh;
+  }
   .messages {
     padding-bottom: 0; /* Removed padding-bottom to prevent interference */
     /* min-height:75vh; */ /* Removed */

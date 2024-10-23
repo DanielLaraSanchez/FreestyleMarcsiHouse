@@ -56,15 +56,14 @@
     </div>
      <!-- Contacts List -->
      <div class="contacts-list">
-      <div class="search-bar">
-        <!-- Bound searchTerm to enable filtering -->
+      <!-- <div class="search-bar">
         <input
           type="text"
           pInputText
           placeholder="Search or start new chat"
           [(ngModel)]="searchTerm"
         />
-      </div>
+      </div> -->
       <div class="contacts">
         <!-- General Chat -->
         <div
@@ -133,14 +132,14 @@
     </div>
 
     <div *ngIf="!selectedTab" class="mobile-contacts-list">
-      <div class="search-bar">
+      <!-- <div class="search-bar">
         <input
           type="text"
           pInputText
           placeholder="Search or start new chat"
           [(ngModel)]="searchTerm"
         />
-      </div>
+      </div> -->
       <div class="contacts">
         <div
           class="contact-item general-chat"

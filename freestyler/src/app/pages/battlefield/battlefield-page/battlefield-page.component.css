@@ -22,8 +22,8 @@
 
   /* Online Users occupy 25% of the width on desktop */
   .online-users {
-    flex: 0 0 25%;
-    max-width: 25%;
+    flex: 0 0 35%;
+    max-width:35%;
     overflow-y: auto;
     padding: 20px;
     background-color: #ffffff; /* White background for cleanliness */
@@ -89,6 +89,8 @@
   transition: background-color 0.3s ease, transform 0.3s ease;
   box-sizing: border-box;
   background-color: transparent;
+  will-change: transform, background-color; /* Optimize for animation */
+  backface-visibility: hidden; /* Prevent flickering */
 }
 
 .user-item:hover .outer-wrapper,
@@ -106,6 +108,8 @@
   padding: 4px;
   transition: background-color 0.3s ease, transform 0.3s ease;
   box-sizing: border-box;
+  will-change: transform, background-color; /* Optimize for animation */
+  backface-visibility: hidden; /* Prevent flickering */
 }
 
 .user-item:hover .inner-wrapper,
@@ -126,16 +130,17 @@
   height: 60px;
   object-fit: cover;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transform: translateZ(0); /* Promote to own layer for better rendering */
 }
 
 .user-item:hover .user-avatar,
 .user-item:focus .user-avatar {
-  transform: scale(1.1);
+  transform: scale(1.1) translateZ(0);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .user-item:active .user-avatar {
-  transform: scale(0.95);
+  transform: scale(0.95) translateZ(0);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
@@ -201,6 +206,8 @@ body {
 
 /* Open Chat Button for Mobile */
 @media (max-width: 767px) {
+  /* General Container Styles */
+
   .battle-fab {
     position: static;
     transform: none;
