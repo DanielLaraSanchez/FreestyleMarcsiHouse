@@ -37,6 +37,7 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { DividerModule } from 'primeng/divider';
 import { MessageService } from 'primeng/api';
 
+import { DialogModule } from 'primeng/dialog';
 import { TooltipModule } from 'primeng/tooltip';
 import { TabViewModule } from 'primeng/tabview';
 import { UserActionsDialogComponent } from './components/user-actions-dialog/user-actions-dialog.component';
@@ -79,6 +80,7 @@ export function initializeApp(configService: ConfigService) {
     BrowserModule,
     AppRoutingModule,
     SidebarModule,
+    DialogModule,
     ButtonModule,
     KnobModule,
     BrowserAnimationsModule,

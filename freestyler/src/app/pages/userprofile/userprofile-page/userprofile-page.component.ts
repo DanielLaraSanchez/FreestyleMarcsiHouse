@@ -1,15 +1,19 @@
 import { Component } from '@angular/core';
 import { DeviceDetectorService } from '../../../services/device-detector.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-userprofile-page',
   templateUrl: './userprofile-page.component.html',
-  styleUrls: ['./userprofile-page.component.css']
+  styleUrls: ['./userprofile-page.component.css'],
 })
 export class UserprofilePageComponent {
   user = {
-    _id: "1",
+    _id: '1',
     name: 'MC Hammer',
+    email: 'mchammer@example.com',
+    phone: '+1 (555) 123-4567',
+    address: '123 Main St, Springfield, USA',
     profilePicture: 'https://randomuser.me/api/portraits/men/1.jpg',
     isOnline: true,
     isInBattlefield: false,
@@ -23,18 +27,32 @@ export class UserprofilePageComponent {
   };
 
   isMobile: boolean = false;
-  isTablet: boolean = false;
   isDesktop: boolean = false;
 
-  constructor(private deviceDetector: DeviceDetectorService) {
-    this.deviceDetector.isMobile$.subscribe(
-      (isMobile) => (this.isMobile = isMobile)
-    );
-    this.deviceDetector.isTablet$.subscribe(
-      (isTablet) => (this.isTablet = isTablet)
-    );
-    this.deviceDetector.isDesktop$.subscribe(
-      (isDesktop) => (this.isDesktop = isDesktop)
-    );
+  displayUserProfileDialog: boolean = true; // Dialog is visible by default
+
+  constructor(
+    private deviceDetector: DeviceDetectorService,
+    private router: Router
+  ) {
+    this.deviceDetector.isMobile$.subscribe((isMobile) => {
+      this.isMobile = isMobile;
+      this.isDesktop = !isMobile;
+    });
+  }
+
+  onChangeProfilePicture() {
+    // Logic to change profile picture
+    console.log('Change profile picture clicked');
+  }
+
+  saveChanges() {
+    // Logic to save changes
+    console.log('User details saved:', this.user);
+  }
+
+  onDialogHide() {
+    // Navigate to the desired route when the dialog is closed
+    this.router.navigate(['/field']); // Replace '/home' with your desired route
   }
 }

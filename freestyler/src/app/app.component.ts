@@ -86,7 +86,7 @@ export class AppComponent implements OnInit, OnDestroy {
       },
       {
         icon: 'pi pi-fw pi-user',
-        routerLink: '/profile',
+        routerLink: '/user-profile',
       },
     ];
 
