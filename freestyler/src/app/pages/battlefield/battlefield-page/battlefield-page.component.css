@@ -26,7 +26,7 @@
     max-width:35%;
     overflow-y: auto;
     padding: 20px;
-    background-color: #ffffff; /* White background for cleanliness */
+    background-color: ghostwhite; /* White background for cleanliness */
     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
   }
 
