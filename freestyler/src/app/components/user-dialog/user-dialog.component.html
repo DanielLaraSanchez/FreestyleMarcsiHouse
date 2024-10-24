@@ -1,0 +1,37 @@
+<!-- <div class="dialog-content">
+    <p-avatar [image]="user.profilePicture" shape="circle" size="xlarge"></p-avatar>
+    <div class="actions">
+      <button 
+        pButton 
+        type="button" 
+        label="Private Message" 
+        icon="pi pi-envelope" 
+        class="p-button-rounded p-button-secondary action-button">
+      </button>
+      <button 
+        pButton 
+        type="button" 
+        label="View Profile" 
+        icon="pi pi-user" 
+        class="p-button-rounded p-button-secondary action-button">
+      </button>
+      <button 
+        pButton 
+        type="button" 
+        label="Battle Request" 
+        icon="pi pi-fist-raised" 
+        class="p-button-rounded p-button-secondary action-button">
+      </button>
+    </div>
+  </div> -->
+
+  <div class="user-dialog-content">
+    <div class="header-section">
+      <p-avatar [image]="user?.profilePicture" shape="circle" size="large"></p-avatar>
+      <span class="user-name">{{ user?.name }}</span>
+    </div>
+    <div class="details-section">
+      <!-- Add more user details here -->
+      <!-- Example fields, adjust based on your User model -->
+    </div>
+  </div>

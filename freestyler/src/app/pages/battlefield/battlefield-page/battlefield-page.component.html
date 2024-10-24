@@ -1,58 +1,79 @@
-<div class="battlefield-container">
-  <div class="battlefield-content">
-    <!-- Online Users Section -->
-    <div class="online-users">
-      <div class="user-grid">
-        <!-- User Cards -->
-        <div
-          *ngFor="let user of usersInBattlefield"
-          class="user-item"
-          role="button"
+<div class="battlefield-container"> 
+  <div class="battlefield-content"> 
+    <!-- Online Users Section --> 
+    <div class="online-users"> 
+      <div class="user-grid"> 
+        <!-- User Cards --> 
+        <div 
+          *ngFor="let user of usersInBattlefield" 
+          class="user-item" 
+          role="button" 
           tabindex="0"
-        >
-          <div class="outer-wrapper">
-            <div class="inner-wrapper" pRipple>
-              <img
-                [src]="user?.profilePicture"
-                [alt]="user?.name"
-                class="user-avatar"
-                shape="circle"
-                size="large"
-              >
-            </div>
-          </div>
-          <div class="user-name">{{ user?.name }}</div>
-        </div>
-      </div>
-    </div>
+          (click)="showUserDialog(user)"
+          (keydown.enter)="showUserDialog(user)" 
+        > 
+          <div class="outer-wrapper"> 
+            <div class="inner-wrapper" pRipple> 
+              <img 
+                [src]="user?.profilePicture" 
+                [alt]="user?.name" 
+                class="user-avatar" 
+                shape="circle" 
+                size="large" 
+              > 
+            </div> 
+          </div> 
+          <div class="user-name">{{ user?.name }}</div> 
+        </div> 
+      </div> 
+    </div> 
 
-    <!-- Chat Component for Desktop -->
-    <div class="chat-desktop" *ngIf="!isMobile">
-      <app-chat-page></app-chat-page>
-    </div>
+    <!-- Chat Component for Desktop --> 
+    <div class="chat-desktop" *ngIf="!isMobile"> 
+      <app-chat-page></app-chat-page> 
+    </div> 
 
-    <!-- Button to Open Chat Sidebar on Mobile -->
-    <button
-      *ngIf="isMobile"
-      (click)="openChatSidebar()"
-      class="open-chat-button"
-      aria-label="Open Chat"
-    >
-      <i class="pi pi-comments"></i>
-    </button>
-  </div>
+    <!-- Button to Open Chat Sidebar on Mobile --> 
+    <button 
+      *ngIf="isMobile" 
+      (click)="openChatSidebar()" 
+      class="open-chat-button" 
+      aria-label="Open Chat" 
+    > 
+      <i class="pi pi-comments"></i> 
+    </button> 
+  </div> 
 
-  <!-- Chat Sidebar for Mobile -->
-  <p-sidebar
-    [style]="{ height: '80%', padding: '0rem' }"
-    [(visible)]="chatSidebarVisible"
-    position="bottom"
-    [dismissible]="true"
-    [modal]="true"
+  <!-- Chat Sidebar for Mobile --> 
+  <p-sidebar 
+    [style]="{ height: '80%', padding: '0rem' }" 
+    [(visible)]="chatSidebarVisible" 
+    position="bottom" 
+    [dismissible]="true" 
+    [modal]="true" 
+    [baseZIndex]="10000" 
+    showCloseIcon="true" 
+    styleClass="chat-sidebar" 
+  > 
+    <app-chat-page></app-chat-page> 
+  </p-sidebar> 
+
+  <!-- User Dialog -->
+  <p-dialog 
+    header="{{selectedUser?.name}}" 
+    [(visible)]="userDialogVisible" 
+    [modal]="true" 
+    [style]="{ width: '25rem' }"
+    [responsive]="true"
+    [breakpoints]="{ '640px': '95vw' }"
+    [closable]="true"
+    [dismissableMask]="true"
     [baseZIndex]="10000"
-    showCloseIcon="true"
-    styleClass="chat-sidebar"
   >
-    <app-chat-page></app-chat-page>
-  </p-sidebar>
+    <app-user-dialog [user]="selectedUser"></app-user-dialog>
+    <ng-template pTemplate="footer">
+      <p-button label="Close" (onClick)="userDialogVisible = false"></p-button>
+    </ng-template>
+  </p-dialog>
+
 </div>

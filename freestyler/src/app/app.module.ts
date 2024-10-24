@@ -48,6 +48,7 @@ import { AuthCallbackComponent } from './components/auth-callback/auth-callback.
 import { BattleSidebarComponent } from './components/battle-sidebar/battle-sidebar.component';
 import { UserprofilePageComponent } from './pages/userprofile/userprofile-page/userprofile-page.component';
 import { ConfigService } from './services/config.service';
+import { UserDialogComponent } from './components/user-dialog/user-dialog.component';
 
 export function initializeApp(configService: ConfigService) {
   return () => configService.loadConfig();
@@ -65,7 +66,8 @@ export function initializeApp(configService: ConfigService) {
     BattlePairComponent,
     AuthCallbackComponent,
     BattleSidebarComponent,
-    UserprofilePageComponent
+    UserprofilePageComponent,
+    UserDialogComponent
   ],
   imports: [
     HttpClientModule,

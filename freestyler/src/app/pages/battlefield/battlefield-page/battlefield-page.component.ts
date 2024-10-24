@@ -31,6 +31,10 @@ export class BattlefieldPageComponent implements OnInit, OnDestroy {
   ongoingBattles: Pair[] = [];
   usersInBattlefield: User[] = [];
 
+  // Properties for the User Dialog
+  selectedUser?: User;
+  userDialogVisible: boolean = false;
+
   constructor(
     private deviceService: DeviceDetectorService,
     private router: Router
@@ -89,4 +93,15 @@ export class BattlefieldPageComponent implements OnInit, OnDestroy {
   onMouseLeave() {
     this.isHovered = false;
   }
-}
+
+    // Method to show the user dialog
+    showUserDialog(user: User) {
+      this.selectedUser = user;
+      this.userDialogVisible = true;
+    }
+  
+    // Optional: Method to close the user dialog
+    closeUserDialog() {
+      this.userDialogVisible = false;
+    }
+  } 
