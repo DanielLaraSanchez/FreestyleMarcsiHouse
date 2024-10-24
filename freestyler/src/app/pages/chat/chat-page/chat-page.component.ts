@@ -17,6 +17,7 @@ import { AuthService } from '../../../services/auth.service';
 import { SignalingService } from '../../../services/signaling.service';
 import { filter } from 'rxjs/operators';
 import { Router } from '@angular/router';
+import { base64Image } from '../../../data/avatarB64';
 
 @Component({
   selector: 'app-chat-page',
@@ -46,7 +47,7 @@ export class ChatPageComponent implements OnInit, AfterViewChecked {
     _id: '-1', // Use _id instead of id
     name: 'General',
     profilePicture:
-      'https://via.placeholder.com/150/000000/FFFFFF/?text=General',
+      'avatarbase.png',
     stats: {
       points: 0,
       votes: 0,
@@ -232,21 +233,29 @@ export class ChatPageComponent implements OnInit, AfterViewChecked {
     return 1;
   }
 
-  getUserById(tabId: string): User | null {
+  getUserById(tabId: string | undefined): User | null {
     if (tabId === 'general') {
       return this.generalUser;
     }
     return this.onlineUsers.find((user) => user._id === tabId) || null;
   }
 
-  getUserProfilePicture(tabId: string): string {
+  getUserProfilePicture(tabId: string | undefined): string {
+    const randomNumber = Math.floor(Math.random() * 17) + 1;
+    const profilePic = `./images/${randomNumber}.png`;
     if (tabId === 'general') {
       return this.generalUser.profilePicture;
     }
     const user = this.getUserById(tabId);
-    return user && user.profilePicture
-      ? user.profilePicture
-      : 'https://via.placeholder.com/150';
+    if (user?.profilePicture) {
+      return user.profilePicture;
+    } else if (user && !user.profilePicture){
+      user.profilePicture = profilePic;
+      return profilePic;
+    }else {
+    return profilePic;
+    }
+
   }
 
   getUserStatus(tabId: string): string {

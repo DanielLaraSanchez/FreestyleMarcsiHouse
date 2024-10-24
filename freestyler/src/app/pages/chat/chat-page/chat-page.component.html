@@ -85,7 +85,7 @@
           [class.active]="activeTabId === user._id?.toString()"
           (click)="selectTab(user._id?.toString() || '')"
         >
-          <p-avatar [image]="user.profilePicture" shape="circle"></p-avatar>
+          <p-avatar [image]="getUserProfilePicture(user._id?.toString())" shape="circle"></p-avatar>
           <div class="contact-info">
             <div class="contact-name">{{ user.name }}</div>
             <div class="contact-preview">{{ getLastMessage(user._id?.toString()) }}</div>
@@ -158,7 +158,7 @@
           [class.active]="activeTabId === user._id?.toString()"
           (click)="selectTab(user?._id?.toString() || '')"
         >
-          <p-avatar [image]="user.profilePicture" shape="circle"></p-avatar>
+          <p-avatar [image]="getUserProfilePicture(user._id?.toString())" shape="circle"></p-avatar>
           <div class="contact-info">
             <div class="contact-name">{{ user.name }}</div>
             <div class="contact-preview">{{ getLastMessage(user._id?.toString()) }}</div>
